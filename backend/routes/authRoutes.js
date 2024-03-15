@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   fetchSignInMethodsForEmail,
+  signOut,
 } from "firebase/auth";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -77,39 +78,44 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// // 로그인
-// router.post("/signin", async (req, res) => {
-//   const { email, password } = req.body;
-//   console.log(req.body);
+// 로그인
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
 
-//   try {
-//     // Firebase를 이용하여 이메일과 비밀번호로 로그인
-//     const userCredential = await admin.auth().signInWithEmailAndPassword(email, password);
-//     const user = userCredential.user;
-//     // 로그인 성공 시 사용자 정보 반환
-//     res
-//       .status(200)
-//       .json({ message: "Signin successful", uid: user.uid, email: user.email });
-//   } catch (error) {
-//     // 로그인 실패 시 오류 응답
-//     console.error("Error signing in", error);
-//     res.status(401).json({ error: "Signin failed" });
-//   }
-// });
+  try {
+    // Firebase를 이용하여 이메일과 비밀번호로 로그인
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+    // 로그인 성공 시 사용자 정보 반환
+    res
+      .status(200)
+      .json({ message: "Signin successful", uid: user.uid, email: user.email });
+  } catch (error) {
+    // 로그인 실패 시 오류 응답
+    console.error("Error signing in", error);
+    res.status(401).json({ error: "Signin failed" });
+  }
+});
 
-// // 로그아웃
-// router.post("/signout", (req, res) => {
-//   signOut(auth) // Use the signOut function
-//     .then(() => {
-//       // 로그아웃 성공 시 응답
-//       res.status(200).json({ message: "Singout successful" });
-//     })
-//     .catch((error) => {
-//       // 로그아웃 실패 시 오류 응답
-//       console.error("Error Signing out:", error);
-//       res.status(500).json({ error: "Signout failed" });
-//     });
-// });
+// 로그아웃
+router.post("/logout", async (req, res) => {
+  try {
+    // Firebase에서 로그아웃
+    await signOut(auth);
+
+    // 로그아웃 성공 시 응답
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error signing out", error);
+    res.status(500).json({ error: "Logout failed" });
+  }
+});
+
 
 // // 프로필 수정
 // router.post("/profile/update", async (req, res) => {
