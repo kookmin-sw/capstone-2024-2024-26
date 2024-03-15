@@ -204,7 +204,9 @@ class _SignUpState extends State<SignUp> {
     );
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
-      if (responseData['success'] == true) {
+
+      if (responseData['message'] == 'Signup successful') {
+        print('회원가입 성공');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('회원가입에 성공하였습니다.'),
@@ -218,8 +220,7 @@ class _SignUpState extends State<SignUp> {
             ),
           ),
         );
-        Navigator.push(
-          context,
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => SignIn()),
         );
       } else {
