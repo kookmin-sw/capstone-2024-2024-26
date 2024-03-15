@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
 import 'package:email_validator/email_validator.dart';
@@ -206,22 +207,12 @@ class _SignUpState extends State<SignUp> {
       final responseData = json.decode(response.body);
 
       if (responseData['message'] == 'Signup successful') {
-        print('회원가입 성공');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('회원가입에 성공하였습니다.'),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating, // 또는 SnackBarBehavior.fixed
-            backgroundColor: Color(0xFF141D5B),
-            margin: EdgeInsets.all(8.0), // SnackBar의 외부 여백 설정
-            shape: RoundedRectangleBorder(
-              // SnackBar 모양 설정
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-        );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SignIn()),
+        print('회원가입 성공'); // echo check
+
+        // 회원가입 성공 시 회원가입 완료 화면으로 이동
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignupSuccess()),
         );
       } else {
         debugPrint('회원가입 실패');
