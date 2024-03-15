@@ -78,6 +78,7 @@ router.post("/signup", async (req, res) => {
     })
 
     console.log("signup success");
+    res.status(201).json({ message: "Signup successful" });
     // 회원가입 성공 시 응답
     
   } catch (error) {
