@@ -2,27 +2,32 @@ import { getAuth, signInWithEmailAndPassword,createUserWithEmailAndPassword } fr
 import {addDoc,collection, getFirestore} from 'firebase/firestore';
 import {initializeApp} from 'firebase/app';
 import express from 'express';
+import { GoogleAuthProvider } from "firebase/auth";
 
+import dotenv from 'dotenv';
+dotenv.config() ;
 const firebaseConfig = {
-  apiKey: "AIzaSyAocxBUBdG8MuMl7Z7owoX6S6PXax8vYZQ",
-  authDomain: "capstone-c2358.firebaseapp.com",
-  projectId: "capstone-c2358",
-  storageBucket: "capstone-c2358.appspot.com",
-  messagingSenderId: "452182758120",
-  appId: "1:452182758120:web:30f72007059d6fdf4c6f5d",
-  measurementId: "G-ST9TF7PNY3"
+  apiKey: process.env.FLUTTER_APP_apikey,
+  authDomain: process.env.FLUTTER_APP_authDomain,
+  projectId: process.env.FLUTTER_APP_projectId,
+  storageBucket: process.env.FLUTTER_APP_storageBucket,
+  messagingSenderId: process.env.FLUTTER_APP_messagingSenderId,
+  appId: process.env.FLUTTER_APP_appId,
+  measurementId: process.env.FLUTTER_APP_measurementId,
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
-const auth = getAuth(app);
+const app = initializeApp(firebaseConfig); // Firebase 앱 초기화 (연결 통로 확보)
+const db = getFirestore(app); // db 객체 생성
 
-const router = express.Router();
 
-// 회원가입
+
+const auth = getAuth(app); // auth 객체 생성
+const router = express.Router(); // router 객체 생성
+const provider = new GoogleAuthProvider(); // 로그인 위한 객체 생성
+
+// 회원가입 라우터 구현 
 router.post("/signup", async (req, res) => {
-  
   const {
     email,
     password,
@@ -50,11 +55,10 @@ router.post("/signup", async (req, res) => {
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         const user = userCredential.user;
         console.log(user);
-        // ...
       })
+
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -74,15 +78,8 @@ router.post("/signup", async (req, res) => {
     })
 
     console.log("signup success");
-
-    
-    
-    
-
-    
-
     // 회원가입 성공 시 응답
-    res.status(201).json({ message: "User created successfully" });
+    
   } catch (error) {
     // 오류 발생시 오류 응답
     console.error("Error creating user", error);
