@@ -184,7 +184,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> registerUser() async {
-    const url = 'http://10.30.119.166:3000/auth/signup';
+    const url = 'http://localhost:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
