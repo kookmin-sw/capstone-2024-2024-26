@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/sign_up.dart';
+import 'package:frontend/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_application_1/sign_in.dart';
-import 'package:flutter_application_1/loading.dart';
+import 'package:frontend/sign_in.dart';
+import 'package:frontend/loading.dart';
 
 void main() {
   runApp(MyApp());

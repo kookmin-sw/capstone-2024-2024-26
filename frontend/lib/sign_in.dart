@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/main.dart';
+import 'package:frontend/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
 import 'dart:convert';
