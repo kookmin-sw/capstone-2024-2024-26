@@ -1,32 +1,31 @@
-import { getAuth, signInWithEmailAndPassword,createUserWithEmailAndPassword } from "firebase/auth";
-import {addDoc,collection, getFirestore} from 'firebase/firestore';
-import {initializeApp} from 'firebase/app';
-import express from 'express';
-import { GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
+} from "firebase/auth";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import express from "express";
 
-import dotenv from 'dotenv';
-dotenv.config() ;
 const firebaseConfig = {
-  apiKey: process.env.FLUTTER_APP_apikey,
-  authDomain: process.env.FLUTTER_APP_authDomain,
-  projectId: process.env.FLUTTER_APP_projectId,
-  storageBucket: process.env.FLUTTER_APP_storageBucket,
-  messagingSenderId: process.env.FLUTTER_APP_messagingSenderId,
-  appId: process.env.FLUTTER_APP_appId,
-  measurementId: process.env.FLUTTER_APP_measurementId,
+  apiKey: "AIzaSyAocxBUBdG8MuMl7Z7owoX6S6PXax8vYZQ",
+  authDomain: "capstone-c2358.firebaseapp.com",
+  projectId: "capstone-c2358",
+  storageBucket: "capstone-c2358.appspot.com",
+  messagingSenderId: "452182758120",
+  appId: "1:452182758120:web:30f72007059d6fdf4c6f5d",
+  measurementId: "G-ST9TF7PNY3",
 };
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const app = initializeApp(firebaseConfig); // Firebase 앱 초기화 (연결 통로 확보)
-const db = getFirestore(app); // db 객체 생성
+const auth = getAuth(app);
 
+const router = express.Router();
 
-
-const auth = getAuth(app); // auth 객체 생성
-const router = express.Router(); // router 객체 생성
-const provider = new GoogleAuthProvider(); // 로그인 위한 객체 생성
-
-// 회원가입 라우터 구현 
+// 회원가입
 router.post("/signup", async (req, res) => {
   const {
     email,
@@ -40,47 +39,37 @@ router.post("/signup", async (req, res) => {
     agreeForm,
   } = req.body;
 
-  console.log(req.body);
-
-  
-
   try {
     // 이미 가입된 이메일인지 확인
-    // const existingUser = await auth().getUserByEmail(email);
-    // if (existingUser) {
-    //   // 이미 가입된 이메일인 경우 오류 응답
-    //   console.error("Email already in use", error);
-    //   return res.status(400).json({ error: "Email already in use" });
-    // }
+    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+    if (signInMethods && signInMethods.length > 0) {
+      console.error("Email already in use");
+      return res.status(400).json({ error: "Email already in use" });
+    }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-      })
+    // 가입되지 않은 이메일이면 회원가입 진행
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-      });
-    const user_doc = await addDoc(collection(db, "/users"), {
-      
-      email : email , 
-      agreeForm : agreeForm ,
-      club : club ,
-      name : name ,
-      phone : phone ,
-      studentId : studentId ,
-      faculty : faculty ,
-      department : department
-
-    })
+    // 사용자 정보 추가
+    await addDoc(collection(db, "users"), {
+      email: email,
+      name: name,
+      studentId: studentId,
+      faculty: faculty,
+      department: department,
+      club: club,
+      phone: phone,
+      agreeForm: agreeForm,
+    });
 
     console.log("signup success");
-    res.status(201).json({ message: "Signup successful" });
+
     // 회원가입 성공 시 응답
-    
+    res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     // 오류 발생시 오류 응답
     console.error("Error creating user", error);
@@ -185,6 +174,5 @@ router.post("/signup", async (req, res) => {
 //     res.status(500).json({ error: "Failed to fetch profile" });
 //   }
 // });
-
 
 export default router;
