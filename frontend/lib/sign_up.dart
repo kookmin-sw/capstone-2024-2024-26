@@ -206,9 +206,8 @@ class _SignUpState extends State<SignUp> {
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
 
-      if (responseData['message'] == 'Signup successful') {
+      if (responseData['message'] == 'User created successfully') {
         print('회원가입 성공'); // echo check
-
         // 회원가입 성공 시 회원가입 완료 화면으로 이동
         Navigator.push(
           context,

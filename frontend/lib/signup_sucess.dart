@@ -34,8 +34,11 @@ class SignupSuccess extends StatelessWidget {
               height: 150,
             ),
             ElevatedButton(
-              onPressed: () async {
-                await loginUser(context);
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignIn()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF9F9F9),
@@ -57,66 +60,4 @@ class SignupSuccess extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> loginUser(BuildContext context) async {
-    setState(() {
-      isLoading = true; // 요청 시작 시 로딩 시작
-    });
-
-    const url = 'http://localhost:3000/auth/signin';
-    final Map<String, String> data = {
-      'email': "se",
-      'password': "tt",
-    };
-
-    debugPrint('email:${data['email']}');
-
-    debugPrint('${data}');
-    final response = await http.post(
-      Uri.parse(url),
-      body: json.encode(data),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    setState(() {
-      isLoading = false; // 요청 완료 시 로딩 숨김
-    });
-
-    debugPrint('${response.statusCode}');
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      if (responseData['success'] == true && responseData['token'] != null) {
-        saveTokenToSharedPreferences(responseData['token']);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('로그인 성공!'),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Color(0xFF3694A8),
-            margin: EdgeInsets.all(8.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-        );
-        //로그인성공시 메인페이지로 이동
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainPage()),
-        );
-      } else {
-        setState(() {
-          var errorMessage = '아이디와 비밀번호를 확인해주세요';
-        });
-      }
-    } else {
-      setState(() {
-        var errorMessage = '아이디와 비밀번호를 확인해주세요';
-      });
-    }
-  }
-
-  void setState(Null Function() param0) {}
-
-  void saveTokenToSharedPreferences(responseData) {}
 }
