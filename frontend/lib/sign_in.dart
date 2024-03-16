@@ -126,7 +126,10 @@ class _SignInState extends State<SignIn> {
 
   Future<void> saveTokenToSharedPreferences(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
+    if (isChecked == true) {
+      prefs.setString('token', 'true');
+    }
+    // 자동로그인 체크되어있으면 토큰 발급
   }
 
   Future<void> loginUser(BuildContext context) async {
@@ -154,20 +157,10 @@ class _SignInState extends State<SignIn> {
     debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      if (responseData['success'] == true && responseData['token'] != null) {
+      if (responseData['message'] == 'Signin successful' &&
+          responseData['token'] != null) {
         saveTokenToSharedPreferences(responseData['token']);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('로그인 성공!'),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Color(0xFF3694A8),
-            margin: EdgeInsets.all(8.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-        );
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MainPage()),
