@@ -5,7 +5,7 @@ import {
   fetchSignInMethodsForEmail,
   signOut,
 } from "firebase/auth";
-import { addDoc, collection, getFirestore, getDoc, doc} from "firebase/firestore";
+import { addDoc, collection, getFirestore, getDoc, doc, updateDoc} from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
 
@@ -117,43 +117,42 @@ router.post("/logout", async (req, res) => {
 });
 
 
-// // 프로필 수정
-// router.post("/profile/update", async (req, res) => {
-//   const { uid, name, studentId, faculty, department, club, phone, agreeForm } =
-//     req.body;
+// 프로필 수정
+router.post("/profile/update/:uid", async (req, res) => {
+  const uid = req.params.uid;
+  const { name, studentId, faculty, department, club, phone, agreeForm, email } = req.body;
 
-//   try {
-//     // Firebase Firestore에서 사용자의 문서를 가져옴
-//     const userDoc = await firebase
-//       .firestore()
-//       .collection("users")
-//       .doc(uid)
-//       .get();
-//     if (!userDoc.exists) {
-//       // 사용자 문서가 존재하지 않는 경우 오류 응답
-//       return res.status(404).json({ error: "User not found" });
-//     }
+  try {
+    // Firebase Firestore에서 사용자의 문서를 가져옴
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (!userDoc.exists()) {
+      // 사용자 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "User not found" });
+    }
 
-//     // 사용자 문서를 업데이트
-//     await firebase.firestore().collection("users").doc(uid).update({
-//       name: name,
-//       studentId: studentId,
-//       faculty: faculty,
-//       department: department,
-//       club: club,
-//       email: email,
-//       phone: phone,
-//       agreeForm: agreeForm,
-//     });
+    // 변경된 필드만 업데이트
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (studentId) updateFields.studentId = studentId;
+    if (faculty) updateFields.faculty = faculty;
+    if (department) updateFields.department = department;
+    if (club) updateFields.club = club;
+    if (phone) updateFields.phone = phone;
+    if (agreeForm) updateFields.agreeForm = agreeForm;
+    if (email) updateFields.email = email;
 
-//     // 업데이트된 사용자 정보 반환
-//     res.status(200).json({ message: "Profile updated successfully" });
-//   } catch (error) {
-//     // 오류 발생 시 오류 응답
-//     console.error("Error updating profile", error);
-//     res.status(500).json({ error: "Failed to update profile" });
-//   }
-// });
+    // 사용자 문서를 업데이트
+    await updateDoc(doc(db, "users", uid), updateFields);
+
+    // 업데이트된 사용자 정보 반환
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error updating profile", error);
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
 
 // 프로필 조회
 router.get("/profile/:uid", async (req, res) => {
