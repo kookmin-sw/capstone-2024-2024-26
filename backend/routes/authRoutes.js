@@ -78,6 +78,8 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+
+
 // 로그인
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
@@ -90,10 +92,11 @@ router.post("/signin", async (req, res) => {
       password
     );
     const user = userCredential.user;
+    console.log("signin success");
     // 로그인 성공 시 사용자 정보 반환
     res
       .status(200)
-      .json({ message: "Signin successful", uid: user.uid, email: user.email });
+      .json({ message: "Signin successful", uid: user.uid, email: user.email,token: 'true' });
   } catch (error) {
     // 로그인 실패 시 오류 응답
     console.error("Error signing in", error);
