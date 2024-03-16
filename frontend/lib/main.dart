@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:frontend/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   runApp(MyApp());
@@ -74,6 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+// 메인페이지 ( 대여공간 선택 창 )
 class MainPage extends StatefulWidget {
   @override
   State<MainPage> createState() => _MainPageState();
@@ -82,18 +85,105 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
+    // 중간 바디부분
+
     return Scaffold(
-      body: PageView(
-        physics: NeverScrollableScrollPhysics(),
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '대여하실 공간을 선택해주세요.',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(180, 240),
+                    backgroundColor: Color(0xFFF7F7F7),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.25),
+                    ),
+                  ),
+                  onPressed: () {
+                    // TODO: Implement button 1 functionality
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Image.asset(
+                        'assets/lentgroup.png',
+                        width: 113,
+                        height: 101,
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text('동아리방 대여',
+                          style: TextStyle(
+                            fontSize: 18.75,
+                            color: Color(0xFF006282),
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                          )),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(180, 240),
+                    backgroundColor: Color(0xFFF7F7F7),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.25),
+                    ),
+                  ),
+                  onPressed: () {
+                    // TODO: Implement button 1 functionality
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Image.asset(
+                        'assets/lentroom.png',
+                        width: 113,
+                        height: 101,
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text('강의실 대여',
+                          style: TextStyle(
+                            fontSize: 18.75,
+                            color: Color(0xFF006282),
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                          )),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
+
+      // 하단 바
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -106,20 +196,23 @@ class _MainPageState extends State<MainPage> {
             );
           });
         },
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: SvgPicture.asset('assets/icons/lent.svg'),
+            label: '대여하기',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
+            icon: SvgPicture.asset('assets/icons/reserved.svg'),
+            label: '예약 내역',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: SvgPicture.asset('assets/icons/mypage.svg'),
+            label: '마이페이지',
           ),
         ],
+        selectedLabelStyle:
+            TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        selectedItemColor: Colors.black,
       ),
     );
   }
