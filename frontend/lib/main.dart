@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/lent_teamroom.dart';
+import 'package:frontend/lent_conference.dart';
 
 void main() {
   runApp(MyApp());
@@ -103,10 +105,12 @@ class _MainPageState extends State<MainPage> {
           ),
           centerTitle: true,
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none))
+            IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset('assets/icons/notice_none.svg'))
           ],
           backgroundColor: Colors.transparent, // 상단바 배경색
-          //foregroundColor: Colors(), 상단바 아이콘색
+          foregroundColor: Colors.black, //상단바 아이콘색
 
           //shadowColor: Colors(), 상단바 그림자색
           bottomOpacity: 0.0,
@@ -114,6 +118,7 @@ class _MainPageState extends State<MainPage> {
           scrolledUnderElevation: 0,
 
           ///
+          // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
           shape: Border(
             bottom: BorderSide(
               color: Colors.grey,
@@ -145,7 +150,11 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                     onPressed: () {
-                      // TODO: Implement button 1 functionality
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Lent_Teamroom()),
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +190,11 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                     onPressed: () {
-                      // TODO: Implement button 1 functionality
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Lent_Conference()),
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
