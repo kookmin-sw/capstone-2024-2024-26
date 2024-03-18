@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_svg/svg.dart';
-
+import 'alert.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -36,9 +36,18 @@ class _MyPageState extends State<MyPage> {
         actions: [ // 종모양 아이콘은 따로 배치
           IconButton(
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AlertPage()),
+              );
               // Implement your action here
             },
-            icon: Icon(Icons.more_vert), // 종모양 버튼 아이콘
+            icon: Padding(
+    padding: EdgeInsets.only(right: 40), // 오른쪽 마진 추가
+    child: SvgPicture.asset(
+      'assets/icons/bell.svg', // 종 모양 이모티콘 SVG 파일
+      width: 24, // 아이콘의 너비 조정
+      height: 24, // 아이콘의 높이 조정
+    ),
+             ) // 종모양 버튼 아이콘
           ),
         ],
       ),
@@ -144,21 +153,18 @@ class _MyPageState extends State<MyPage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/lent.svg'),
-            label: '대여하기', // 수정
+            icon: SvgPicture.asset('assets/icons/lent_1.svg'),
+            label: '대여하기',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/reserved.svg'),
-            label: '예약내역', // 수정
+            label: '예약내역',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/mypage.svg'),
+            icon: SvgPicture.asset('assets/icons/mypageB.svg'),
             label: '마이페이지',
           ),
         ],
-        selectedLabelStyle:
-        TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        selectedItemColor: Colors.black,
       ),
     );
   }
