@@ -5,6 +5,7 @@ import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
 import 'package:email_validator/email_validator.dart';
+import 'loading.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool isChecked = false;
+  bool isloading = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -27,110 +29,114 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('회원가입'),
-        backgroundColor: const Color(0xFF3694A8),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              buildInputField('이름', controller: nameController),
-              buildInputField('학번', controller: studentIdController),
-              buildInputField('소속 단과대학', controller: facultyController),
-              buildInputField('학부', controller: departmentController),
-              buildInputField('소속 동아리', controller: clubController),
-              buildInputField('이메일', controller: emailController),
-              buildInputField('비밀번호',
-                  isPassword: true, controller: passwordController),
-              buildInputField('비밀번호 확인',
-                  isPassword: true, controller: confirmPasswordController),
-              buildInputField('휴대폰 번호', controller: phoneController),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Checkbox(
-                    value: isChecked,
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
+    if (isloading) {
+      return LoadingScreen();
+    } else {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: const Text('회원가입'),
+          backgroundColor: const Color(0xFF3694A8),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                buildInputField('이름', controller: nameController),
+                buildInputField('학번', controller: studentIdController),
+                buildInputField('소속 단과대학', controller: facultyController),
+                buildInputField('학부', controller: departmentController),
+                buildInputField('소속 동아리', controller: clubController),
+                buildInputField('이메일', controller: emailController),
+                buildInputField('비밀번호',
+                    isPassword: true, controller: passwordController),
+                buildInputField('비밀번호 확인',
+                    isPassword: true, controller: confirmPasswordController),
+                buildInputField('휴대폰 번호', controller: phoneController),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value!;
+                        });
+                      },
+                    ),
+                    const Text(
+                      '개인정보 이용 및 약관에 동의하시겠습니까?',
+                      style: TextStyle(color: Color(0xFF7A7A7A)),
+                    ),
+                  ],
+                ),
+                Container(
+                    width: double.infinity,
+                    child: Text(
+                      errorMessage,
+                      style: TextStyle(color: Colors.red),
+                      textAlign: TextAlign.left,
+                    )),
+                const SizedBox(height: 10),
+                Center(
+                  // Center widget added
+                  child: ElevatedButton(
+                    // ElevatedButton centered
+                    onPressed: () async {
+                      if (validateFields()) {
+                        await registerUser();
+                      }
                     },
-                  ),
-                  const Text(
-                    '개인정보 이용 및 약관에 동의하시겠습니까?',
-                    style: TextStyle(color: Color(0xFF7A7A7A)),
-                  ),
-                ],
-              ),
-              Container(
-                  width: double.infinity,
-                  child: Text(
-                    errorMessage,
-                    style: TextStyle(color: Colors.red),
-                    textAlign: TextAlign.left,
-                  )),
-              const SizedBox(height: 10),
-              Center(
-                // Center widget added
-                child: ElevatedButton(
-                  // ElevatedButton centered
-                  onPressed: () async {
-                    if (validateFields()) {
-                      await registerUser();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3694A8),
-                    minimumSize: const Size(265.75, 39.46),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3)),
-                  ),
-                  child: const Text(
-                    '회원가입',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3694A8),
+                      minimumSize: const Size(265.75, 39.46),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3)),
+                    ),
+                    child: const Text(
+                      '회원가입',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "이미 회원이신가요?",
-                    style: TextStyle(color: Color(0xFF7A7A7A)),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // Handle login action
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignIn()),
-                      );
-                    },
-                    child: const Text("로그인",
-                        style: TextStyle(color: Color(0xFF141D5B))),
-                  )
-                ],
-              )
-            ],
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "이미 회원이신가요?",
+                      style: TextStyle(color: Color(0xFF7A7A7A)),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // Handle login action
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignIn()),
+                        );
+                      },
+                      child: const Text("로그인",
+                          style: TextStyle(color: Color(0xFF141D5B))),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget buildInputField(String labelText,
@@ -185,6 +191,9 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> registerUser() async {
+    setState(() {
+      isloading = true;
+    });
     const url = 'http://localhost:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,

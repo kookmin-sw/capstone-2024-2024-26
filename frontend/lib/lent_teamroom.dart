@@ -1,8 +1,8 @@
-import 'package:frontend/select_reserve.dart';
-
-import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'main.dart'; // 필요시 main.dart 파일을 import합니다.
+import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
+import 'select_reserve.dart'; // 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
 
 class Lent_Teamroom extends StatefulWidget {
   @override
@@ -10,18 +10,21 @@ class Lent_Teamroom extends StatefulWidget {
 }
 
 class _Lentteam extends State<Lent_Teamroom> {
+  final PageController _pageController = PageController();
+  final ExpansionTileController controller = ExpansionTileController();
+  int _currentIndex = 0;
+  String time = '09:00 ~ 22:00'; //server
+  String people = '12'; //server
+  String room_name = '미래관 601호'; //server
+  String room_count = '2'; // server
+  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+
   @override
   Widget build(BuildContext context) {
-    final PageController _pageController = PageController();
-    final ExpansionTileController controller = ExpansionTileController();
-    int _currentIndex = 0;
-    String time = '09:00 ~ 22:00'; //server
-    String people = '12'; //server
-    String room_name = '미래관 601호'; //server
-    String room_count = '2'; // server
-    bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
-
-    return Scaffold(
+    if (isLoading) {
+      return LoadingScreen();
+    } else {
+      return Scaffold(
         appBar: AppBar(
           title: Text(
             '동아리방 대여',
@@ -42,19 +45,15 @@ class _Lentteam extends State<Lent_Teamroom> {
           centerTitle: true,
           actions: [
             IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset('assets/icons/notice_none.svg'))
+              onPressed: () {},
+              icon: SvgPicture.asset('assets/icons/notice_none.svg'),
+            ),
           ],
           backgroundColor: Colors.transparent, // 상단바 배경색
           foregroundColor: Colors.black, //상단바 아이콘색
-
-          //shadowColor: Colors(), 상단바 그림자색
           bottomOpacity: 0.0,
           elevation: 0.0,
           scrolledUnderElevation: 0,
-
-          ///
-          // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
           shape: Border(
             bottom: BorderSide(
               color: Colors.grey,
@@ -83,8 +82,6 @@ class _Lentteam extends State<Lent_Teamroom> {
                         spreadRadius: 0,
                       ),
                     ],
-
-                    /// 여기까지 바깥 배경 블락
                   ),
                   child: SingleChildScrollView(
                     child: Column(
@@ -106,10 +103,11 @@ class _Lentteam extends State<Lent_Teamroom> {
                                 width: 100.15,
                                 height: 36,
                                 decoration: ShapeDecoration(
-                                    color: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4),
-                                    )),
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
                                 child: TextButton(
                                   onPressed: null,
                                   child: Text(
@@ -164,7 +162,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
@@ -191,7 +189,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
@@ -203,14 +201,16 @@ class _Lentteam extends State<Lent_Teamroom> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Select_reserve()),
+                                builder: (context) => Select_reserve(),
+                              ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF3694A8),
                             minimumSize: const Size(340.75, 40),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3)),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                           ),
                           child: Text(
                             isLoading ? '로딩 중...' : '예약하기',
@@ -229,8 +229,6 @@ class _Lentteam extends State<Lent_Teamroom> {
             ),
           ),
         ),
-
-        // 하단 바
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -240,7 +238,7 @@ class _Lentteam extends State<Lent_Teamroom> {
               ),
             ),
           ),
-          padding: EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
+          padding: EdgeInsets.symmetric(vertical: 10),
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) {
@@ -271,6 +269,8 @@ class _Lentteam extends State<Lent_Teamroom> {
                 TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             selectedItemColor: Colors.black,
           ),
-        ));
+        ),
+      );
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'loading.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -19,109 +20,113 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                '로그인',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                  height: 0.06,
-                ),
-              ),
-              buildInputField(
-                '이메일',
-                controller: emailController,
-              ),
-              buildInputField('비밀번호',
-                  isPassword: true, controller: passwordController),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  errorMessage,
-                  style: TextStyle(color: Colors.red),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    activeColor: const Color(0xFF3694A8),
-                    value: isChecked,
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
-                    },
+    if (isLoading) {
+      return LoadingScreen();
+    } else {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  '로그인',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    height: 0.06,
                   ),
-                  const Text(
-                    '자동 로그인',
+                ),
+                buildInputField(
+                  '이메일',
+                  controller: emailController,
+                ),
+                buildInputField('비밀번호',
+                    isPassword: true, controller: passwordController),
+                Container(
+                  width: double.infinity,
+                  child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.red),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      activeColor: const Color(0xFF3694A8),
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value!;
+                        });
+                      },
+                    ),
+                    const Text(
+                      '자동 로그인',
+                      style: TextStyle(
+                        color: Color(0xFF7A7A7A),
+                        fontSize: 12,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await loginUser(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3694A8),
+                    minimumSize: const Size(265.75, 39.46),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(3)),
+                  ),
+                  child: Text(
+                    '로그인',
                     style: TextStyle(
-                      color: Color(0xFF7A7A7A),
+                      color: Colors.white,
                       fontSize: 12,
-                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  await loginUser(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3694A8),
-                  minimumSize: const Size(265.75, 39.46),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3)),
                 ),
-                child: Text(
-                  isLoading ? '로딩 중...' : '로그인',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Divider(
+                  color: Colors.grey,
+                  thickness: 0.5,
+                  height: 60,
+                  indent: 30,
+                  endIndent: 30,
                 ),
-              ),
-              Divider(
-                color: Colors.grey,
-                thickness: 0.5,
-                height: 60,
-                indent: 30,
-                endIndent: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("회원이 아니신가요?",
-                      style: TextStyle(color: Color(0xFF7A7A7A))),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
-                      );
-                    },
-                    child: const Text("회원가입",
-                        style: TextStyle(color: Color(0xFF3694A8))),
-                  )
-                ],
-              )
-            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("회원이 아니신가요?",
+                        style: TextStyle(color: Color(0xFF7A7A7A))),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUp()),
+                        );
+                      },
+                      child: const Text("회원가입",
+                          style: TextStyle(color: Color(0xFF3694A8))),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Future<void> saveTokenToSharedPreferences(String token) async {
