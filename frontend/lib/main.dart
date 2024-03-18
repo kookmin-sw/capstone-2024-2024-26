@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/myPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -189,11 +190,17 @@ class _MainPageState extends State<MainPage> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
+            if (index == 2) {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MyPage()), // myPage.dart로 이동
+              );
+            } else {
+              _pageController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
           });
         },
         items: <BottomNavigationBarItem>[
