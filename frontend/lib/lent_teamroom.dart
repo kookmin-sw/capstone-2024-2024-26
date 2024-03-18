@@ -1,3 +1,5 @@
+import 'package:frontend/select_reserve.dart';
+
 import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,10 +13,14 @@ class _Lentteam extends State<Lent_Teamroom> {
   @override
   Widget build(BuildContext context) {
     final PageController _pageController = PageController();
+    final ExpansionTileController controller = ExpansionTileController();
     int _currentIndex = 0;
-    String time = '09:00 ~ 22:00';
-    String people = '12';
-    bool _isExpanded = false;
+    String time = '09:00 ~ 22:00'; //server
+    String people = '12'; //server
+    String room_name = '미래관 601호'; //server
+    String room_count = '2'; // server
+    bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -57,7 +63,7 @@ class _Lentteam extends State<Lent_Teamroom> {
           ),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 30),
+          padding: EdgeInsets.symmetric(vertical: 20),
           child: Center(
             child: Column(
               children: [
@@ -85,10 +91,13 @@ class _Lentteam extends State<Lent_Teamroom> {
                       children: [
                         Stack(
                           children: [
-                            Image.asset(
-                              'assets/images.png',
-                              width: 340,
-                              height: 160,
+                            Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Image.asset(
+                                'assets/images.png',
+                                width: 340.63,
+                                height: 164.03,
+                              ),
                             ),
                             Positioned(
                               top: 0,
@@ -104,7 +113,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                 child: TextButton(
                                   onPressed: null,
                                   child: Text(
-                                    '동아리방 1',
+                                    room_name,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 15,
@@ -116,8 +125,8 @@ class _Lentteam extends State<Lent_Teamroom> {
                               ),
                             ),
                             Positioned(
-                              bottom: 15,
-                              right: 20,
+                              bottom: 12,
+                              right: 18,
                               child: GestureDetector(
                                 onTap: () {
                                   // 맵 버튼 눌렀을 때 이동할 화면
@@ -134,8 +143,8 @@ class _Lentteam extends State<Lent_Teamroom> {
                               ),
                             ),
                             Positioned(
-                              top: 10,
-                              right: 120,
+                              top: 15,
+                              right: 105,
                               child: GestureDetector(
                                 onTap: () {
                                   // 맵 버튼 눌렀을 때 이동할 화면
@@ -161,7 +170,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                               ),
                             ),
                             Positioned(
-                              top: 10,
+                              top: 15,
                               right: 8,
                               child: GestureDetector(
                                 onTap: () {
@@ -189,54 +198,28 @@ class _Lentteam extends State<Lent_Teamroom> {
                             ),
                           ],
                         ),
-
-                        /// 예약하기 펼쳐지는 부분
-                        ExpansionTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 45), // Add left padding here
-                                child: Text(
-                                  '예약하기',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(width: 5), // 텍스트와 아이콘 간격 조절
-                              SvgPicture.asset(
-                                'assets/icons/narrow_icon.svg',
-                              ),
-                            ],
+                        ElevatedButton(
+                          onPressed: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Select_reserve()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF3694A8),
+                            minimumSize: const Size(340.75, 40),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3)),
                           ),
-
-                          trailing: SizedBox(), // 기본 화살표를 숨깁니다.
-                          initiallyExpanded: false,
-
-                          /// 펼쳐졌을 때
-                          ///
-
-                          children: <Widget>[
-                            ListTile(
-                              title: Text('Item 1'),
-                              onTap: () {
-                                // Add your action here
-                              },
+                          child: Text(
+                            isLoading ? '로딩 중...' : '예약하기',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
-                            ListTile(
-                              title: Text('Item 2'),
-                              onTap: () {
-                                // Add your action here
-                              },
-                            ),
-                            // Add more ListTiles as needed
-                          ],
+                          ),
                         ),
                       ],
                     ),
