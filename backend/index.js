@@ -2,7 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import router from "./routes/authRoutes.js";
-import reserveClub from "./routes/reserveClub.js";
+import reserveClub from "./routes/reserveclub.js";
+import reserveroom from "./routes/reserveroom.js";
 
 const port = 3000;
 
@@ -14,7 +15,9 @@ app2.use(bodyParser.json());
 app2.use("/auth", router);
 // 동아리 예약 관련 api
 app2.use("/reserveclub", reserveClub);
+// 강의실 예약 관련 api
+app2.use("/reserveroom", reserveroom);
 // 서버 시작
 app2.listen(port, () => {
-  console.log("Server is running on port ${port}");
+  console.log(`Server is running on port ${port}`);
 });
