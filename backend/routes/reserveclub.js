@@ -50,17 +50,8 @@ reserveClub.post("/", async (req, res) => {
       collection(db, "reservationClub"),
       where("date", "==", date),
       where("roomId", "==", roomId),
-      where("tableNumber", "==", tableNumber),
-      where("startTime", "==", startTime),
-      where("endTime", "==", endTime)
+      where("tableNumber", "==", tableNumber)
     );
-
-    // 이미 해당 예약이 존재하는 경우
-    if (!existingReservationsSnapshot.empty) {
-      return res
-        .status(400)
-        .json({ error: "The same reservation already exists" });
-    }
 
     // 겹치는 예약이 있는지 확인
     const isOverlapping = existingReservationsSnapshot.docs.some((doc) => {
@@ -70,15 +61,18 @@ reserveClub.post("/", async (req, res) => {
       const existingStartTime = new Date(reservation.startTime);
       const existingEndTime = new Date(reservation.endTime);
 
-      // 새 예약의 시작 시간이 기존 예약의 끝 시간보다 이전이고, 새 예약의 끝 시간이 기존 예약의 시작 시간보다 이후일 경우 겹침
-      if (newStartTime < existingEndTime && newEndTime > existingStartTime) {
+      // 겹치는 예약인지 확인
+      if (
+        (newStartTime < existingEndTime && newEndTime > existingStartTime) ||
+        (existingStartTime < newEndTime && existingEndTime > newStartTime)
+      ) {
         return true;
       }
 
       return false;
     });
 
-    // 겹치는 예약이 있는지 확인
+    // 겹치는 예약이 있는 경우 에러 반환
     if (isOverlapping) {
       return res
         .status(400)
@@ -138,12 +132,10 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
     });
 
     // 사용자의 예약 정보 반환
-    res
-      .status(200)
-      .json({
-        message: "User reservations fetched successfully",
-        reservations: userReservations,
-      });
+    res.status(200).json({
+      message: "User reservations fetched successfully",
+      reservations: userReservations,
+    });
   } catch (error) {
     // 오류 발생 시 오류 응답
     console.error("Error fetching user reservations", error);
@@ -187,12 +179,10 @@ reserveClub.get("/reservationclubs/:date", async (req, res) => {
     });
 
     // 해당 날짜의 모든 예약 내역 반환
-    res
-      .status(200)
-      .json({
-        message: "Reservations for the date fetched successfully",
-        reservations,
-      });
+    res.status(200).json({
+      message: "Reservations for the date fetched successfully",
+      reservations,
+    });
   } catch (error) {
     // 오류 발생 시 오류 응답
     console.error("Error fetching reservations for the date", error);
