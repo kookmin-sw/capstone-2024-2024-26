@@ -133,6 +133,7 @@ router.post("/logout", async (req, res) => {
 
 // 프로필 수정
 router.post("/profile/update/:uid", async (req, res) => {
+  // Firestore user uid로 해야함!!
   const uid = req.params.uid;
   const {
     name,
@@ -155,6 +156,7 @@ router.post("/profile/update/:uid", async (req, res) => {
 
     // 변경된 필드만 업데이트
     const updateFields = {};
+    if (password) updateFields.password = password;
     if (name) updateFields.name = name;
     if (studentId) updateFields.studentId = studentId;
     if (faculty) updateFields.faculty = faculty;
@@ -162,7 +164,6 @@ router.post("/profile/update/:uid", async (req, res) => {
     if (club) updateFields.club = club;
     if (phone) updateFields.phone = phone;
     if (agreeForm) updateFields.agreeForm = agreeForm;
-    if (email) updateFields.email = email;
 
     // 사용자 문서를 업데이트
     await updateDoc(doc(db, "users", uid), updateFields);
@@ -234,6 +235,51 @@ router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error deleting user", error);
     res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+router.post("/adminMode/update/:uid", isAdmin, async(req, res) => {
+  // Firestore user uid로 해야함!!
+  const uid = req.params.uid;
+  const {
+    password,
+    name,
+    studentId,
+    faculty,
+    department,
+    club,
+    phone,
+    agreeForm,
+  } = req.body;
+
+  try {
+    // Firebase Firestore에서 사용자의 문서를 가져옴
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (!userDoc.exists()) {
+      // 사용자 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // 변경된 필드만 업데이트
+    const updateFields = {};
+    if (password) updateFields.password = password;
+    if (name) updateFields.name = name;
+    if (studentId) updateFields.studentId = studentId;
+    if (faculty) updateFields.faculty = faculty;
+    if (department) updateFields.department = department;
+    if (club) updateFields.club = club;
+    if (phone) updateFields.phone = phone;
+    if (agreeForm) updateFields.agreeForm = agreeForm;
+
+    // 사용자 문서를 업데이트
+    await updateDoc(doc(db, "users", uid), updateFields);
+
+    // 업데이트된 사용자 정보 반환
+    res.status(200).json({ message: "adminMode Profile updated successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error adminMode updating profile", error);
+    res.status(500).json({ error: "Failed to adminMode update profile" });
   }
 });
 
