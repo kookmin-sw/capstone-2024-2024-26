@@ -92,4 +92,50 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
+reserveroom.get("/reservationrooms/:date", async(req, res) => {
+  const date = req.params.date;
+
+  try {
+    // 해당 날짜의 모든 예약 내역 가져오기
+    const reservationsSnapshot = await getDocs(
+      collection(db, "reservationRoom"),
+      where("date", "==", date)
+    );
+
+    if (reservationsSnapshot.empty) {
+      return res
+        .status(404)
+        .json({ message: "No reservations found for this date" });
+    }
+
+    // 예약 내역 반환
+    const reservations = [];
+    reservationsSnapshot.forEach((doc) => {
+      const reservation = doc.data();
+      reservations.push({
+        id: doc.id, // 예약 문서 ID
+        userId: reservation.userId,
+        userName: reservation.userName,
+        roomId: reservation.roomId,
+        date: reservation.date,
+        startTime: reservation.startTime,
+        endTime: reservation.endTime,
+        numberOfPeople: reservation.numberOfPeople,
+      });
+    });
+
+    // 해당 날짜의 모든 예약 내역 반환
+    res.status(200).json({
+      message: "Reservations for the date fetched successfully",
+      reservations,
+    });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error fetching reservations for the date", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch reservations for the date" });
+  }
+})
+
 export default reserveroom;
