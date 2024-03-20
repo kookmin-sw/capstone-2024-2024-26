@@ -16,5 +16,5 @@ app2.use("/auth", router);
 app2.use("/reserveclub", reserveClub);
 // 서버 시작
 app2.listen(port, () => {
-  console.log("Server is running on port ${port}");
+  console.log(`Server is running on port ${port}`);
 });
