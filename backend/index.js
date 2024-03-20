@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import router from "./routes/authRoutes.js";
-import reserveClub from "./routes/reserveClub.js";
+import reserveClub from "./routes/reserveclub.js";
 
 const port = 3000;
 
