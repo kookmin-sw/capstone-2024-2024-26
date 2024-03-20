@@ -50,6 +50,7 @@ reserveClub.post("/", async (req, res) => {
       collection(db, "reservationClub"),
       where("roomId", "==", roomId),
       where("date", "==", date),
+      where("tableNumber", "==", tableNumber),
       where("startTime", "<", endTime),
       where("endTime", ">", startTime)
     );
