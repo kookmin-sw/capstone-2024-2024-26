@@ -85,44 +85,44 @@ reserveClub.post("/", async (req, res) => {
   }
 });
 
-// // 사용자별 동아리방 예약 내역 조회
-// router.get("/reservations/:userId", async(req, res) =>{
-//     const userId = req.params.userId;
+// 사용자별 동아리 예약 내역 조회
+reserveClub.get("/reservations/:userId", async (req, res) => {
+  const userId = req.params.userId;
 
-//     try{
-//         // 사용자의 모든 예약 내역 가져오기
-//         const userReservationsSnapshot = await firebase
-//         .firestore()
-//         .collection("reservations")
-//         .where("userId", "==", userId)
-//         .get();
+  try {
+      // 사용자의 모든 예약 내역 가져오기
+      const userReservationsSnapshot = await getDocs(
+          collection(db, "reservationClub"),
+          where("userId", "==", userId)
+      );
 
-//         if(userReservations.empty){
-//             return res.status(404).json({ message: "No reservations found"});
-//         }
+      if (userReservationsSnapshot.empty) {
+          return res.status(404).json({ message: "No reservations found" });
+      }
 
-//         // 예약 내역 반환
-//         const userReservations = [];
-//         userReservationsSnapshot.foreEach((doc) => {
-//             const reservation = doc.data();
-//             userReservations.push({
-//                 id: doc.id, // 예약 문서 ID
-//                 roomId: reservation.roomId,
-//                 numberOfPeople: reservation.numberOfPeople,
-//                 date: reservation.date,
-//                 startTime: reservation.startTime,
-//                 endTime: reservation.endTime,
-//                 tableNumber: reservation.tableNumber,
-//             });
-//         });
+      // 예약 내역 반환
+      const userReservations = [];
+      userReservationsSnapshot.forEach((doc) => {
+          const reservation = doc.data();
+          userReservations.push({
+              id: doc.id, // 예약 문서 ID
+              roomId: reservation.roomId,
+              numberOfPeople: reservation.numberOfPeople,
+              date: reservation.date,
+              startTime: reservation.startTime,
+              endTime: reservation.endTime,
+              tableNumber: reservation.tableNumber,
+          });
+      });
 
-//         // 사용자의 예약 정보 반환
-//         res.status(200).json(userReservations);
-//     } catch(error) {
-//         // 오류 발생 시 오류 응답
-//         console.error("Error fetching user reservations", error);
-//         res.status(500).json({ error: "Failed to fetch user reservations"});
-//     }
-// });
+      // 사용자의 예약 정보 반환
+      res.status(200).json({ message: "User reservations fetched successfully", reservations: userReservations });
+  } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
+  }
+});
+
 
 export default reserveClub;
