@@ -206,16 +206,17 @@ class _Lentteam extends State<Lent_Teamroom> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF3694A8),
+                            backgroundColor: Colors.white,
                             minimumSize: const Size(340.75, 40),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3),
                             ),
+                            elevation: 0, // Remove button shadow
                           ),
                           child: Text(
                             isLoading ? '로딩 중...' : '예약하기',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
