@@ -63,8 +63,8 @@ reserveClub.post("/", async (req, res) => {
 
       // 겹치는 예약인지 확인
       if (
-        (newStartTime < existingEndTime && newEndTime > existingStartTime) ||
-        (existingStartTime < newEndTime && existingEndTime > newStartTime)
+        (startTime < existingEndTime && endTime > existingStartTime) ||
+        (existingStartTime < endTime && existingEndTime > startTime)
       ) {
         return true;
       }
