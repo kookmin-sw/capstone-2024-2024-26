@@ -6,6 +6,7 @@ import {
   doc,
   getDocs,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -242,6 +243,21 @@ reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
     // 오류 발생 시 오류 응답
     console.error("Error creating reservation club in admin mode", error);
     res.status(500).json({ error: "Failed reservation club in admin mode" });
+  }
+});
+
+reserveClub.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
+  try {
+    // Firestore reservationClub uid로 해야함!!
+    const uid = req.params.uid;
+
+    // Firestore에서 동아리 예약내역 삭제
+    await deleteDoc(doc(db, "reservationClub", uid));
+
+    res.status(200).json({ message: "Reservation club deleted successfully" });
+  } catch (error) {
+    console.log("Error deleting reservation club", error);
+    res.status(500).json({ error: "Failed to delete reservation club" });
   }
 });
 
