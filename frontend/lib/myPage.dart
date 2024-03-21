@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter_svg/svg.dart';
-import 'alert.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'alert.dart';
+import 'settings.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -41,13 +42,13 @@ class _MyPageState extends State<MyPage> {
               // Implement your action here
             },
             icon: Padding(
-    padding: EdgeInsets.only(right: 40), // 오른쪽 마진 추가
-    child: SvgPicture.asset(
-      'assets/icons/bell.svg', // 종 모양 이모티콘 SVG 파일
-      width: 24, // 아이콘의 너비 조정
-      height: 24, // 아이콘의 높이 조정
-    ),
-             ) // 종모양 버튼 아이콘
+              padding: EdgeInsets.only(right: 40), // 오른쪽 마진 추가
+              child: SvgPicture.asset(
+                'assets/icons/bell.svg', // 종 모양 이모티콘 SVG 파일
+                width: 24, // 아이콘의 너비 조정
+                height: 24, // 아이콘의 높이 조정
+              ),
+            ), // 종모양 버튼 아이콘
           ),
         ],
       ),
@@ -80,18 +81,32 @@ class _MyPageState extends State<MyPage> {
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
+                SizedBox(width: 50),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 10), // 이름 div의 top margin 추가
-                      child: Text(
-                        '정일형',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10), // 이름 div의 top margin 추가
+                          child: Text(
+                            '정일형',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()),);
+                          },
+                          icon: SvgPicture.asset(
+                            'assets/icons/settings.svg',
+                            width: 24,
+                            height: 24,
+                          ),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 5),

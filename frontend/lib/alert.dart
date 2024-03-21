@@ -25,7 +25,7 @@ class AlertPage extends StatelessWidget {
           Divider(),
           SizedBox(height: 8), // Divider 아래 여백 조정
           Text(
-            '이 부분은 알림 외의 내용이 될 수 있습니다.',
+            '알림 데이터 작업 완료되면 페이지 수정 예정',
             style: TextStyle(fontSize: 18),
           ),
         ],
