@@ -7,6 +7,7 @@ import {
   getDocs,
   where,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -55,26 +56,31 @@ reserveClub.post("/", async (req, res) => {
     );
 
     // 겹치는 예약이 있는지 확인
-    const isOverlapping = existingReservationsSnapshot.docs.some((doc) => {
-      const reservation = doc.data();
+    const overlappingReservation = existingReservationsSnapshot.docs.find(
+      (doc) => {
+        const reservation = doc.data();
 
-      // 기존 예약의 시작 시간과 끝 시간
-      const existingStartTime = new Date(reservation.startTime);
-      const existingEndTime = new Date(reservation.endTime);
+        // 기존 예약의 시작 시간과 끝 시간
+        const existingStartTime = reservation.startTime;
+        const existingEndTime = reservation.endTime;
+        const startTimeClub = startTime;
+        const endTimeClub = endTime;
 
-      // 겹치는 예약인지 확인
-      if (
-        (startTime < existingEndTime && endTime > existingStartTime) ||
-        (existingStartTime < endTime && existingEndTime > startTime)
-      ) {
-        return true;
+        // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
+        if (
+          (startTimeClub == existingStartTime &&
+            endTimeClub == existingEndTime) ||
+          (startTimeClub < existingEndTime && endTimeClub > existingStartTime)
+        ) {
+          return true;
+        }
+
+        return false;
       }
-
-      return false;
-    });
+    );
 
     // 겹치는 예약이 있는 경우 에러 반환
-    if (isOverlapping) {
+    if (overlappingReservation) {
       return res
         .status(400)
         .json({ error: "The room is already reserved for this time" });
@@ -190,6 +196,75 @@ reserveClub.get("/reservationclubs/:date", async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to fetch reservations for the date" });
+  }
+});
+
+// 동아리방 예약 수정
+reserveClub.post("/update/:uid", async (req, res) => {
+  try {
+    const uid = req.params.uid;
+    const { roomId, date, startTime, endTime, numberOfPeople, tableNumber } =
+      req.body;
+
+    // Firestore reservationClub에서 사용자의 문서를 가져옴
+    const reserveClubDoc = await getDoc(doc(db, "reservationClub", uid));
+    if (!reserveClubDoc.exists()) {
+      // 사용자 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // 변경된 필드만 업데이트
+    const updateFields = {};
+    if (roomId) updateFields.roomId = roomId;
+    if (date) updateFields.date = date;
+    if (startTime) updateFields.startTime = startTime;
+    if (endTime) updateFields.endTime = endTime;
+    if (numberOfPeople) updateFields.numberOfPeople = numberOfPeople;
+    if (tableNumber) updateFields.tableNumber = tableNumber;
+
+    // 변경된 예약시간과 기존 예약 시간이 충돌하는지 확인
+    const existingReservationsSnapshot = await getDocs(
+      collection(db, "reservationClub"),
+      where("date", "==", updateFields.date),
+      where("roomId", "==", updateFields.roomId),
+      where("tableNumber", "==", updateFields.tableNumber)
+    );
+
+    // 겹치는 예약이 있는지 확인
+    const isOverlapping = existingReservationsSnapshot.docs.some((doc) => {
+      const reservation = doc.data();
+
+      // 기존 예약의 시작 시간과 종료 시간
+      const existingStartTime = new Date(reservation.startTime);
+      const existingEndTime = new Date(reservation.endTime);
+
+      // 겹치는 예약인지 확인
+      if (
+        (updateFields.startTime < existingEndTime &&
+          updateFields.endTime > existingStartTime) ||
+        (existingStartTime < updateFields.endTime &&
+          existingEndTime > updateFields.startTime)
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    // 겹치는 예약이 있는 경우 에러 반환
+    if (isOverlapping) {
+      return res
+        .status(400)
+        .json({ error: "The room is already reserved for this time " });
+    }
+
+    // 겹치는 예약이 없으면 예약 업데이트
+    await updateDoc(doc(db, "reservationClub", uid), updateFields);
+
+    // 업데이트 된 동아리방 예약 정보 반환
+    res.status(200).json({ message: "Reservationclub updated successfully" });
+  } catch (error) {
+    console.error("Error updating reservationclub");
+    res.status(500).json({ error: "Failed to update reservationclub" });
   }
 });
 
