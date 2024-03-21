@@ -199,18 +199,17 @@ reserveClub.get("/reservationclubs/:date", async (req, res) => {
   }
 });
 
-// 동아리방 예약 수정
 reserveClub.post("/update/:uid", async (req, res) => {
   try {
     const uid = req.params.uid;
     const { roomId, date, startTime, endTime, numberOfPeople, tableNumber } =
       req.body;
 
-    // Firestore reservationClub에서 사용자의 문서를 가져옴
+    // Firestore reservationClub에서 해당 예약 문서를 가져옴
     const reserveClubDoc = await getDoc(doc(db, "reservationClub", uid));
     if (!reserveClubDoc.exists()) {
-      // 사용자 문서가 존재하지 않는 경우 오류 응답
-      return res.status(404).json({ error: "User not found" });
+      // 예약 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "Reservation not found" });
     }
 
     // 변경된 필드만 업데이트
@@ -222,39 +221,39 @@ reserveClub.post("/update/:uid", async (req, res) => {
     if (numberOfPeople) updateFields.numberOfPeople = numberOfPeople;
     if (tableNumber) updateFields.tableNumber = tableNumber;
 
-    // 변경된 예약시간과 기존 예약 시간이 충돌하는지 확인
+    // 겹치는 예약이 있는지 확인
     const existingReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("date", "==", updateFields.date),
-      where("roomId", "==", updateFields.roomId),
-      where("tableNumber", "==", updateFields.tableNumber)
+      where("date", "==", date),
+      where("roomId", "==", roomId),
+      where("tableNumber", "==", tableNumber),
+      where("uid", "!=", uid) // 현재 예약을 제외하고 조회
     );
 
-    // 겹치는 예약이 있는지 확인
-    const isOverlapping = existingReservationsSnapshot.docs.some((doc) => {
-      const reservation = doc.data();
-
-      // 기존 예약의 시작 시간과 종료 시간
-      const existingStartTime = new Date(reservation.startTime);
-      const existingEndTime = new Date(reservation.endTime);
-
-      // 겹치는 예약인지 확인
-      if (
-        (updateFields.startTime < existingEndTime &&
-          updateFields.endTime > existingStartTime) ||
-        (existingStartTime < updateFields.endTime &&
-          existingEndTime > updateFields.startTime)
-      ) {
-        return true;
-      }
-      return false;
-    });
-
     // 겹치는 예약이 있는 경우 에러 반환
-    if (isOverlapping) {
-      return res
-        .status(400)
-        .json({ error: "The room is already reserved for this time " });
+    if (!existingReservationsSnapshot.empty) {
+      const overlappingReservation = existingReservationsSnapshot.docs.find(
+        (doc) => {
+          const reservation = doc.data();
+          const existingStartTime = reservation.startTime;
+          const existingEndTime = reservation.endTime;
+
+          // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
+          if (
+            (startTime == existingStartTime && endTime == existingEndTime) ||
+            (startTime < existingEndTime && endTime > existingStartTime)
+          ) {
+            return true;
+          }
+          return false;
+        }
+      );
+
+      if (overlappingReservation) {
+        return res
+          .status(400)
+          .json({ error: "The room is already reserved for this time" });
+      }
     }
 
     // 겹치는 예약이 없으면 예약 업데이트
