@@ -217,7 +217,7 @@ function isAdmin(req, res, next) {
 
 router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
   try {
-    // Firestore uid로 해야함!!
+    // Firestore users uid로 해야함!!
     const uid = req.params.uid;
 
     // Firebase Authentication에서 회원 삭제
