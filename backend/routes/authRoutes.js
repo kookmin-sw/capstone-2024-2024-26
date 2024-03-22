@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import {
   addDoc,
+  setDoc,
   collection,
   getFirestore,
   getDoc,
@@ -33,8 +34,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const auth = getAuth(app);
-
 const router = express.Router();
+
+
 
 // 회원가입
 router.post("/signup", async (req, res) => {
@@ -64,9 +66,10 @@ router.post("/signup", async (req, res) => {
       email,
       password
     );
+    const user = userCredential.user;
 
-    // 사용자 정보 추가
-    await addDoc(collection(db, "users"), {
+    // 사용자 정보 추가 파이어베이스 문서 이름 uid로 바꿔놨음 . 
+    await setDoc(doc(db, "users",user.uid), {
       email: email,
       name: name,
       studentId: studentId,
@@ -102,10 +105,7 @@ router.post("/signin", async (req, res) => {
     const user = userCredential.user;
     console.log("signin success");
 
-    // 사용자 정보 추가
-    await addDoc(collection(db, "users"), {
-      uid :user.uid ,
-    });
+    
     // 로그인 성공 시 사용자 정보 반환
     res
       .status(200)
