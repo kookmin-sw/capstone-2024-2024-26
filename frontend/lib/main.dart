@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null) {
       Timer(Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SignIn()),
+          MaterialPageRoute(builder: (context) => MainPage()),
         );
       });
     } else {
