@@ -19,13 +19,13 @@ import { initializeApp } from "firebase/app";
 import express from "express";
 
 const firebaseConfig = {
-  apiKey: FLUTTER_APP_apikey,
-  authDomain: FLUTTER_APP_authDomain,
-  projectId: FLUTTER_APP_projectId,
-  storageBucket: FLUTTER_APP_storageBucket,
-  messagingSenderId: FLUTTER_APP_messagingSenderId,
-  appId: FLUTTER_APP_appId,
-  measurementId: FLUTTER_APP_measurementId,
+  apiKey: process.env.FLUTTER_APP_apikey,
+  authDomain: process.env.FLUTTER_APP_authDomain,
+  projectId: process.env.FLUTTER_APP_projectId,
+  storageBucket: process.env.FLUTTER_APP_storageBucket,
+  messagingSenderId: process.env.FLUTTER_APP_messagingSenderId,
+  appId: process.env.FLUTTER_APP_appId,
+  measurementId: process.env.FLUTTER_APP_measurementId,
 };
 
 const app = initializeApp(firebaseConfig);
