@@ -1,8 +1,12 @@
 import 'main.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'sign_in.dart';
+import 'package:http/http.dart' as http;
 
 class Select_reserve extends StatefulWidget {
   @override
@@ -14,6 +18,11 @@ class _select extends State<Select_reserve> {
     width: 50,
     // Customize your empty data representation
   );
+  void initState() {
+    super.initState();
+    _checkUidStatus();
+  }
+
   final double intervalWidth = 50.0;
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
@@ -21,8 +30,16 @@ class _select extends State<Select_reserve> {
   String time = '09:00 ~ 22:00'; //server
   String people = '12'; //server
   String room_name = '미래관 601호'; //server
-  String room_count = '2'; // server
+  String table_number = '2'; // server
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+  String? uid = '';
+
+  _checkUidStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+    print(uid);
+  }
+
   DateTime selectedDate = DateTime.utc(
     DateTime.now().year,
     DateTime.now().month,
@@ -297,7 +314,7 @@ class _select extends State<Select_reserve> {
 
                     ElevatedButton(
                       onPressed: () async {
-                        //await loginUser(context);
+                        await Reservation(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3694A8),
@@ -365,6 +382,54 @@ class _select extends State<Select_reserve> {
         ),
       ),
     );
+  }
+
+  Future<void> Reservation(BuildContext context) async {
+    setState(() {
+      isLoading = true; // 요청 시작 시 로딩 시작
+    });
+
+    const url = 'http://localhost:3000/reserveclub/';
+    final Map<String, String> data = {
+      'userId': uid!,
+      'roomId': room_name,
+      'date': selectedDate.toString(),
+      'startTime': time,
+      'endTime': time,
+      'numberOfPeople': people,
+      'tableNumber': table_number,
+    };
+
+    debugPrint('${data}');
+    final response = await http.post(
+      Uri.parse(url),
+      body: json.encode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    setState(() {
+      isLoading = false; // 요청 완료 시 로딩 숨김
+    });
+
+    debugPrint('${response.statusCode}');
+
+    if (response.statusCode == 201) {
+      final responseData = json.decode(response.body);
+      if (responseData['message'] == 'Reservation club created successfully') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MainPage()),
+        );
+      } else {
+        setState(() {
+          //errorMessage = '아이디와 비밀번호를 확인해주세요';
+        });
+      }
+    } else {
+      setState(() {
+        //errorMessage = '아이디와 비밀번호를 확인해주세요';
+      });
+    }
   }
 
   // onDaySelected 함수 추가

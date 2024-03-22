@@ -5,6 +5,7 @@ import 'sign_up.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'loading.dart';
+import 'select_reserve.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -133,6 +134,12 @@ class _SignInState extends State<SignIn> {
     final prefs = await SharedPreferences.getInstance();
     if (isChecked == true) {
       prefs.setString('token', 'true');
+      prefs.setString('uid', uid);
+
+      print(uid);
+    } else {
+      prefs.setString('uid', uid);
+      print(uid);
     }
 
     // 자동로그인 체크되어있으면 토큰 발급
