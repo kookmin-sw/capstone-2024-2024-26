@@ -86,7 +86,7 @@ class _SignInState extends State<SignIn> {
                         borderRadius: BorderRadius.circular(3)),
                   ),
                   child: Text(
-                    '로그인',
+                    isLoading ? '로딩 중...' : '로그인',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -129,11 +129,12 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  Future<void> saveTokenToSharedPreferences(String token) async {
+  Future<void> saveTokenToSharedPreferences(String token, String uid) async {
     final prefs = await SharedPreferences.getInstance();
     if (isChecked == true) {
       prefs.setString('token', 'true');
     }
+
     // 자동로그인 체크되어있으면 토큰 발급
   }
 
@@ -164,7 +165,8 @@ class _SignInState extends State<SignIn> {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'Signin successful' &&
           responseData['token'] != null) {
-        saveTokenToSharedPreferences(responseData['token']);
+        saveTokenToSharedPreferences(
+            responseData['token'], responseData['uid']);
 
         Navigator.push(
           context,
