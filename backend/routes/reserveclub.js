@@ -3,6 +3,7 @@ import {
   collection,
   getFirestore,
   getDoc,
+  setDoc,
   doc,
   getDocs,
   where,
@@ -39,14 +40,15 @@ reserveClub.post("/", async (req, res) => {
     numberOfPeople,
     tableNumber,
   } = req.body;
-
+  console.log(req.body);
   try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
+    // // 사용자 정보 가져오기
+    // const userDoc = await getDoc(doc(db, "users", userId));
+    
+    // if (!userDoc.exists()) {
+    //   return res.status(404).json({ error: "User not found" });
+    // }
+    // const userData = userDoc.data();
 
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
@@ -86,9 +88,12 @@ reserveClub.post("/", async (req, res) => {
         .status(400)
         .json({ error: "The room is already reserved for this time" });
     }
+     
+     
+    
 
     // 겹치는 예약이 없으면 예약 추가
-    await addDoc(collection(db, "reservationClub"), {
+    await setDoc(doc(db, "reservationClub"), {
       userId: userId,
       userName: userData.name,
       userClub: userData.club,
