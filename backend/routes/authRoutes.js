@@ -100,6 +100,11 @@ router.post("/signin", async (req, res) => {
     );
     const user = userCredential.user;
     console.log("signin success");
+
+    // 사용자 정보 추가
+    await addDoc(collection(db, "users"), {
+      uid :user.uid ,
+    });
     // 로그인 성공 시 사용자 정보 반환
     res
       .status(200)
