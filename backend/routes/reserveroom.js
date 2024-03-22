@@ -1,23 +1,26 @@
 import {
-  addDoc,
   collection,
   getFirestore,
   getDoc,
+  setDoc,
   doc,
   getDocs,
   where,
+  deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
 const firebaseConfig = {
-  apiKey: "AIzaSyAocxBUBdG8MuMl7Z7owoX6S6PXax8vYZQ",
-  authDomain: "capstone-c2358.firebaseapp.com",
-  projectId: "capstone-c2358",
-  storageBucket: "capstone-c2358.appspot.com",
-  messagingSenderId: "452182758120",
-  appId: "1:452182758120:web:30f72007059d6fdf4c6f5d",
-  measurementId: "G-ST9TF7PNY3",
+  apiKey: process.env.FLUTTER_APP_apikey,
+  authDomain: process.env.FLUTTER_APP_authDomain,
+  projectId: process.env.FLUTTER_APP_projectId,
+  storageBucket: process.env.FLUTTER_APP_storageBucket,
+  messagingSenderId: process.env.FLUTTER_APP_messagingSenderId,
+  appId: process.env.FLUTTER_APP_appId,
+  measurementId: process.env.FLUTTER_APP_measurementId,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -74,8 +77,8 @@ reserveroom.post("/", async (req, res) => {
     }
 
     // 겹치는 예약이 없으면 예약 추가
-    await addDoc(collection(db, "reservationRoom"), {
-      userId: userId,
+    await setDoc(doc(db, "reservationRoom", userId), {
+      name: userData.name,
       roomId: roomId,
       date: date,
       startTime: startTime,
