@@ -40,15 +40,14 @@ reserveClub.post("/", async (req, res) => {
     numberOfPeople,
     tableNumber,
   } = req.body;
-  console.log(req.body);
   try {
-    // // 사용자 정보 가져오기
-    // const userDoc = await getDoc(doc(db, "users", userId));
-    
-    // if (!userDoc.exists()) {
-    //   return res.status(404).json({ error: "User not found" });
-    // }
-    // const userData = userDoc.data();
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
 
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
@@ -88,13 +87,9 @@ reserveClub.post("/", async (req, res) => {
         .status(400)
         .json({ error: "The room is already reserved for this time" });
     }
-     
-     
-    
 
     // 겹치는 예약이 없으면 예약 추가
-    await setDoc(doc(db, "reservationClub"), {
-      userId: userId,
+    await setDoc(doc(db, "reservationClub", userId), {
       userName: userData.name,
       userClub: userData.club,
       roomId: roomId,
@@ -207,12 +202,12 @@ reserveClub.get("/reservationclubs/:date", async (req, res) => {
 
 reserveClub.post("/update/:uid", async (req, res) => {
   try {
-    const uid = req.params.uid;
+    const userId = req.params.uid;
     const { roomId, date, startTime, endTime, numberOfPeople, tableNumber } =
       req.body;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
-    const reserveClubDoc = await getDoc(doc(db, "reservationClub", uid));
+    const reserveClubDoc = await getDoc(doc(db, "reservationClub", userId));
     if (!reserveClubDoc.exists()) {
       // 예약 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "Reservation not found" });
@@ -233,7 +228,7 @@ reserveClub.post("/update/:uid", async (req, res) => {
       where("date", "==", date),
       where("roomId", "==", roomId),
       where("tableNumber", "==", tableNumber),
-      where("uid", "!=", uid) // 현재 예약을 제외하고 조회
+      where("userId", "!=", userId) // 현재 예약을 제외하고 조회
     );
 
     // 겹치는 예약이 있는 경우 에러 반환
@@ -263,7 +258,7 @@ reserveClub.post("/update/:uid", async (req, res) => {
     }
 
     // 겹치는 예약이 없으면 예약 업데이트
-    await updateDoc(doc(db, "reservationClub", uid), updateFields);
+    await updateDoc(doc(db, "reservationClub", userId), updateFields);
 
     // 업데이트 된 동아리방 예약 정보 반환
     res.status(200).json({ message: "Reservationclub updated successfully" });
@@ -329,10 +324,10 @@ reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
 reserveClub.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
   try {
     // Firestore reservationClub uid로 해야함!!
-    const uid = req.params.uid;
+    const userId = req.params.uid;
 
     // Firestore에서 동아리 예약내역 삭제
-    await deleteDoc(doc(db, "reservationClub", uid));
+    await deleteDoc(doc(db, "reservationClub", userId));
 
     res.status(200).json({ message: "Reservation club deleted successfully" });
   } catch (error) {
