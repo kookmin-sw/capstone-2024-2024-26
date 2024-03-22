@@ -11,7 +11,8 @@ import {
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
 const firebaseConfig = {
   apiKey: process.env.FLUTTER_APP_apikey,
   authDomain: process.env.FLUTTER_APP_authDomain,
