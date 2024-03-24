@@ -2,12 +2,12 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail,
   signOut,
   deleteUser,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import {
-  addDoc,
+  setDoc,
   collection,
   getFirestore,
   getDoc,
@@ -33,7 +33,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const auth = getAuth(app);
-
 const router = express.Router();
 
 // 회원가입
@@ -64,9 +63,10 @@ router.post("/signup", async (req, res) => {
       email,
       password
     );
+    const user = userCredential.user;
 
-    // 사용자 정보 추가
-    await addDoc(collection(db, "users"), {
+    // 사용자 정보 추가 파이어베이스 문서 이름 uid로 바꿔놨음 .
+    await setDoc(doc(db, "users", user.uid), {
       email: email,
       name: name,
       studentId: studentId,
@@ -102,19 +102,13 @@ router.post("/signin", async (req, res) => {
     const user = userCredential.user;
     console.log("signin success");
 
-    // 사용자 정보 추가
-    await addDoc(collection(db, "users"), {
-      uid :user.uid ,
-    });
     // 로그인 성공 시 사용자 정보 반환
-    res
-      .status(200)
-      .json({
-        message: "Signin successful",
-        uid: user.uid,
-        email: user.email,
-        token: "true",
-      });
+    res.status(200).json({
+      message: "Signin successful",
+      uid: user.uid,
+      email: user.email,
+      token: "true",
+    });
   } catch (error) {
     // 로그인 실패 시 오류 응답
     console.error("Error signing in", error);
@@ -139,9 +133,9 @@ router.post("/logout", async (req, res) => {
 
 // 프로필 수정
 router.post("/profile/update/:uid", async (req, res) => {
-  // Firestore user uid로 해야함!!
-  const uid = req.params.uid;
-  const {
+  const userId = req.params.uid;
+  const {    
+    password,
     name,
     studentId,
     faculty,
@@ -149,12 +143,11 @@ router.post("/profile/update/:uid", async (req, res) => {
     club,
     phone,
     agreeForm,
-    email,
   } = req.body;
 
   try {
     // Firebase Firestore에서 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -172,7 +165,7 @@ router.post("/profile/update/:uid", async (req, res) => {
     if (agreeForm) updateFields.agreeForm = agreeForm;
 
     // 사용자 문서를 업데이트
-    await updateDoc(doc(db, "users", uid), updateFields);
+    await updateDoc(doc(db, "users", userId), updateFields);
 
     // 업데이트된 사용자 정보 반환
     res.status(200).json({ message: "Profile updated successfully" });
@@ -185,11 +178,11 @@ router.post("/profile/update/:uid", async (req, res) => {
 
 // 프로필 조회
 router.get("/profile/:uid", async (req, res) => {
-  const uid = req.params.uid;
+  const userId = req.params.uid;
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -223,19 +216,19 @@ function isAdmin(req, res, next) {
 
 router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
   try {
-    // Firestore users uid로 해야함!!
-    const uid = req.params.uid;
+    const userId = req.params.uid;
 
     // Firebase Authentication에서 회원 삭제
-    deleteUser(auth, uid).then(() => {
-      console.log('User deleted successfully1');
-    })
-    .catch((error) => {
-      console.error('Error deleting user', error);
-    });
+    deleteUser(auth, userId)
+      .then(() => {
+        console.log("User deleted successfully1");
+      })
+      .catch((error) => {
+        console.error("Error deleting user", error);
+      });
 
     // Firestore에서 회원정보 삭제
-    await deleteDoc(doc(db, "users", uid));
+    await deleteDoc(doc(db, "users", userId));
 
     res.status(200).json({ message: "User deleted successfully " });
   } catch (error) {
@@ -244,9 +237,8 @@ router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/adminMode/update/:uid", isAdmin, async(req, res) => {
-  // Firestore user uid로 해야함!!
-  const uid = req.params.uid;
+router.post("/adminMode/update/:uid", isAdmin, async (req, res) => {
+  const userId = req.params.uid;
   const {
     password,
     name,
@@ -260,7 +252,7 @@ router.post("/adminMode/update/:uid", isAdmin, async(req, res) => {
 
   try {
     // Firebase Firestore에서 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -278,7 +270,7 @@ router.post("/adminMode/update/:uid", isAdmin, async(req, res) => {
     if (agreeForm) updateFields.agreeForm = agreeForm;
 
     // 사용자 문서를 업데이트
-    await updateDoc(doc(db, "users", uid), updateFields);
+    await updateDoc(doc(db, "users", userId), updateFields);
 
     // 업데이트된 사용자 정보 반환
     res.status(200).json({ message: "adminMode Profile updated successfully" });
