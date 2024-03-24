@@ -65,11 +65,12 @@ reserveClub.post("/", async (req, res) => {
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;
         const existingEndTime = reservation.endTime;
+        const existingDate = reservation.date;
         const startTimeClub = startTime;
         const endTimeClub = endTime;
 
         // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-        if (
+        if (existingDate == date &&
           (startTimeClub == existingStartTime &&
             endTimeClub == existingEndTime) ||
           (startTimeClub < existingEndTime && endTimeClub > existingStartTime)
