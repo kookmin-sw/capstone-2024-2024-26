@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'loading.dart';
+import 'complete.dart';
 
 class Select_reserve extends StatefulWidget {
   @override
@@ -425,7 +426,7 @@ class _select extends State<Select_reserve> {
       if (responseData['message'] == 'Reservation club created successfully') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => Complete()),
         );
       } else {
         setState(() {

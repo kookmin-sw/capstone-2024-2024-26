@@ -23,6 +23,7 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.0
   date_time_picker_widget: ^2.0.0
+  dotted_line: ^3.2.2
   
 
 dev_dependencies:
