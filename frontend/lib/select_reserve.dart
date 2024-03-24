@@ -250,6 +250,33 @@ class _select extends State<Select_reserve> {
                         ],
                       ),
 
+                      Row(
+                        children: [
+                          SvgPicture.asset('assets/icons/dead.svg'),
+                          Text(
+                            '마감     ',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 8,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SvgPicture.asset('assets/icons/possible.svg'),
+                          Text(
+                            '  예약 가능',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 8,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+
                       const Divider(
                         color: Colors.grey,
                         thickness: 0.5,
@@ -318,6 +345,34 @@ class _select extends State<Select_reserve> {
                           ),
                         ],
                       ),
+                      Row(
+                        children: [
+                          SvgPicture.asset('assets/icons/dead.svg'),
+                          Text(
+                            '마감     ',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 8,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SvgPicture.asset('assets/icons/possible.svg'),
+                          Text(
+                            '  예약 가능',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 8,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+
+                      SizedBox(height: 20),
 
                       ElevatedButton(
                         onPressed: () async {
