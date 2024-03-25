@@ -350,8 +350,7 @@ class _select extends State<Select_reserve> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 SizedBox(
-                                  width: 15,
-                                  height: 8,
+                                  width: 30,
                                   child: IconButton(
                                     icon: SvgPicture.asset(
                                       'assets/icons/minus.svg',
@@ -377,7 +376,7 @@ class _select extends State<Select_reserve> {
                                 ),
                                 SvgPicture.asset('assets/icons/line.svg'),
                                 SizedBox(
-                                  width: 15,
+                                  width: 30,
                                   child: IconButton(
                                     icon: SvgPicture.asset(
                                       'assets/icons/plus.svg',
