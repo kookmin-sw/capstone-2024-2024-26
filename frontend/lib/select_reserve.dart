@@ -35,6 +35,7 @@ class _select extends State<Select_reserve> {
   String table_number = '2'; // server
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
+  int _counterValue = 0;
 
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -295,32 +296,98 @@ class _select extends State<Select_reserve> {
                           )
                         ],
                       ),
-                      Column(
-                        children: [
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '인원',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5),
+
                       Row(
                         children: [
-                          Text(
-                            '최대 ?명까지 예약 가능합니다.',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFFA3A3A3),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                              Text(
+                                '인원',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '최대 ?명까지 예약 가능합니다.',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: 'Inter',
+                                  color: Color(0xFFA3A3A3),
+                                  height: 2,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 90),
+                          Container(
+                            width: 92.62,
+                            height: 30.72,
+                            constraints: BoxConstraints(
+                              maxWidth: 92.62,
+                              maxHeight: 30.72,
                             ),
-                            textAlign: TextAlign.left,
+                            decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 0.50, color: Color(0xFFE3E3E3)),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                shadows: [
+                                  BoxShadow(
+                                    color: Color(0x0C000000),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 0),
+                                    spreadRadius: 0,
+                                  )
+                                ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: 15,
+                                  height: 8,
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      'assets/icons/minus.svg',
+                                    ),
+                                    onPressed: _counterValue > 0
+                                        ? _decrementCounter
+                                        : null,
+                                  ),
+                                ),
+                                SvgPicture.asset('assets/icons/line.svg'),
+                                SizedBox(
+                                  child: Center(
+                                    child: Text(
+                                      '  $_counterValue  ',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SvgPicture.asset('assets/icons/line.svg'),
+                                SizedBox(
+                                  width: 15,
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      'assets/icons/plus.svg',
+                                      color: Colors.black,
+                                    ),
+                                    onPressed: _incrementCounter,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -499,6 +566,18 @@ class _select extends State<Select_reserve> {
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
       selectedDate = selectedDay;
+    });
+  }
+
+  void _incrementCounter() {
+    setState(() {
+      _counterValue++;
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      _counterValue--;
     });
   }
 
