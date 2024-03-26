@@ -30,12 +30,14 @@ class _select extends State<Select_reserve> {
   final ExpansionTileController controller = ExpansionTileController();
   int _currentIndex = 0;
   String time = '09:00 ~ 22:00'; //server
-  String people = '12'; //server
+
   String room_name = '미래관 601호'; //server
   String table_number = '2'; // server
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
-  int _counterValue = 0;
+  int _peopleValue = 0;
+  List<bool> isButtonPressedList =
+      List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
 
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -251,8 +253,62 @@ class _select extends State<Select_reserve> {
                         ],
                       ),
 
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            16,
+                            (index) {
+                              int hour = index + 9;
+                              return Padding(
+                                padding: EdgeInsets.zero,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start, // 텍스트를 왼쪽으로 정렬
+                                  children: [
+                                    Text(
+                                      '$hour시',
+                                      style: TextStyle(
+                                        color: Color(0xFFA3A3A3),
+                                        fontSize: 10,
+                                        fontFamily: 'Inter',
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          // Change the color here
+                                          // For example, change to red
+                                          isButtonPressedList[index] =
+                                              !isButtonPressedList[index];
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: isButtonPressedList[index]
+                                            ? Colors.green
+                                            : Color(
+                                                0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
+                                        minimumSize: Size(50, 30),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                        ),
+                                        elevation: 0.2, // 그림자 제거
+                                      ),
+                                      child: Text('  '),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
                       Row(
                         children: [
+                          SizedBox(width: 10),
                           SvgPicture.asset('assets/icons/dead.svg'),
                           Text(
                             '마감     ',
@@ -355,7 +411,7 @@ class _select extends State<Select_reserve> {
                                     icon: SvgPicture.asset(
                                       'assets/icons/minus.svg',
                                     ),
-                                    onPressed: _counterValue > 0
+                                    onPressed: _peopleValue > 0
                                         ? _decrementCounter
                                         : null,
                                   ),
@@ -364,7 +420,7 @@ class _select extends State<Select_reserve> {
                                 SizedBox(
                                   child: Center(
                                     child: Text(
-                                      '  $_counterValue  ',
+                                      '  $_peopleValue  ',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.black,
@@ -525,7 +581,7 @@ class _select extends State<Select_reserve> {
       'date': selectedDate.toString(),
       'startTime': time,
       'endTime': time,
-      'numberOfPeople': people,
+      'numberOfPeople': _peopleValue.toString(),
       'tableNumber': table_number,
     };
 
@@ -570,13 +626,13 @@ class _select extends State<Select_reserve> {
 
   void _incrementCounter() {
     setState(() {
-      _counterValue++;
+      _peopleValue++;
     });
   }
 
   void _decrementCounter() {
     setState(() {
-      _counterValue--;
+      _peopleValue--;
     });
   }
 
