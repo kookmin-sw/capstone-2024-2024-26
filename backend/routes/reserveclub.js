@@ -95,7 +95,7 @@ reserveClub.post("/", async (req, res) => {
       where("userEmail", "==", userEmail)
     );
 
-    // 문서 컬렉션에 이메일로 구분해주기(겹치지않게 문서 개수에 따라 번호 부여)
+    // 문서 컬렉션에 이메일로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
     const reservationCount = existingMyReservationSnapshot.size;
 
     // 겹치는 예약이 없으면 예약 추가
