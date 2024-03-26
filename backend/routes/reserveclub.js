@@ -32,7 +32,7 @@ const reserveClub = express.Router();
 // 동아리방 예약
 reserveClub.post("/", async (req, res) => {
   const {
-    userEmail,
+    userId,
     roomId,
     date,
     startTime,
@@ -42,7 +42,7 @@ reserveClub.post("/", async (req, res) => {
   } = req.body;
   try {
     // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userEmail));
+    const userDoc = await getDoc(doc(db, "users", userId));
 
     if (!userDoc.exists()) {
       return res.status(404).json({ error: "User not found" });
@@ -92,27 +92,24 @@ reserveClub.post("/", async (req, res) => {
     // 전에 사용자가 한 예약이 있는지 확인
     const existingMyReservationSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("userEmail", "==", userEmail)
+      where("userEmail", "==", userData.email)
     );
 
-    // 문서 컬렉션에 이메일로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
+    // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
     const reservationCount = existingMyReservationSnapshot.size;
 
     // 겹치는 예약이 없으면 예약 추가
-    await setDoc(
-      doc(db, "reservationClub", `${userEmail}_${reservationCount}`),
-      {
-        userEmail: userData.email,
-        userName: userData.name,
-        userClub: userData.club,
-        roomId: roomId,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        numberOfPeople: numberOfPeople,
-        tableNumber: tableNumber,
-      }
-    );
+    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
+      userEmail: userData.email,
+      userName: userData.name,
+      userClub: userData.club,
+      roomId: roomId,
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      numberOfPeople: numberOfPeople,
+      tableNumber: tableNumber,
+    });
 
     // 예약 성공 시 응답
     res.status(201).json({ message: "Reservation club created successfully" });
@@ -124,14 +121,14 @@ reserveClub.post("/", async (req, res) => {
 });
 
 // 사용자별 동아리 예약 내역 조회
-reserveClub.get("/reservationclubs/:userId", async (req, res) => {
-  const userId = req.params.userId;
+reserveClub.get("/reservationclubs/:userEmail", async (req, res) => {
+  const userEmail = req.params.userEmail;
 
   try {
     // 사용자의 모든 예약 내역 가져오기
     const userReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("userId", "==", userId)
+      where("userEmail", "==", userEmail)
     );
 
     if (userReservationsSnapshot.empty) {
