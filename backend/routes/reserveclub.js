@@ -121,14 +121,22 @@ reserveClub.post("/", async (req, res) => {
 });
 
 // 사용자별 동아리 예약 내역 조회
-reserveClub.get("/reservationclubs/:userEmail", async (req, res) => {
-  const userEmail = req.params.userEmail;
+reserveClub.get("/reservationclubs/:userId", async (req, res) => {
+  const userId = req.params.userId;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
     // 사용자의 모든 예약 내역 가져오기
     const userReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("userEmail", "==", userEmail)
+      where("userEmail", "==", userData.email)
     );
 
     if (userReservationsSnapshot.empty) {
@@ -138,16 +146,19 @@ reserveClub.get("/reservationclubs/:userEmail", async (req, res) => {
     // 예약 내역 반환
     const userReservations = [];
     userReservationsSnapshot.forEach((doc) => {
-      const reservation = doc.data();
-      userReservations.push({
-        id: doc.id, // 예약 문서 ID
-        roomId: reservation.roomId,
-        numberOfPeople: reservation.numberOfPeople,
-        date: reservation.date,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-        tableNumber: reservation.tableNumber,
-      });
+      // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
+      if (doc.id.includes(userId)) {
+        const reservation = doc.data();
+        userReservations.push({
+          id: doc.id, // 예약 문서 ID
+          roomId: reservation.roomId,
+          numberOfPeople: reservation.numberOfPeople,
+          date: reservation.date,
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+          tableNumber: reservation.tableNumber,
+        });
+      }
     });
 
     // 사용자의 예약 정보 반환
