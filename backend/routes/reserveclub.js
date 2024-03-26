@@ -32,7 +32,7 @@ const reserveClub = express.Router();
 // 동아리방 예약
 reserveClub.post("/", async (req, res) => {
   const {
-    userId,
+    userEmail,
     roomId,
     date,
     startTime,
@@ -42,7 +42,7 @@ reserveClub.post("/", async (req, res) => {
   } = req.body;
   try {
     // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
+    const userDoc = await getDoc(doc(db, "users", userEmail));
 
     if (!userDoc.exists()) {
       return res.status(404).json({ error: "User not found" });
@@ -70,8 +70,9 @@ reserveClub.post("/", async (req, res) => {
         const endTimeClub = endTime;
 
         // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-        if (existingDate == date &&
-          (startTimeClub == existingStartTime &&
+        if (
+          (existingDate == date &&
+            startTimeClub == existingStartTime &&
             endTimeClub == existingEndTime) ||
           (startTimeClub < existingEndTime && endTimeClub > existingStartTime)
         ) {
@@ -88,18 +89,30 @@ reserveClub.post("/", async (req, res) => {
         .status(400)
         .json({ error: "The room is already reserved for this time" });
     }
+    // 전에 사용자가 한 예약이 있는지 확인
+    const existingMyReservationSnapshot = await getDocs(
+      collection(db, "reservationClub"),
+      where("userEmail", "==", userEmail)
+    );
+
+    // 문서 컬렉션에 이메일로 구분해주기(겹치지않게 문서 개수에 따라 번호 부여)
+    const reservationCount = existingMyReservationSnapshot.size;
 
     // 겹치는 예약이 없으면 예약 추가
-    await setDoc(doc(db, "reservationClub", userId), {
-      userName: userData.name,
-      userClub: userData.club,
-      roomId: roomId,
-      date: date,
-      startTime: startTime,
-      endTime: endTime,
-      numberOfPeople: numberOfPeople,
-      tableNumber: tableNumber,
-    });
+    await setDoc(
+      doc(db, "reservationClub", `${userEmail}_${reservationCount}`),
+      {
+        userEmail: userData.email,
+        userName: userData.name,
+        userClub: userData.club,
+        roomId: roomId,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        numberOfPeople: numberOfPeople,
+        tableNumber: tableNumber,
+      }
+    );
 
     // 예약 성공 시 응답
     res.status(201).json({ message: "Reservation club created successfully" });
