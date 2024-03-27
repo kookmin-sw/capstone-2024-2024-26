@@ -29,16 +29,22 @@ class _select extends State<Select_reserve> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
   int _currentIndex = 0;
-  String time = '09:00 ~ 22:00'; //server
-
+  String startTime = ''; //server
+  String endTime = '';
   String room_name = '미래관 601호'; //server
-  String table_number = '2'; // server
+  int table_number = 0; // server
+
+  int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
   int _peopleValue = 0;
+  int count = 0;
+  int find = 0;
+
   List<bool> isButtonPressedList =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
-
+  List<bool> isButtonPressedTable =
+      List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
@@ -279,6 +285,7 @@ class _select extends State<Select_reserve> {
                                         setState(() {
                                           // Change the color here
                                           // For example, change to red
+
                                           isButtonPressedList[index] =
                                               !isButtonPressedList[index];
                                         });
@@ -289,10 +296,7 @@ class _select extends State<Select_reserve> {
                                             : Color(
                                                 0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
                                         minimumSize: Size(50, 30),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(3),
-                                        ),
+                                        shape: RoundedRectangleBorder(),
                                         elevation: 0.2, // 그림자 제거
                                       ),
                                       child: Text('  '),
@@ -304,6 +308,7 @@ class _select extends State<Select_reserve> {
                           ),
                         ),
                       ),
+
                       SizedBox(height: 10),
 
                       Row(
@@ -467,6 +472,53 @@ class _select extends State<Select_reserve> {
                           ),
                         ],
                       ),
+
+                      Stack(
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: List.generate(
+                                1,
+                                (index) {
+                                  return Padding(
+                                    padding: EdgeInsets.zero,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isButtonPressedTable[index] =
+                                                  !isButtonPressedTable[index];
+                                            });
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary: isButtonPressedTable[index]
+                                                ? Colors.green
+                                                : Color(0xFFEAEAEA),
+                                            minimumSize: Size(98.655, 37.61),
+                                          ),
+                                          child: Text(
+                                            '테이블 ${index + 1}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                              fontFamily: 'Inter',
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                       Row(
                         children: [
                           SvgPicture.asset('assets/icons/dead.svg'),
@@ -574,15 +626,47 @@ class _select extends State<Select_reserve> {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
+    //시간선택 알고리즘
+    for (int i = 0; i < isButtonPressedList.length; i++) {
+      count = 0;
+      if (isButtonPressedList[i] == true &&
+          isButtonPressedList[i + 1] == true) {
+        count += 2;
+        find = i;
+      } else if (isButtonPressedList[i] == true) {
+        count += 1;
+        find = i;
+      }
+
+      print(count);
+
+      // 1시간일때
+      if (count == 1) {
+        startTime = (find + 9).toString() + ':00';
+        endTime = (find + 10).toString() + ':00';
+      } // 2시간일때
+      else if (count == 2) {
+        startTime = (find + 9).toString() + ':00';
+        endTime = (find + 11).toString() + ':00';
+      }
+    }
+
+    // 테이블 번호선택 알고리즘
+    for (int i = 0; i < isButtonPressedTable.length; i++) {
+      if (isButtonPressedTable[i] == true) {
+        table_number = i + 1;
+      }
+    }
+
     const url = 'http://localhost:3000/reserveclub/';
     final Map<String, String> data = {
       'userId': uid!,
       'roomId': room_name,
       'date': selectedDate.toString(),
-      'startTime': time,
-      'endTime': time,
+      'startTime': startTime,
+      'endTime': endTime,
       'numberOfPeople': _peopleValue.toString(),
-      'tableNumber': table_number,
+      'tableNumber': table_number.toString(),
     };
 
     debugPrint('${data}');
