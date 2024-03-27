@@ -65,7 +65,7 @@ router.post("/signup", async (req, res) => {
     );
     const user = userCredential.user;
 
-    // 사용자 정보 추가 파이어베이스 문서 이름 uid로 바꿔놨음 .
+    // 사용자 정보 추가 파이어베이스 문서 이름 email로 바꿔놨음 .
     await setDoc(doc(db, "users", user.uid), {
       email: email,
       name: name,
