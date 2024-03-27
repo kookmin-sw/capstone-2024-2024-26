@@ -45,6 +45,15 @@ class _select extends State<Select_reserve> {
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
   List<bool> isButtonPressedTable =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
+
+  List<Offset> circlePositions = [
+    Offset(10, 0),
+    Offset(40, 0),
+    Offset(70, 0),
+    Offset(10, 30),
+    Offset(40, 30),
+    Offset(70, 30),
+  ]; // 의자 위치
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
@@ -202,7 +211,7 @@ class _select extends State<Select_reserve> {
                         calendarStyle: const CalendarStyle(
                           isTodayHighlighted: true,
                           todayTextStyle: const TextStyle(
-                            color: Color(0xFF3694A8),
+                            color: Color(0xFF004F9E),
                             fontFamily: 'Inter',
                             fontSize: 10,
                           ),
@@ -216,7 +225,7 @@ class _select extends State<Select_reserve> {
                             fontSize: 10,
                           ),
                           selectedDecoration: BoxDecoration(
-                              color: const Color(0xFF3694A8),
+                              color: const Color(0xFF004F9E),
                               shape: BoxShape.rectangle),
                           outsideDaysVisible: false,
                           defaultTextStyle: TextStyle(
@@ -292,7 +301,7 @@ class _select extends State<Select_reserve> {
                                       },
                                       style: ElevatedButton.styleFrom(
                                         primary: isButtonPressedList[index]
-                                            ? Colors.green
+                                            ? Color(0XFF004F9E)
                                             : Color(
                                                 0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
                                         minimumSize: Size(50, 30),
@@ -325,7 +334,8 @@ class _select extends State<Select_reserve> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SvgPicture.asset('assets/icons/possible.svg'),
+                          SvgPicture.asset('assets/icons/possible.svg',
+                              color: Color(0XFF004F9E)),
                           Text(
                             '  예약 가능',
                             textAlign: TextAlign.center,
@@ -475,6 +485,14 @@ class _select extends State<Select_reserve> {
 
                       Stack(
                         children: [
+                          for (var position in circlePositions)
+                            Positioned(
+                              top: position.dy,
+                              left: position.dx,
+                              child: SvgPicture.asset(
+                                'assets/icons/circle.svg',
+                              ),
+                            ),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -496,12 +514,13 @@ class _select extends State<Select_reserve> {
                                           },
                                           style: ElevatedButton.styleFrom(
                                             primary: isButtonPressedTable[index]
-                                                ? Colors.green
+                                                ? Color(0xFF004F9E)
                                                 : Color(0xFFEAEAEA),
                                             minimumSize: Size(98.655, 37.61),
+                                            elevation: 0.0,
                                           ),
                                           child: Text(
-                                            '테이블 ${index + 1}',
+                                            'T ${index + 1}',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15,
@@ -516,9 +535,10 @@ class _select extends State<Select_reserve> {
                               ),
                             ),
                           ),
+                          //의자 위치 6명이면 6개
                         ],
                       ),
-
+                      SizedBox(height: 30),
                       Row(
                         children: [
                           SvgPicture.asset('assets/icons/dead.svg'),
@@ -532,7 +552,10 @@ class _select extends State<Select_reserve> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SvgPicture.asset('assets/icons/possible.svg'),
+                          SvgPicture.asset(
+                            'assets/icons/possible.svg',
+                            color: Color(0XFF004F9E),
+                          ),
                           Text(
                             '  예약 가능',
                             textAlign: TextAlign.center,
@@ -553,7 +576,7 @@ class _select extends State<Select_reserve> {
                           await Reservation(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3694A8),
+                          backgroundColor: const Color(0xFF004F9E),
                           minimumSize: const Size(314.87, 41.97),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3)),
