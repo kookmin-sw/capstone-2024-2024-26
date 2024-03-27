@@ -48,7 +48,7 @@ reserveClub.post("/", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     const userData = userDoc.data();
-
+    console.log(userData);
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
@@ -61,19 +61,22 @@ reserveClub.post("/", async (req, res) => {
     const overlappingReservation = existingReservationsSnapshot.docs.find(
       (doc) => {
         const reservation = doc.data();
+        console.log(reservation);
 
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;
         const existingEndTime = reservation.endTime;
         const existingDate = reservation.date;
+        const existingRoomId = reservation.roomId;
         const startTimeClub = startTime;
         const endTimeClub = endTime;
 
         // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-        if (existingDate == date &&
-          (startTimeClub == existingStartTime &&
-            endTimeClub == existingEndTime) ||
-          (startTimeClub < existingEndTime && endTimeClub > existingStartTime)
+        if (
+          (existingDate == date &&
+            startTimeClub == existingStartTime &&
+            endTimeClub == existingEndTime && roomId == existingRoomId) ||
+          (existingDate == date && roomId == existingRoomId && startTimeClub < existingEndTime && endTimeClub > existingStartTime)
         ) {
           return true;
         }
@@ -85,12 +88,22 @@ reserveClub.post("/", async (req, res) => {
     // 겹치는 예약이 있는 경우 에러 반환
     if (overlappingReservation) {
       return res
-        .status(400)
+        .status(401)
         .json({ error: "The room is already reserved for this time" });
+       
     }
+    // 전에 사용자가 한 예약이 있는지 확인
+    const existingMyReservationSnapshot = await getDocs(
+      collection(db, "reservationClub"),
+      where("userEmail", "==", userData.email)
+    );
+
+    // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
+    const reservationCount = existingMyReservationSnapshot.size;
 
     // 겹치는 예약이 없으면 예약 추가
-    await setDoc(doc(db, "reservationClub", userId), {
+    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
+      userEmail: userData.email,
       userName: userData.name,
       userClub: userData.club,
       roomId: roomId,
@@ -115,10 +128,18 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
   const userId = req.params.userId;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
     // 사용자의 모든 예약 내역 가져오기
     const userReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("userId", "==", userId)
+      where("userEmail", "==", userData.email)
     );
 
     if (userReservationsSnapshot.empty) {
@@ -128,16 +149,19 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
     // 예약 내역 반환
     const userReservations = [];
     userReservationsSnapshot.forEach((doc) => {
-      const reservation = doc.data();
-      userReservations.push({
-        id: doc.id, // 예약 문서 ID
-        roomId: reservation.roomId,
-        numberOfPeople: reservation.numberOfPeople,
-        date: reservation.date,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-        tableNumber: reservation.tableNumber,
-      });
+      // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
+      if (doc.id.includes(userId)) {
+        const reservation = doc.data();
+        userReservations.push({
+          id: doc.id, // 예약 문서 ID
+          roomId: reservation.roomId,
+          numberOfPeople: reservation.numberOfPeople,
+          date: reservation.date,
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+          tableNumber: reservation.tableNumber,
+        });
+      }
     });
 
     // 사용자의 예약 정보 반환
@@ -153,14 +177,14 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
 });
 
 // 해당 날짜에 해당하는 모든 예약 내역 가져오기
-reserveClub.get("/reservationclubs/:date", async (req, res) => {
-  const date = req.params.date;
+reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
+  const requestDate = req.params.requestDate;
 
   try {
     // 해당 날짜의 모든 예약 내역 가져오기
     const reservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
-      where("date", "==", date)
+      where("date", "==", requestDate)
     );
 
     if (reservationsSnapshot.empty) {
