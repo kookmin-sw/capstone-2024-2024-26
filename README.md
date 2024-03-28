@@ -3,7 +3,7 @@
 
 
 ## 프로젝트 소개
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png" width="100" height="80">K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 강의실 대여와 동아리방 예약 시스템을 만들어 공간부족 문제를 해결하려합니다.
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2016.png" width="100" height="80">K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 강의실 대여와 동아리방 예약 시스템을 만들어 공간부족 문제를 해결하려합니다.
     
 
 ## 프로젝트 영상
@@ -13,7 +13,8 @@
 
 
 ## 팀 소개
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">안수현(팀장) - frontend, backend<br/>▪️학번 : 20191621<br/>▪️Email: saker123456@kookmin.ac.kr<br/>▪️github: @3uhyeon
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">
+안수현(팀장) - frontend, backend<br/>▪️학번 : 20191621<br/>▪️Email: saker123456@kookmin.ac.kr<br/>▪️github: @3uhyeon
 
 
 <img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%A3%A8%ED%94%BC.jpg" width="100" height="80">
