@@ -25,6 +25,23 @@ class _SignUpState extends State<SignUp> {
 
   String errorMessage = '';
 
+  List<String> _clubs = [
+    'Wink',
+    'D-Alpha', 
+    'KoBot', 
+    'Poska',
+    ];
+  List<String> _faculties = [
+    '소프트웨어 융합 대학',
+    '창의 공과 대학',
+    '조형 대학', 
+    '경상 대학', 
+    ];
+
+    String? _selectedClub;
+    String? _selectedFaculty;
+
+
   @override
 Widget build(BuildContext context) {
   return Scaffold(
@@ -108,7 +125,7 @@ Widget build(BuildContext context) {
               ),
               ),
               SizedBox(height: 10),
-              buildInputField('단과대학을 입력하세요', controller: facultyController),
+              buildDropdownField('단과대학', _faculties, _selectedFaculty),
               SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(right: 220),
@@ -140,7 +157,7 @@ Widget build(BuildContext context) {
               ),
               ),
               SizedBox(height: 10),
-              buildInputField('소속 동아리를 입력하세요', controller: clubController),
+              buildDropdownField('소속 동아리', _clubs, _selectedClub),
               SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(right: 170),
@@ -314,11 +331,54 @@ Widget build(BuildContext context) {
         ),
         border: InputBorder.none,
         filled: true,
-        fillColor: Color(0xFFEDEDED),
+        fillColor: Color.fromARGB(255, 246, 246, 246),
       ),
       ),
     );
   }
+
+Widget buildDropdownField(String labelText, List<String> items, String? value) {
+  return Container(
+    width: 265.75,
+    height: 28.97,
+    child: DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        hintText: labelText,
+        hintStyle: TextStyle(
+          color: Color(0xFF9C9C9C),
+          fontSize: 13,
+          ),
+        filled: true,
+        fillColor: Color.fromARGB(255, 246, 246, 246),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        border: InputBorder.none,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(2.0),
+          borderSide: BorderSide(color: Colors.transparent),
+        ),
+      ),
+      value: value,
+      onChanged: (newValue) {
+        setState(() {
+          if (labelText == '소속 동아리') {
+            _selectedClub = newValue;
+          } else if (labelText == '단과대학') {
+            _selectedFaculty = newValue;
+          }
+        });
+      },
+      items: items.map<DropdownMenuItem<String>>((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(
+            item,
+            style: TextStyle(fontSize: 12),),
+        );
+      }).toList(),
+      ),
+    );
+  }
+
 
   bool validateFields() {
     if (nameController.text.isEmpty ||
