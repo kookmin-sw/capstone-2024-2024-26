@@ -16,9 +16,9 @@
 <div>
     <div><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">
     </div>
-    <p>
+    <div>
         안수현(팀장) - frontend, backend<br/>▪️학번 : 20191621<br/>▪️Email: saker123456@kookmin.ac.kr<br/>▪️github: @3uhyeon
-    </p>
+    </div>
 </div>
 
 
