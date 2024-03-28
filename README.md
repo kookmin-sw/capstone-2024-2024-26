@@ -15,11 +15,7 @@
 # 🔶 팀 소개
 팀명 : 펄기아
 
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">
-안수현(팀장) - frontend, backend
-            ▪️학번 : 20191621
-            ▪️Email: saker123456@kookmin.ac.kr
-            ▪️github: @3uhyeon
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">안수현(팀장) - frontend, backend<br/>▪️학번 : 20191621<br/>▪️Email: saker123456@kookmin.ac.kr<br/>▪️github: @3uhyeon
 
 <img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%A3%A8%ED%94%BC.jpg" width="100" height="80">
 정의석(팀원) - backend
