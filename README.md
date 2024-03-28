@@ -1,29 +1,19 @@
-<header>
-    <h1>
-        💋 K-SharePlace
-    </h1>
-    <h3>
-        2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
-    </h3>
-</header>
+# 국민대 공유공간 어플 K-SharePlace
+2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
 
 
-
-<body>
-    <h2>
-        🔶 프로젝트 소개
-    </h2>
-        <img src="(https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png)" width="100" height="80">
+## 🔶 프로젝트 소개
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png" width="100" height="80">
         K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 
     
 
-# 🔶 프로젝트 영상
+## 🔶 프로젝트 영상
 
       추가 예정
 
 
 
-# 🔶 팀 소개
+## 🔶 팀 소개
 <div>
     <div><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" width="100" height="80">
     </div>
@@ -42,14 +32,14 @@
 <img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%81%AC%EB%A1%B1.jpg" width="100" height="80">
 이재훈(팀원) - AI<br/>▪️학번 : 20213053<br/>▪️Email: jhoon5061@gmail.com<br/>▪️github: @jaehoon222
 
-# 🔶 사용법
+## ✅ 사용법
 
     1. frontend/windows/runners/pubspec.yaml 다운로드 -> 패키지 및 라이브러리 관리
     2. 터미널에서 cd backend, npm install, npm start를 차례대로 입력해 서버 실행
     3. frontend/lib/main.dart 실행
+    
+ ## 🔍 사용된 기술 stack
  
- # 🔶 추가적인 내용
-
-</body>
+ ## 추가적인 내용
 
         
