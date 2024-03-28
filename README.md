@@ -13,10 +13,8 @@
     <h2>
         🔶 프로젝트 소개
     </h2>
-    <h4>
         <img src="(https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png)" width="100" height="80">
         K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 
-    </h4>
     
 
 # 🔶 프로젝트 영상
