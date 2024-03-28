@@ -29,17 +29,13 @@ K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서�
   </tbody>
 </table>
 
-안수현(팀장) - frontend, backend<br/>▪️학번 : 20191621<br/>▪️Email: saker123456@kookmin.ac.kr<br/>▪️github: @3uhyeon
 
+||안수현|정의석|정일형|이재훈|
+Stack|frontend,backend|backend|frontend|AI
+학번|20191621|20203134|20195303|20213053
+Email|saker123456@kookmin.ac.kr|jungus07@kookmin.ac.kr|jungih1017@gmail.com|jhoon5061@gmail.com
+Git|@3uhyeon|@Uiseokjung|@JohnJung-1017|@jaehoon222
 
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%A3%A8%ED%94%BC.jpg" width="100" height="80">
-정의석(팀원) - backend<br/>▪️학번 : 20203134<br/>▪️Email: jungus07@kookmin.ac.kr<br/>▪️github: @Uiseokjung
-            
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%8F%AC%EB%B9%84.jpg" width="100" height="80">
-정일형(팀원) - frontend<br/>▪️학번 : 20195303<br/>▪️Email: jungih1017@gmail.com<br/>▪️github: @JohnJung-1017
-            
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%81%AC%EB%A1%B1.jpg" width="100" height="80">
-이재훈(팀원) - AI<br/>▪️학번 : 20213053<br/>▪️Email: jhoon5061@gmail.com<br/>▪️github: @jaehoon222
 
 ## ✅ 사용법
 
