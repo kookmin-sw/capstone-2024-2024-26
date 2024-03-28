@@ -1,9 +1,11 @@
-<head>
+<header>
     <h1>
         💋 K-SharePlace
-        2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
     </h1>
-</head>
+    <h3>
+        2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
+    </h3>
+</header>
 
 <body>
     <h2>
