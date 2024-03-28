@@ -14,10 +14,10 @@ K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서�
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%BD%80%EB%A1%9C%EB%A1%9C.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀장 : 안수현</b></sub></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EB%A3%A8%ED%94%BC.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀원 : 정의석</b></sub></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%8F%AC%EB%B9%84.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀원 : 정일형</b></sub></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%81%AC%EB%A1%B1.jpg"height="80"  width="100px;" alt=""/><br /><sub><b>팀원 : 이재훈</b></sub></a><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9A%B0%EB%8F%84%ED%99%98.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀장 : 안수현</b></sub></a><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%ED%8C%90%EC%8A%A5.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀원 : 정의석</b></sub></a><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%B0%A8%EC%9D%80%EC%9A%B0.jpg" height="80" width="100px;" alt=""/><br /><sub><b>팀원 : 정일형</b></sub></a><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%EC%9A%B1.jpg"height="80"  width="100px;" alt=""/><br /><sub><b>팀원 : 이재훈</b></sub></a><br /></td>
      <tr/>
   </tbody>
 </table>
