@@ -55,6 +55,7 @@
             ▪️github: @jaehoon222
 
 🔶 사용법
+
     1. frontend/windows/runners/pubspec.yaml 다운로드 -> 패키지 및 라이브러리 관리
     2. 터미널에서 cd backend, npm install, npm start를 차례대로 입력해 서버 실행
     3. frontend/lib/main.dart 실행
