@@ -1,10 +1,18 @@
-# 💋 K-SharePlace
+<head>
+    <h1>
+        💋 K-SharePlace
+        2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
+    </h1>
+</head>
 
-2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
-
-# 🔶 프로젝트 소개
+<body>
+    <h2>
+        🔶 프로젝트 소개
+    </h2>
+    <h3>
+        ![어플로고](https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png) K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 
+    </h3>
     
-![어플로고](https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2014.png) K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 
 
 # 🔶 프로젝트 영상
 
@@ -39,6 +47,6 @@
  
  # 🔶 추가적인 내용
 
-
+</body>
 
         
