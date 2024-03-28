@@ -8,15 +8,8 @@
 K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서비스 어플로 강의실 대여와 동아리방 예약 시스템을 만들어 공간부족 문제를 해결하려합니다.
 #### 예상되는 효과
 다소 까다로웠던 강의실 대여 절차를 줄여 보다 많은 학생들이 학교에서 모여서 함께 할 기회를 제공하며 부족했던 동아리방 문제를 완화하여 현재 동아리방을 사용하지 못하는 동아리의 불만을 해소함과 동시에 더 많은 동아리를 학과에서 만들 수 있는 긍정적인 효과를 기대 할 수 있습니다.
-
-    
-
 ## 📽️프로젝트 영상
-
       추가 예정
-
-
-
 ## 팀 소개
 <table>
   <tbody>
@@ -36,8 +29,6 @@ Stack|frontend,backend|backend|frontend|AI
 학번|20191621|20203134|20195303|20213053
 Email|saker123456@kookmin.ac.kr|jungus07@kookmin.ac.kr|jungih1017@gmail.com|jhoon5061@gmail.com
 Git|@3uhyeon|@Uiseokjung|@JohnJung-1017|@jaehoon222
-
-
 ## ✅ 사용법
 
     1. frontend/windows/runners/pubspec.yaml 다운로드 -> 패키지 및 라이브러리 관리
