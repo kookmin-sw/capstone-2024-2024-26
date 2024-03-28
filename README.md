@@ -31,6 +31,7 @@ K-SharePlace는 국민대학교 강의실 및 동아리방 예약 자동화 서�
 
 
 ||안수현|정의석|정일형|이재훈|
+|---|---|---|---|---|
 Stack|frontend,backend|backend|frontend|AI
 학번|20191621|20203134|20195303|20213053
 Email|saker123456@kookmin.ac.kr|jungus07@kookmin.ac.kr|jungih1017@gmail.com|jhoon5061@gmail.com
