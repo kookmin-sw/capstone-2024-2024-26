@@ -77,8 +77,6 @@ router.post("/signup", async (req, res) => {
       agreeForm: agreeForm,
     });
 
-    console.log("signup success");
-
     // 회원가입 성공 시 응답
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -100,7 +98,6 @@ router.post("/signin", async (req, res) => {
       password
     );
     const user = userCredential.user;
-    console.log("signin success");
 
     // 로그인 성공 시 사용자 정보 반환
     res.status(200).json({
@@ -206,7 +203,6 @@ function isAdmin(req, res, next) {
   // 이메일이 관리자 이메일과 일치하는지 확인
   if (email === adminEmail) {
     // 관리자인 경우 다음 미들웨어로 진행
-    console.log("isAdmin OK");
     next();
   } else {
     // 관리자가 아닌 경우 권한 없음 응답
@@ -221,7 +217,6 @@ router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
     // Firebase Authentication에서 회원 삭제
     deleteUser(auth, userId)
       .then(() => {
-        console.log("User deleted successfully1");
       })
       .catch((error) => {
         console.error("Error deleting user", error);
