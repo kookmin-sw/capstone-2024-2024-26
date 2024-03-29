@@ -1,4 +1,4 @@
-# 국민대 공유공간 어플 K-SharePlace
+# 국민대 공유공간 플랫폼 K-SharePlace
 2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
 
 
