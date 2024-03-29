@@ -134,7 +134,7 @@ router.post("/logout", async (req, res) => {
 // 프로필 수정
 router.post("/profile/update/:uid", async (req, res) => {
   const userId = req.params.uid;
-  const {    
+  const {
     password,
     name,
     studentId,
@@ -278,6 +278,63 @@ router.post("/adminMode/update/:uid", isAdmin, async (req, res) => {
     // 오류 발생 시 오류 응답
     console.error("Error adminMode updating profile", error);
     res.status(500).json({ error: "Failed to adminMode update profile" });
+  }
+});
+
+router.post("/adminMode/add", isAdmin, async (req, res) => {
+  const {
+    useremail,
+    password,
+    name,
+    studentId,
+    faculty,
+    department,
+    club,
+    phone,
+    agreeForm,
+  } = req.body;
+
+  try {
+    // 이미 가입된 이메일인지 확인
+    const signInMethods = await fetchSignInMethodsForEmail(auth, useremail);
+    if (signInMethods && signInMethods.length > 0) {
+      console.error("Email already in use");
+      return res
+        .status(400)
+        .json({
+          error: "Email already in use. Please use a different email address.",
+        });
+    }
+
+    // Firebase Authentication을 사용하여 사용자 생성
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      useremail,
+      password
+    );
+    const user = userCredential.user;
+
+    // Firestore에 사용자 정보 추가
+    await setDoc(doc(db, "users", user.uid), {
+      useremail: useremail,
+      password: password,
+      name: name,
+      studentId: studentId,
+      faculty: faculty,
+      department: department,
+      club: club,
+      phone: phone,
+      agreeForm: agreeForm,
+    });
+
+    // 사용자 추가 성공 응답
+    res
+      .status(201)
+      .json({ message: "User added successfully", userId: user.uid });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error adding user", error);
+    res.status(500).json({ error: "Failed to add user" });
   }
 });
 
