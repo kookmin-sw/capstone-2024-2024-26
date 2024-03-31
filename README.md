@@ -19,7 +19,7 @@
 |공간대여 선택|공유공간 선택|예약내역|예약 폼|
 |---|---|---|---|
 <img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2023.png">|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2024.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2025.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2028.png
-https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2026.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027%20(1).png
+https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2026.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027%20(1).png|
 ## 📽️프로젝트 영상
       추가 예정
 ## 팀 소개
