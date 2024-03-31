@@ -14,6 +14,12 @@
 #### 3️⃣예상되는 효과
  파손 및 도난의 우려가 있어 쉽게 대여가 안됐던 강의실 문제를 책임소재를 정확히 명시하여 올바른 대여가 가능하도록 하며 AI를 통해 관리자의 부담을 덜며 다소 까다로웠던 강의실 대영 절차를 줄여 보다 많은 학생들이 학교에 모여 함께 활동을  할 기회를 제공 할 수 있게 됩니다.
  또한 공유공간 예약 시스템을 통해 현재 공유공간을 사용하지 못하던 동아리들의 문제를 해결함과 동시에 공간을 효율적으로 배분 할 수 있게 됩니다.
+#### 4️⃣기능 및 초안
+
+|공간대여 선택|공유공간 선택|예약내역|예약 폼|
+|---|---|---|---|
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2023.png">|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2024.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2025.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2028.png
+https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2026.png|https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/Group%2027%20(1).png
 ## 📽️프로젝트 영상
       추가 예정
 ## 팀 소개
