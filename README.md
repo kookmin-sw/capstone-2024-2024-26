@@ -1,6 +1,6 @@
-<div style="background-color: #f0f0f0; padding: 10;">
-      국민대 공유공간 
-</div>
+<span style="background-color: #f0f0f0; padding: 10px;">
+    이 부분에는 배경색이 지정된 텍스트가 나타납니다.
+</span>
 
 # 국민대 공유공간 플랫폼 K-SharePlace
 2024년 26조 https://kookmin-sw.github.io/capstone-2024-26/
