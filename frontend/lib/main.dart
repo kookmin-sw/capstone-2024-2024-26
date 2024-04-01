@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null) {
       Timer(Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => SignIn()),
         );
       });
     } else {
@@ -74,6 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
           'assets/logo.png',
           width: 200,
           height: 200,
+          color: Color(0XFF004F9E),
         ),
       ),
     );
