@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:frontend/lent_teamroom.dart';
 
 class LoadingScreen extends StatelessWidget {
   @override

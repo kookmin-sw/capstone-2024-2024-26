@@ -2,28 +2,37 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail,
   signOut,
+  deleteUser,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
-import { addDoc, collection, getFirestore, getDoc, doc, updateDoc} from "firebase/firestore";
+import {
+  setDoc,
+  collection,
+  getFirestore,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
 const firebaseConfig = {
-  apiKey: "AIzaSyAocxBUBdG8MuMl7Z7owoX6S6PXax8vYZQ",
-  authDomain: "capstone-c2358.firebaseapp.com",
-  projectId: "capstone-c2358",
-  storageBucket: "capstone-c2358.appspot.com",
-  messagingSenderId: "452182758120",
-  appId: "1:452182758120:web:30f72007059d6fdf4c6f5d",
-  measurementId: "G-ST9TF7PNY3",
+  apiKey: process.env.FLUTTER_APP_apikey,
+  authDomain: process.env.FLUTTER_APP_authDomain,
+  projectId: process.env.FLUTTER_APP_projectId,
+  storageBucket: process.env.FLUTTER_APP_storageBucket,
+  messagingSenderId: process.env.FLUTTER_APP_messagingSenderId,
+  appId: process.env.FLUTTER_APP_appId,
+  measurementId: process.env.FLUTTER_APP_measurementId,
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const auth = getAuth(app);
-
 const router = express.Router();
 
 // 회원가입
@@ -54,9 +63,10 @@ router.post("/signup", async (req, res) => {
       email,
       password
     );
+    const user = userCredential.user;
 
-    // 사용자 정보 추가
-    await addDoc(collection(db, "users"), {
+    // 사용자 정보 추가 파이어베이스 문서 이름 email로 바꿔놨음 .
+    await setDoc(doc(db, "users", user.uid), {
       email: email,
       name: name,
       studentId: studentId,
@@ -78,8 +88,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-
-
 // 로그인
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
@@ -93,10 +101,14 @@ router.post("/signin", async (req, res) => {
     );
     const user = userCredential.user;
     console.log("signin success");
+
     // 로그인 성공 시 사용자 정보 반환
-    res
-      .status(200)
-      .json({ message: "Signin successful", uid: user.uid, email: user.email,token: 'true' });
+    res.status(200).json({
+      message: "Signin successful",
+      uid: user.uid,
+      email: user.email,
+      token: "true",
+    });
   } catch (error) {
     // 로그인 실패 시 오류 응답
     console.error("Error signing in", error);
@@ -119,15 +131,23 @@ router.post("/logout", async (req, res) => {
   }
 });
 
-
 // 프로필 수정
 router.post("/profile/update/:uid", async (req, res) => {
-  const uid = req.params.uid;
-  const { name, studentId, faculty, department, club, phone, agreeForm, email } = req.body;
+  const userId = req.params.uid;
+  const {    
+    password,
+    name,
+    studentId,
+    faculty,
+    department,
+    club,
+    phone,
+    agreeForm,
+  } = req.body;
 
   try {
     // Firebase Firestore에서 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -135,6 +155,7 @@ router.post("/profile/update/:uid", async (req, res) => {
 
     // 변경된 필드만 업데이트
     const updateFields = {};
+    if (password) updateFields.password = password;
     if (name) updateFields.name = name;
     if (studentId) updateFields.studentId = studentId;
     if (faculty) updateFields.faculty = faculty;
@@ -142,10 +163,9 @@ router.post("/profile/update/:uid", async (req, res) => {
     if (club) updateFields.club = club;
     if (phone) updateFields.phone = phone;
     if (agreeForm) updateFields.agreeForm = agreeForm;
-    if (email) updateFields.email = email;
 
     // 사용자 문서를 업데이트
-    await updateDoc(doc(db, "users", uid), updateFields);
+    await updateDoc(doc(db, "users", userId), updateFields);
 
     // 업데이트된 사용자 정보 반환
     res.status(200).json({ message: "Profile updated successfully" });
@@ -156,14 +176,13 @@ router.post("/profile/update/:uid", async (req, res) => {
   }
 });
 
-
 // 프로필 조회
 router.get("/profile/:uid", async (req, res) => {
-  const uid = req.params.uid;
+  const userId = req.params.uid;
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -179,5 +198,87 @@ router.get("/profile/:uid", async (req, res) => {
   }
 });
 
+function isAdmin(req, res, next) {
+  const { email } = req.body;
+  // 관리자 이메일
+  const adminEmail = "admin@kookmin.ac.kr";
+
+  // 이메일이 관리자 이메일과 일치하는지 확인
+  if (email === adminEmail) {
+    // 관리자인 경우 다음 미들웨어로 진행
+    console.log("isAdmin OK");
+    next();
+  } else {
+    // 관리자가 아닌 경우 권한 없음 응답
+    res.status(403).json({ error: "Unauthorized: You are not an admin " });
+  }
+}
+
+router.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.uid;
+
+    // Firebase Authentication에서 회원 삭제
+    deleteUser(auth, userId)
+      .then(() => {
+        console.log("User deleted successfully1");
+      })
+      .catch((error) => {
+        console.error("Error deleting user", error);
+      });
+
+    // Firestore에서 회원정보 삭제
+    await deleteDoc(doc(db, "users", userId));
+
+    res.status(200).json({ message: "User deleted successfully " });
+  } catch (error) {
+    console.error("Error deleting user", error);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+router.post("/adminMode/update/:uid", isAdmin, async (req, res) => {
+  const userId = req.params.uid;
+  const {
+    password,
+    name,
+    studentId,
+    faculty,
+    department,
+    club,
+    phone,
+    agreeForm,
+  } = req.body;
+
+  try {
+    // Firebase Firestore에서 사용자의 문서를 가져옴
+    const userDoc = await getDoc(doc(db, "users", userId));
+    if (!userDoc.exists()) {
+      // 사용자 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // 변경된 필드만 업데이트
+    const updateFields = {};
+    if (password) updateFields.password = password;
+    if (name) updateFields.name = name;
+    if (studentId) updateFields.studentId = studentId;
+    if (faculty) updateFields.faculty = faculty;
+    if (department) updateFields.department = department;
+    if (club) updateFields.club = club;
+    if (phone) updateFields.phone = phone;
+    if (agreeForm) updateFields.agreeForm = agreeForm;
+
+    // 사용자 문서를 업데이트
+    await updateDoc(doc(db, "users", userId), updateFields);
+
+    // 업데이트된 사용자 정보 반환
+    res.status(200).json({ message: "adminMode Profile updated successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error adminMode updating profile", error);
+    res.status(500).json({ error: "Failed to adminMode update profile" });
+  }
+});
 
 export default router;

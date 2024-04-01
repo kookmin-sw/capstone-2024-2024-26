@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/myPage.dart';
 import 'package:frontend/lent_teamroom.dart';
 import 'package:frontend/lent_conference.dart';
+import 'loading.dart';
 
 void main() {
   runApp(MyApp());
@@ -87,12 +89,15 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
+  bool isloading = false;
 
   @override
   Widget build(BuildContext context) {
     // 중간 바디부분
-
-    return Scaffold(
+    if (isloading) {
+      return LoadingScreen();
+    } else {
+      return Scaffold(
         appBar: AppBar(
           title: Text(
             '대여 공간 선택',
@@ -227,47 +232,46 @@ class _MainPageState extends State<MainPage> {
         ),
 
         // 하단 바
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          padding: EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+              if (index == 2) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => MyPage()), // myPage.dart로 이동
+                );
+              } else {
                 _pageController.animateToPage(
                   index,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
-              });
-            },
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/lent.svg'),
-                label: '공간 대여',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/reserved.svg'),
-                label: '예약 내역',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/mypage.svg'),
-                label: '마이페이지',
-              ),
-            ],
-            selectedLabelStyle:
-                TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            selectedItemColor: Colors.black,
-          ),
-        ));
+              }
+            });
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent.svg'),
+              label: '대여하기',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved.svg'),
+              label: '예약 내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          selectedItemColor: Colors.black,
+        ),
+      );
+      // 하단 바
+    }
   }
 
   void addClick() {
