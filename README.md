@@ -14,6 +14,14 @@
 #### 3️⃣예상되는 효과
  파손 및 도난의 우려가 있어 쉽게 대여가 안됐던 강의실 문제를 책임소재를 정확히 명시하여 올바른 대여가 가능하도록 하며 AI를 통해 관리자의 부담을 덜며 다소 까다로웠던 강의실 대영 절차를 줄여 보다 많은 학생들이 학교에 모여 함께 활동을  할 기회를 제공 할 수 있게 됩니다.
  또한 공유공간 예약 시스템을 통해 현재 공유공간을 사용하지 못하던 동아리들의 문제를 해결함과 동시에 공간을 효율적으로 배분 할 수 있게 됩니다.
+
+ ## 🔍Abstract
+#### 1️⃣Problem
+ This application targets Kookmin Univ’s lack of space problem. In our university there are no tools to make a reservation of share space. It makes our colleagues hard to have a group activity. So our team made a application that helps our colleagues easy to make a reservation. And from the university's perspective, it is difficult to rent out a classroom due to management issues such as loss, theft, and safety issues.
+
+#### 2️⃣Goal
+ In reality its impossible to increase the share space. So we are planning to make a system to reserve the lecture room and make a share-space reservation system wishing our app will ease the space lack problem. Also AI technology in our app helps supervisor managing the lecture room.
+ 
 #### 4️⃣기능 및 초안
 
 |공간대여 선택|공유공간 선택|예약내역|예약 폼|
@@ -26,12 +34,7 @@
 ## 📽️프로젝트 영상
       추가 예정
 
-## 🔍Abstract
-#### 1️⃣Problem
- This application targets Kookmin Univ’s lack of space problem. In our university there are no tools to make a reservation of share space. It makes our colleagues hard to have a group activity. So our team made a application that helps our colleagues easy to make a reservation. And from the university's perspective, it is difficult to rent out a classroom due to management issues such as loss, theft, and safety issues.
 
-#### 2️⃣Goal
- In reality its impossible to increase the share space. So we are planning to make a system to reserve the lecture room and make a share-space reservation system wishing our app will ease the space lack problem. Also AI technology in our app helps supervisor managing the lecture room.
  
  
 
