@@ -114,7 +114,9 @@
 
   ### ✔️AI
 <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
- 
+
+ ### ✔️협업 도구 및 디자인
+ <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"><img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
  ## 추가적인 내용
 
         
