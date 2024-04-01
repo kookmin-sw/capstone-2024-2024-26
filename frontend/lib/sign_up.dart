@@ -5,6 +5,7 @@ import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
 import 'package:email_validator/email_validator.dart';
+import 'loading.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool isChecked = false;
+  bool isloading = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -275,39 +277,40 @@ Widget build(BuildContext context) {
                       fontSize: 12,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "이미 회원이신가요?",
-                    style: TextStyle(color: Color(0xFF7A7A7A)),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // Handle login action
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignIn()),
-                      );
-                    },
-                    child: const Text("로그인",
-                        style: TextStyle(color: Color(0xFF141D5B))),
-                  )
-                ],
-              )
-            ],
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "이미 회원이신가요?",
+                      style: TextStyle(color: Color(0xFF7A7A7A)),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // Handle login action
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignIn()),
+                        );
+                      },
+                      child: const Text("로그인",
+                          style: TextStyle(color: Color(0xFF141D5B))),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget buildInputField(String labelText,
@@ -416,6 +419,9 @@ Widget buildDropdownField(String labelText, List<String> items, String? value) {
   }
 
   Future<void> registerUser() async {
+    setState(() {
+      isloading = true;
+    });
     const url = 'http://localhost:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,
