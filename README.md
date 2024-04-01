@@ -28,7 +28,7 @@
 ## 팀 소개
 
 
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="180" width="200px;" alt=""/>
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="180" width="200px;">
 
 ```markdown
 😁 Name : 안수현(팀장)
@@ -41,7 +41,7 @@
 
 ```
 
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="180" width="200px;" alt=""/>
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="180" width="200px;" >
 
 ```markdown
 😁 Name : 정의석
@@ -53,7 +53,7 @@
     - AI-Server 제작 및 공간 대여 Server 제작
      
 ```
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="150" width="150px;" alt=""/>
+<img algin=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="180" width="200px;" >
 
 ```markdown
 😁 Name : 정일형
@@ -66,7 +66,7 @@
 
 ```
 
-<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg"height="150"  width="150px;" alt=""/><br />
+<img algin=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg" height="180"  width="200px;" >
 
 ```markdown
 😁 Name : 이재훈
