@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
@@ -45,46 +46,85 @@ class _SignInState extends State<SignIn> {
                   '이메일',
                   controller: emailController,
                 ),
-                buildInputField('비밀번호',
-                    isPassword: true, controller: passwordController),
-                Container(
-                  width: double.infinity,
-                  child: Text(
-                    errorMessage,
-                    style: TextStyle(color: Colors.red),
-                    textAlign: TextAlign.left,
-                  ),
+              ),
+              SizedBox(height: 30,),
+              Padding(
+                padding: const EdgeInsets.only(right: 220),
+                child: const Text(
+                '아이디',
+                style: TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                height: 0.13,
+            ),
+              ),
+              ),
+              SizedBox(height: 10,),
+              buildInputField(
+                '아이디를 입력하세요',
+                controller: emailController,
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(right: 220) ,
+                child: const Text(
+                '비밀번호',
+                style: TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w500,
+                height: 0.13,
+            ),
+              ),
+              ),
+              SizedBox(height:10),
+              buildInputField('비밀번호를 입력하세요',
+                  isPassword: true, controller: passwordController),
+              Container(
+                width: double.infinity,
+                child: Text(
+                  errorMessage,
+                  style: TextStyle(color: Colors.red),
+                  textAlign: TextAlign.left,
                 ),
-                Row(
-                  children: [
-                    Checkbox(
-                      activeColor: const Color(0xFF3694A8),
-                      value: isChecked,
-                      onChanged: (value) {
-                        setState(() {
-                          isChecked = value!;
-                        });
-                      },
-                    ),
-                    const Text(
-                      '자동 로그인',
-                      style: TextStyle(
-                        color: Color(0xFF7A7A7A),
-                        fontSize: 12,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await loginUser(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3694A8),
-                    minimumSize: const Size(265.75, 39.46),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3)),
+              ),
+              Padding(
+  padding: const EdgeInsets.only(left: 15.0), // 원하는 좌측 padding 값 설정
+  child: Row(
+    children: [
+      Checkbox(
+        activeColor: const Color(0xFF3694A8),
+        value: isChecked,
+        onChanged: (value) {
+          setState(() {
+            isChecked = value!;
+          });
+        },
+      ),
+      const Text(
+        '자동 로그인',
+        style: TextStyle(
+          color: Color(0xFF7A7A7A),
+          fontSize: 12,
+          fontFamily: 'Inter',
+        ),
+      ),
+    ],
+  ),
+),
+SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  await loginUser(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3694A8),
+                  minimumSize: const Size(265.75, 39.46),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3)),         
                   ),
                   child: Text(
                     isLoading ? '로딩 중...' : '로그인',
@@ -193,15 +233,28 @@ class _SignInState extends State<SignIn> {
 
   Widget buildInputField(String labelText,
       {bool isPassword = false, TextEditingController? controller}) {
-    return TextField(
-      obscureText: isPassword,
-      controller: controller,
-      style: const TextStyle(fontSize: 13),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(color: Color(0xFF9C9C9C)),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF9C9C9C)),
+    return Container(
+      width: 265.75,
+      height: 28.97,
+      decoration: ShapeDecoration(
+        color: Color(0x4FECECEC),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      ),
+      child: TextField(
+        obscureText: isPassword,
+        controller: controller,
+        style: const TextStyle(fontSize: 13),
+        decoration: InputDecoration(
+          hintText: labelText,
+          hintStyle: const TextStyle(color: Color(0xFF9C9C9C)),
+          filled: true,
+          fillColor: Color(0xFFEDEDED),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF9C9C9C)),
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFEDEDED)),
+          ),
         ),
       ),
     );
