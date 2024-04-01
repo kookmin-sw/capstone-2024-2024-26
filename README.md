@@ -54,7 +54,7 @@
      
 ```
 
-<img algin=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="180" width="200px;" >
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="180" width="200px;" >
 
 ```markdown
 😁 Name : 정일형
@@ -67,7 +67,7 @@
 
 ```
 
-<img algin=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg" height="180"  width="200px;" >
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg" height="180"  width="200px;" >
 
 ```markdown
 😁 Name : 이재훈
