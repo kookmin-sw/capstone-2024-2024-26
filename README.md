@@ -25,6 +25,18 @@
 
 ## 📽️프로젝트 영상
       추가 예정
+
+## 🔍Abstract
+ 1️⃣Problem
+ This application targets Kookmin Univ’s lack of space problem. In our university there are no tools to make a reservation of share space. It makes our colleagues hard to have a group activity. So our team made a application that helps our colleagues easy to make a reservation. And from the university's perspective, it is difficult to rent out a classroom due to management issues such as loss, theft, and safety issues.
+
+
+ 2️⃣Goal
+ In reality its impossible to increase the share space. So we are planning to make a system to reserve the lecture room and make a share-space reservation system wishing our app will ease the space lack problem. Also AI technology in our app helps supervisor managing the lecture room.
+ 
+ 
+
+
 ## 팀 소개
 
 
