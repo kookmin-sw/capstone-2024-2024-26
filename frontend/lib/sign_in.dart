@@ -5,8 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'loading.dart';
-import 'select_reserve.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -22,29 +20,21 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return LoadingScreen();
-    } else {
-      return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '로그인',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    height: 0.06,
-                  ),
-                ),
-                buildInputField(
-                  '이메일',
-                  controller: emailController,
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '로그인',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                  height: 0.06,
                 ),
               ),
               SizedBox(height: 30,),
@@ -124,64 +114,56 @@ SizedBox(height: 10),
                   backgroundColor: const Color(0xFF3694A8),
                   minimumSize: const Size(265.75, 39.46),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3)),         
-                  ),
-                  child: Text(
-                    isLoading ? '로딩 중...' : '로그인',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
+                      borderRadius: BorderRadius.circular(3)),
+                ),
+                child: Text(
+                  isLoading ? '로딩 중...' : '로그인',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                Divider(
-                  color: Colors.grey,
-                  thickness: 0.5,
-                  height: 60,
-                  indent: 30,
-                  endIndent: 30,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("회원이 아니신가요?",
-                        style: TextStyle(color: Color(0xFF7A7A7A))),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUp()),
-                        );
-                      },
-                      child: const Text("회원가입",
-                          style: TextStyle(color: Color(0xFF3694A8))),
-                    )
-                  ],
-                )
-              ],
-            ),
+              ),
+              Divider(
+                color: Colors.grey,
+                thickness: 0.5,
+                height: 60,
+                indent: 30,
+                endIndent: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("회원이 아니신가요?",
+                      style: TextStyle(color: Color(0xFF7A7A7A))),
+                  const SizedBox(
+                    width: 4,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignUp()),
+                      );
+                    },
+                    child: const Text("회원가입",
+                        style: TextStyle(color: Color(0xFF3694A8))),
+                  )
+                ],
+              )
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
-  Future<void> saveTokenToSharedPreferences(String token, String uid) async {
+  Future<void> saveTokenToSharedPreferences(String token) async {
     final prefs = await SharedPreferences.getInstance();
     if (isChecked == true) {
       prefs.setString('token', 'true');
-      prefs.setString('uid', uid);
-
-      print(uid);
-    } else {
-      prefs.setString('uid', uid);
-      print(uid);
     }
-
     // 자동로그인 체크되어있으면 토큰 발급
   }
 
@@ -212,8 +194,7 @@ SizedBox(height: 10),
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'Signin successful' &&
           responseData['token'] != null) {
-        saveTokenToSharedPreferences(
-            responseData['token'], responseData['uid']);
+        saveTokenToSharedPreferences(responseData['token']);
 
         Navigator.push(
           context,
