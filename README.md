@@ -27,24 +27,62 @@
       추가 예정
 ## 팀 소개
 
-<table>
-  <tbody>
-    <tr>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="150" width="150px;" alt=""/><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="150" width="150px;" alt=""/><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="150" width="150px;" alt=""/><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg"height="150"  width="150px;" alt=""/><br /></td>
-     <tr/>
-  </tbody>
-</table>
+
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="180" width="200px;" alt=""/>
+
+```markdown
+😁 Name : 안수현(팀장)
+👨🏻‍💻 ID   : 20191621
+📧 Email: saker123456@kookmin.ac.kr
+
+🛠 Role:
+    - Frontend, Backend
+    - 프로젝트 기획 및 구성 설계, 풀스택 개발
+
+```
+
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="180" width="200px;" alt=""/>
+
+```markdown
+😁 Name : 정의석
+👨🏻‍💻 ID   : 2020134
+📧 Email: jungus07@kookmin.ac.kr
+
+🛠 Role :
+    - Backend
+    - AI-Server 제작 및 공간 대여 Server 제작
+     
+```
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="150" width="150px;" alt=""/>
+
+```markdown
+😁 Name : 정일형
+👨🏻‍💻 ID   : 20195303
+📧 Email: jungih1017@gmail.com
+
+🛠 Role :
+    - Frontend
+    - 디자인 및 앱 개발 
+
+```
+
+<img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg"height="150"  width="150px;" alt=""/><br />
+
+```markdown
+😁 Name : 이재훈
+👨🏻‍💻 ID   : 20213053
+📧 Email: jhoon5061@gmail.com
+
+🛠 Role :
+    - AI 
+    - AI 데이터 구축 및 학습 , 기능에 대한 AI 모델 개발
+
+```
+
+<br/>
 
 
-|<td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="150" width="150px;" alt=""/><br /></td><a>안수현 (팀장)<br/>|정의석|정일형|이재훈|
-|---|---|---|---|---|
-역할|frontend,backend|backend|frontend|AI
-학번|****1621|****134|****5303|****3053
-Email|saker123456@kookmin.ac.kr|jungus07@kookmin.ac.kr|jungih1017@gmail.com|jhoon5061@gmail.com
-Git|@3uhyeon|@Uiseokjung|@JohnJung-1017|@jaehoon222
+
 ## ✅ 사용법
 
 
