@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null) {
       Timer(Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SignIn()),
+          MaterialPageRoute(builder: (context) => MainPage()),
         );
       });
     } else {
@@ -74,7 +74,6 @@ class _SplashScreenState extends State<SplashScreen> {
           'assets/logo.png',
           width: 200,
           height: 200,
-          color: Color(0XFF004F9E),
         ),
       ),
     );
@@ -109,6 +108,7 @@ class _MainPageState extends State<MainPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          leading: Container(),
           centerTitle: true,
           actions: [
             IconButton(
@@ -179,7 +179,7 @@ class _MainPageState extends State<MainPage> {
                         Text('동아리방 대여',
                             style: TextStyle(
                               fontSize: 18.75,
-                              color: Color(0xFF006282),
+                              color: Color(0xFF004f9e),
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
                             )),
@@ -219,7 +219,7 @@ class _MainPageState extends State<MainPage> {
                         Text('강의실 대여',
                             style: TextStyle(
                               fontSize: 18.75,
-                              color: Color(0xFF006282),
+                              color: Color(0xFF004f9e),
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
                             )),
@@ -269,6 +269,9 @@ class _MainPageState extends State<MainPage> {
           selectedLabelStyle:
               TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
         ),
       );
       // 하단 바

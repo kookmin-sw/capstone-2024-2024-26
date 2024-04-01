@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'alert.dart';
 import 'settings.dart';
+import 'main.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -30,31 +31,45 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( // AppBar를 사용하여 중앙에 마이페이지 div 배치
-        title: Center(
-          child: Text('마이페이지'),
-        ),
-        actions: [ // 종모양 아이콘은 따로 배치
-          IconButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AlertPage()),
-              );
-              // Implement your action here
-            },
-            icon: Padding(
-              padding: EdgeInsets.only(right: 40), // 오른쪽 마진 추가
-              child: SvgPicture.asset(
-                'assets/icons/bell.svg', // 종 모양 이모티콘 SVG 파일
-                width: 24, // 아이콘의 너비 조정
-                height: 24, // 아이콘의 높이 조정
-              ),
-            ), // 종모양 버튼 아이콘
+      appBar: AppBar(
+        title: Text(
+          '마이페이지',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 15,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        leading: Container(),
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: SvgPicture.asset('assets/icons/notice_none.svg'))
         ],
+        backgroundColor: Colors.transparent, // 상단바 배경색
+        foregroundColor: Colors.black, //상단바 아이콘색
+
+        //shadowColor: Colors(), 상단바 그림자색
+        bottomOpacity: 0.0,
+        elevation: 0.0,
+        scrolledUnderElevation: 0,
+
+        ///
+        // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.5,
+          ),
+        ),
       ),
-      body: SingleChildScrollView( // SingleChildScrollView로 감싸서 스크롤 가능하도록
+      body: SingleChildScrollView(
+        // SingleChildScrollView로 감싸서 스크롤 가능하도록
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // 이용안내, 문의하기, 로그아웃 버튼을 좌측으로 정렬
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // 이용안내, 문의하기, 로그아웃 버튼을 좌측으로 정렬
           children: [
             SizedBox(height: 20),
             Divider(),
@@ -70,13 +85,14 @@ class _MyPageState extends State<MyPage> {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.grey,
-                      backgroundImage: _image != null ? FileImage(_image!) : null,
+                      backgroundImage:
+                          _image != null ? FileImage(_image!) : null,
                       child: _image == null
                           ? Icon(
-                        Icons.camera_alt,
-                        size: 40,
-                        color: Colors.white,
-                      )
+                              Icons.camera_alt,
+                              size: 40,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ),
@@ -88,7 +104,8 @@ class _MyPageState extends State<MyPage> {
                     Row(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10), // 이름 div의 top margin 추가
+                          padding: EdgeInsets.only(
+                              top: 10, bottom: 10), // 이름 div의 top margin 추가
                           child: Text(
                             '정일형',
                             style: TextStyle(
@@ -98,7 +115,11 @@ class _MyPageState extends State<MyPage> {
                         ),
                         IconButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()),);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SettingsPage()),
+                            );
                           },
                           icon: SvgPicture.asset(
                             'assets/icons/settings.svg',
@@ -156,8 +177,12 @@ class _MyPageState extends State<MyPage> {
         onTap: (index) {
           switch (index) {
             case 0:
-              // Handle navigation to the first screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MainPage()),
+              );
               break;
+
             case 1:
               // Handle navigation to the second screen
               break;
@@ -180,13 +205,21 @@ class _MyPageState extends State<MyPage> {
             label: '마이페이지',
           ),
         ],
+        selectedLabelStyle:
+            TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+
+        selectedItemColor: Colors.black,
+        unselectedLabelStyle:
+            TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+        unselectedItemColor: Colors.grey,
       ),
     );
   }
 
   // 버튼을 생성하는 함수
   Widget _buildButton(String label, VoidCallback onPressed) {
-    return Container( // 버튼을 Container로 감싸서 margin 설정
+    return Container(
+      // 버튼을 Container로 감싸서 margin 설정
       margin: EdgeInsets.only(left: 20), // 왼쪽에만 margin 설정
       child: TextButton(
         onPressed: onPressed,
