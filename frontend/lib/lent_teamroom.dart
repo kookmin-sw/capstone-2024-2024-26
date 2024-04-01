@@ -13,10 +13,10 @@ class _Lentteam extends State<Lent_Teamroom> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
   int _currentIndex = 0;
-  String time = '09:00 ~ 22:00'; //server
-  String people = '12'; //server
-  String room_name = '미래관 601호'; //server
-  String room_count = '2'; // server
+  String time = ''; //server
+  String people = ''; //server
+  String room_name = ''; //server
+  String room_count = ''; // server
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
 
   @override
