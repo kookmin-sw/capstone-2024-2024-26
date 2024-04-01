@@ -48,7 +48,7 @@ reserveClub.post("/", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     const userData = userDoc.data();
-
+    console.log(userData);
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
@@ -61,11 +61,13 @@ reserveClub.post("/", async (req, res) => {
     const overlappingReservation = existingReservationsSnapshot.docs.find(
       (doc) => {
         const reservation = doc.data();
+        console.log(reservation);
 
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;
         const existingEndTime = reservation.endTime;
         const existingDate = reservation.date;
+        const existingRoomId = reservation.roomId;
         const startTimeClub = startTime;
         const endTimeClub = endTime;
 
@@ -73,8 +75,8 @@ reserveClub.post("/", async (req, res) => {
         if (
           (existingDate == date &&
             startTimeClub == existingStartTime &&
-            endTimeClub == existingEndTime) ||
-          (startTimeClub < existingEndTime && endTimeClub > existingStartTime)
+            endTimeClub == existingEndTime && roomId == existingRoomId) ||
+          (existingDate == date && roomId == existingRoomId && startTimeClub < existingEndTime && endTimeClub > existingStartTime)
         ) {
           return true;
         }
@@ -86,8 +88,9 @@ reserveClub.post("/", async (req, res) => {
     // 겹치는 예약이 있는 경우 에러 반환
     if (overlappingReservation) {
       return res
-        .status(400)
+        .status(401)
         .json({ error: "The room is already reserved for this time" });
+       
     }
     // 전에 사용자가 한 예약이 있는지 확인
     const existingMyReservationSnapshot = await getDocs(
