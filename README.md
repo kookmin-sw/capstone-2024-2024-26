@@ -53,6 +53,7 @@
     - AI-Server 제작 및 공간 대여 Server 제작
      
 ```
+
 <img algin=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="180" width="200px;" >
 
 ```markdown
