@@ -39,10 +39,10 @@
 </table>
 
 
-||안수현(팀장)|정의석|정일형|이재훈|
+||<td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="150" width="150px;" alt=""/><br /></td><a>안수현 (팀장)<br/>|정의석|정일형|이재훈|
 |---|---|---|---|---|
 역할|frontend,backend|backend|frontend|AI
-학번|****1621||****134||****5303||****3053
+학번|****1621|****134|****5303|****3053
 Email|saker123456@kookmin.ac.kr|jungus07@kookmin.ac.kr|jungih1017@gmail.com|jhoon5061@gmail.com
 Git|@3uhyeon|@Uiseokjung|@JohnJung-1017|@jaehoon222
 ## ✅ 사용법
