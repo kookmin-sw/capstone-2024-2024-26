@@ -30,10 +30,10 @@
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="150" width="150px;" alt=""/><br /></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="150" width="150px;" alt=""/><br /></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="150" width="150px;" alt=""/><br /></a><br /></td>
-      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg"height="150"  width="150px;" alt=""/><br /></a><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="150" width="150px;" alt=""/><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="150" width="150px;" alt=""/><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="150" width="150px;" alt=""/><br /></td>
+      <td align="center"><a href=""><img src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg"height="150"  width="150px;" alt=""/><br /></td>
      <tr/>
   </tbody>
 </table>
