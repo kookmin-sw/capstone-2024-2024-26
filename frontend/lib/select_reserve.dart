@@ -9,6 +9,8 @@ import 'sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'loading.dart';
 import 'complete.dart';
+import 'reservation_details.dart';
+import 'myPage.dart';
 
 class Select_reserve extends StatefulWidget {
   @override
@@ -74,7 +76,7 @@ class _select extends State<Select_reserve> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '동아리방 대여',
+            '공간대여',
             style: TextStyle(
               color: Colors.black,
               fontSize: 15,
@@ -599,46 +601,48 @@ class _select extends State<Select_reserve> {
         ),
 
         // 하단 바
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 0, // Adjust the index according to your need
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                break;
+
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Details()),
                 );
-              });
-            },
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/lent.svg'),
-                label: '공간 대여',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/reserved.svg'),
-                label: '예약 내역',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/mypage.svg'),
-                label: '마이페이지',
-              ),
-            ],
-            selectedLabelStyle:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            selectedItemColor: Colors.black,
-          ),
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPage()),
+                );
+                break;
+            }
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent.svg'),
+              label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved.svg'),
+              label: '예약내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+
+          selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
         ),
       );
     }

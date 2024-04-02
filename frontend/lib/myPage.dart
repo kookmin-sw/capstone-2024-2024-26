@@ -6,6 +6,7 @@ import 'dart:io';
 import 'alert.dart';
 import 'settings.dart';
 import 'main.dart';
+import 'reservation_details.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -68,101 +69,107 @@ class _MyPageState extends State<MyPage> {
       body: SingleChildScrollView(
         // SingleChildScrollView로 감싸서 스크롤 가능하도록
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // 이용안내, 문의하기, 로그아웃 버튼을 좌측으로 정렬
           children: [
             SizedBox(height: 20),
             Divider(),
             SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: GestureDetector(
-                    onTap: getImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey,
-                      backgroundImage:
-                          _image != null ? FileImage(_image!) : null,
-                      child: _image == null
-                          ? Icon(
-                              Icons.camera_alt,
-                              size: 40,
-                              color: Colors.white,
-                            )
-                          : null,
+            Container(
+              width: 337,
+              height: 132.76,
+              decoration: BoxDecoration(
+                color: Color(0x079A9A9A),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: GestureDetector(
+                      onTap: getImage,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey,
+                        backgroundImage:
+                            _image != null ? FileImage(_image!) : null,
+                        child: _image == null
+                            ? Icon(
+                                Icons.camera_alt,
+                                size: 40,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 50),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: 10, bottom: 10), // 이름 div의 top margin 추가
-                          child: Text(
-                            '정일형',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                  SizedBox(width: 50),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: 10, bottom: 10), // 이름 div의 top margin 추가
+                            child: Text(
+                              '정일형',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SettingsPage()),
-                            );
-                          },
-                          icon: SvgPicture.asset(
-                            'assets/icons/settings.svg',
-                            width: 24,
-                            height: 24,
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SettingsPage()),
+                              );
+                            },
+                            icon: SvgPicture.asset(
+                              'assets/icons/settings.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Text(
+                          '캡스톤',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14, // 글씨 크기 조정
                           ),
                         ),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 5),
-                      child: Text(
-                        '캡스톤',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14, // 글씨 크기 조정
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          '패널티 0회', // 동아리 이름과 패널티 표시
+                          style: TextStyle(
+                            color: Colors.grey[600], // 연한 회색으로 지정
+                            fontSize: 12, // 글씨 크기 조정
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 10),
-                      child: Text(
-                        '패널티 0회', // 동아리 이름과 패널티 표시
-                        style: TextStyle(
-                          color: Colors.grey[600], // 연한 회색으로 지정
-                          fontSize: 12, // 글씨 크기 조정
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          '학번: 20195303',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 10), // 이름 div와 학번 div 사이에 간격 추가
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                '학번: 20195303',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
+
             SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
             _buildButton('이용안내', () {}),
             _buildDivider(),
@@ -184,7 +191,10 @@ class _MyPageState extends State<MyPage> {
               break;
 
             case 1:
-              // Handle navigation to the second screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Details()),
+              );
               break;
             case 2:
               // Handle navigation to the third screen (current screen)
@@ -193,8 +203,8 @@ class _MyPageState extends State<MyPage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/lent_1.svg'),
-            label: '대여하기',
+            icon: SvgPicture.asset('assets/icons/lent_off.svg'),
+            label: '공간대여',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/reserved.svg'),

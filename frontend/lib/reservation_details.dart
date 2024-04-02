@@ -79,11 +79,11 @@ class _Details extends State<Details> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/lent_1.svg'),
-            label: '대여하기',
+            icon: SvgPicture.asset('assets/icons/lent_off.svg'),
+            label: '공간대여',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/reserved.svg'),
+            icon: SvgPicture.asset('assets/icons/reserved_on.svg'),
             label: '예약내역',
           ),
           BottomNavigationBarItem(
