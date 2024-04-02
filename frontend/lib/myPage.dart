@@ -116,6 +116,8 @@ class _MyPageState extends State<MyPage> {
                               '정일형',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 16, // 글씨 크기 조정
+                                fontFamily: 'Inter',
                               ),
                             ),
                           ),
@@ -135,30 +137,35 @@ class _MyPageState extends State<MyPage> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 5),
-                        child: Text(
-                          '캡스톤',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14, // 글씨 크기 조정
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              '캡스톤',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16, // 글씨 크기 조정
+                                fontFamily: 'Inter',
+                              ),
+                            ),
                           ),
-                        ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, bottom: 10),
+                            child: Text(
+                              '패널티 0회', // 동아리 이름과 패널티 표시
+                              style: TextStyle(
+                                color: Colors.grey[600], // 연한 회색으로 지정
+                                fontSize: 12, // 글씨 크기 조정
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       Padding(
                         padding: EdgeInsets.only(bottom: 10),
                         child: Text(
-                          '패널티 0회', // 동아리 이름과 패널티 표시
-                          style: TextStyle(
-                            color: Colors.grey[600], // 연한 회색으로 지정
-                            fontSize: 12, // 글씨 크기 조정
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          '학번: 20195303',
+                          '학번 ',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -171,11 +178,20 @@ class _MyPageState extends State<MyPage> {
             ),
 
             SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
-            _buildButton('이용안내', () {}),
-            _buildDivider(),
-            _buildButton('문의하기', () {}),
-            _buildDivider(),
-            _buildButton('로그아웃', () {}),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildButton(
+                  '이용안내',
+                  () {},
+                ),
+                _buildDivider(),
+                _buildButton('문의하기', () {}),
+                _buildDivider(),
+                _buildButton('로그아웃', () {}),
+                _buildDivider(),
+              ],
+            )
           ],
         ),
       ),
