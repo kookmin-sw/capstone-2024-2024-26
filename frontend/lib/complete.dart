@@ -4,6 +4,8 @@ import 'main.dart'; // 필요시 main.dart 파일을 import합니다.
 import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
 import 'select_reserve.dart'; // 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
 import 'package:dotted_line/dotted_line.dart';
+import 'myPage.dart';
+import 'reservation_details.dart';
 
 class Complete extends StatefulWidget {
   @override
@@ -25,7 +27,7 @@ class _Complete extends State<Complete> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '동아리방 대여',
+            '공간대여',
             style: TextStyle(
               color: Colors.black,
               fontSize: 15,
@@ -100,7 +102,7 @@ class _Complete extends State<Complete> {
                         '2024.3.19(화)',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Color(0xFF3694A8),
+                          color: Color(0xFF004F9E),
                           fontSize: 12,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -135,12 +137,15 @@ class _Complete extends State<Complete> {
                       SizedBox(height: 5),
                       TextButton(
                         onPressed: () {
-                          // TODO: Implement the underline button functionality
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Details()),
+                          );
                         },
                         child: Text(
                           '예약내역 확인하기',
                           style: TextStyle(
-                            color: Color(0xFF3694A8),
+                            color: Color(0xFF004F9E),
                             fontSize: 13,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
@@ -157,46 +162,49 @@ class _Complete extends State<Complete> {
             ],
           ),
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+        // 하단 바
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 0, // Adjust the index according to your need
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                break;
+
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Details()),
                 );
-              });
-            },
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/lent.svg'),
-                label: '공간 대여',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/reserved.svg'),
-                label: '예약 내역',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/mypage.svg'),
-                label: '마이페이지',
-              ),
-            ],
-            selectedLabelStyle:
-                TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            selectedItemColor: Colors.black,
-          ),
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPage()),
+                );
+                break;
+            }
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent.svg'),
+              label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved.svg'),
+              label: '예약내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+
+          selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
         ),
       );
     }
