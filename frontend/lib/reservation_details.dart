@@ -52,9 +52,51 @@ class _Details extends State<Details> {
         ),
       ),
       body: SingleChildScrollView(
-          // SingleChildScrollView로 감싸서 스크롤 가능하도록
-
+          child: Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 30), // Adjust the value as needed
+              child: Text(
+                '이용 예정',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0XFF004F9E),
+                ),
+              ),
+            ),
           ),
+          Padding(padding: EdgeInsets.only(bottom: 10)),
+
+          //예약 내역 카드
+          Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 359.39,
+                maxHeight: 261.64,
+              ),
+              decoration: ShapeDecoration(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Color(0x0C000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 0),
+                    spreadRadius: 0,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      )),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, // Adjust the index according to your need
         onTap: (index) {

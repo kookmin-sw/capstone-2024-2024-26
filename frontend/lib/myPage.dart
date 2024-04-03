@@ -2,11 +2,15 @@ import 'dart:async';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'dart:io';
 import 'alert.dart';
 import 'settings.dart';
 import 'main.dart';
 import 'reservation_details.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -14,6 +18,16 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  String? uid;
+  String name = '';
+  String club = '';
+  String? studentId;
+  String? penalty;
+  void initState() {
+    super.initState();
+    _checkUidStatus();
+  }
+
   File? _image;
   final picker = ImagePicker();
 
@@ -113,7 +127,7 @@ class _MyPageState extends State<MyPage> {
                             padding: EdgeInsets.only(
                                 top: 10, bottom: 10), // 이름 div의 top margin 추가
                             child: Text(
-                              '정일형',
+                              name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16, // 글씨 크기 조정
@@ -142,7 +156,7 @@ class _MyPageState extends State<MyPage> {
                           Padding(
                             padding: EdgeInsets.only(bottom: 10),
                             child: Text(
-                              '캡스톤',
+                              club,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16, // 글씨 크기 조정
@@ -165,7 +179,7 @@ class _MyPageState extends State<MyPage> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 10),
                         child: Text(
-                          '학번 ',
+                          '학번 $studentId',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -260,6 +274,40 @@ class _MyPageState extends State<MyPage> {
         ),
       ),
     );
+  }
+
+  _checkUidStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+    const url = 'http://localhost:3000/auth/profile/:uid';
+
+    final Map<String, String> data = {
+      'uid': uid!,
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: json.encode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    debugPrint('${response.statusCode}');
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['message'] == 'User checking success') {
+        print(responseData['userData']);
+        setState(() {
+          name = responseData['userData']['name'];
+          club = responseData['userData']['club'];
+          studentId = responseData['userData']['studentId'];
+        });
+      } else {}
+    } else {
+      setState(() {
+        String errorMessage = ''; // Define the variable errorMessage
+        errorMessage = '아이디와 비밀번호를 확인해주세요';
+      });
+    }
   }
 
   // Divider를 생성하는 함수

@@ -28,9 +28,9 @@ class _select extends State<Select_reserve> {
   }
 
   final double intervalWidth = 50.0;
-  final PageController _pageController = PageController();
+
   final ExpansionTileController controller = ExpansionTileController();
-  int _currentIndex = 0;
+
   String startTime = ''; //server
   String endTime = '';
   String room_name = '미래관 601호'; //server
@@ -59,7 +59,6 @@ class _select extends State<Select_reserve> {
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
-    print(uid);
   }
 
   DateTime selectedDate = DateTime.utc(
