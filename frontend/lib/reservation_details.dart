@@ -7,6 +7,7 @@ import 'alert.dart';
 import 'settings.dart';
 import 'main.dart';
 import 'myPage.dart';
+import 'package:dotted_line/dotted_line.dart';
 
 class Details extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class Details extends StatefulWidget {
 class _Details extends State<Details> {
   @override
   Widget build(BuildContext context) {
+    bool isLent = false;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -70,30 +72,281 @@ class _Details extends State<Details> {
             ),
           ),
           Padding(padding: EdgeInsets.only(bottom: 10)),
-
-          //예약 내역 카드
-          Center(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: 359.39,
-                maxHeight: 261.64,
-              ),
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                shadows: [
-                  BoxShadow(
-                    color: Color(0x0C000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 0),
-                    spreadRadius: 0,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset('assets/Subtract2.png'),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 13),
+                  Text(
+                    '[ 미래관 610호 ]',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 13),
+                  DottedLine(
+                    direction: Axis.horizontal,
+                    alignment: WrapAlignment.center,
+                    lineLength: 300,
+                    lineThickness: 0.5,
+                    dashLength: 3.0,
+                    dashColor: Colors.grey,
+                    dashRadius: 0.0,
+                    dashGapLength: 6.0,
+                    dashGapColor: Colors.transparent,
+                    dashGapRadius: 0.0,
+                  ),
+                  SizedBox(height: 30),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 50), // Adjust the value as needed
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '날짜  2024.3.19(화)',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF004F9E),
+                          fontSize: 15,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          height: 0.21,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 50), // Adjust the value as needed
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '오후  12:00~15:00' + '  |  ' + '좌석 T1',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF7C7C7C),
+                          fontSize: 12,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          height: 0.21,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // 눌렀을때
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004F9E),
+                      minimumSize: const Size(330.11, 57.06),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)),
+                    ),
+                    child: Text(
+                      isLent ? '반납하기' : '입장하기',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Container(
+                    height: 1, // 선의 높이 조정
+                    width: 350, // 선의 너비 조정
+                    color:
+                        Colors.grey.withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(builder: (context) => Details()),
+                            // );
+                          },
+                          child: Text(
+                            '예약 변경',
+                            style: TextStyle(
+                              color: Color(0xFF8E8E8E),
+                              fontSize: 13,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 60),
+                        Container(
+                          height: 34.74, // 선의 높이 조정
+                          width: 1, // 선의 너비 조정
+                          color: Colors.grey
+                              .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                        ),
+                        SizedBox(width: 60),
+                        TextButton(
+                          onPressed: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(builder: (context) => Details()),
+                            // );
+                          },
+                          child: Text(
+                            '예약 취소',
+                            style: TextStyle(
+                              color: Color(0xFF8E8E8E),
+                              fontSize: 13,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          DottedLine(
+            direction: Axis.horizontal,
+            alignment: WrapAlignment.center,
+            lineLength: 350,
+            lineThickness: 0.5,
+            dashLength: 3.0,
+            dashColor: Colors.grey,
+            dashRadius: 0.0,
+            dashGapLength: 6.0,
+            dashGapColor: Colors.transparent,
+            dashGapRadius: 0.0,
+          ),
+          Padding(padding: EdgeInsets.only(top: 20)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 30), // Adjust the value as needed
+              child: Text(
+                '이용 내역',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ),
+          ),
+          Padding(padding: EdgeInsets.only(bottom: 10)),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset('assets/Subtract3.png'),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '[ 미래관 610호 ]',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 110),
+                      Container(
+                        height: 20.87, // 선의 높이 조정
+                        width: 1, // 선의 너비 조정
+                        color: Colors.grey
+                            .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                      ),
+                      SizedBox(width: 30),
+                      Text(
+                        '이용 완료',
+                        style: TextStyle(
+                          color: Color(0XFF484848),
+                          fontSize: 12,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 15),
+                  DottedLine(
+                    direction: Axis.horizontal,
+                    alignment: WrapAlignment.center,
+                    lineLength: 300,
+                    lineThickness: 0.5,
+                    dashLength: 3.0,
+                    dashColor: Colors.grey,
+                    dashRadius: 0.0,
+                    dashGapLength: 6.0,
+                    dashGapColor: Colors.transparent,
+                    dashGapRadius: 0.0,
+                  ),
+                  SizedBox(height: 30),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 50), // Adjust the value as needed
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '날짜  2024.3.19(화)',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF004F9E),
+                          fontSize: 15,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          height: 0.21,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 50), // Adjust the value as needed
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '오후  12:00~15:00' + '  |  ' + '좌석 T1',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF7C7C7C),
+                          fontSize: 12,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          height: 0.21,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 45),
+                ],
+              ),
+            ],
           ),
         ],
       )),
