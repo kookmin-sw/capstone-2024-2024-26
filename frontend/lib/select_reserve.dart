@@ -39,7 +39,7 @@ class _select extends State<Select_reserve> {
   int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
-  int _peopleValue = 0;
+
   int count = 0;
   int find = 0;
 
@@ -349,121 +349,10 @@ class _select extends State<Select_reserve> {
                           )
                         ],
                       ),
-
-                      const Divider(
-                        color: Colors.grey,
-                        thickness: 0.5,
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(height: 40),
-                          Text(
-                            '인원을 선택하세요',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                      SizedBox(
+                        height: 10,
                       ),
 
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 10),
-                              Text(
-                                '인원',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '최대 ?명까지 예약 가능합니다.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'Inter',
-                                  color: Color(0xFFA3A3A3),
-                                  height: 2,
-                                ),
-                                textAlign: TextAlign.left,
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 90),
-                          Container(
-                            width: 92.62,
-                            height: 30.72,
-                            constraints: BoxConstraints(
-                              maxWidth: 92.62,
-                              maxHeight: 30.72,
-                            ),
-                            decoration: ShapeDecoration(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      width: 0.50, color: Color(0xFFE3E3E3)),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                shadows: [
-                                  BoxShadow(
-                                    color: Color(0x0C000000),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 0),
-                                    spreadRadius: 0,
-                                  )
-                                ]),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(
-                                  width: 30,
-                                  child: IconButton(
-                                    icon: SvgPicture.asset(
-                                      'assets/icons/minus.svg',
-                                    ),
-                                    onPressed: _peopleValue > 0
-                                        ? _decrementCounter
-                                        : null,
-                                  ),
-                                ),
-                                SvgPicture.asset('assets/icons/line.svg'),
-                                SizedBox(
-                                  child: Center(
-                                    child: Text(
-                                      '  $_peopleValue  ',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SvgPicture.asset('assets/icons/line.svg'),
-                                SizedBox(
-                                  width: 30,
-                                  child: IconButton(
-                                    icon: SvgPicture.asset(
-                                      'assets/icons/plus.svg',
-                                      color: Colors.black,
-                                    ),
-                                    onPressed: _incrementCounter,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 10),
                       const Divider(
                         color: Colors.grey,
                         thickness: 0.5,
@@ -691,7 +580,6 @@ class _select extends State<Select_reserve> {
       'date': selectedDate.toString(),
       'startTime': startTime,
       'endTime': endTime,
-      'numberOfPeople': _peopleValue.toString(),
       'tableNumber': table_number.toString(),
     };
 
@@ -731,18 +619,6 @@ class _select extends State<Select_reserve> {
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
       selectedDate = selectedDay;
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _peopleValue++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _peopleValue--;
     });
   }
 
