@@ -21,7 +21,7 @@ const Login = () => {
         event.preventDefault();
         try {
             await signInWithEmailAndPassword(authService, email, password);
-            navigate('/main');
+            navigate('/Main');
         } catch (error) {
             setError(error.message);
         }
