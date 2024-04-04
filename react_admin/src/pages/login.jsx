@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { authService } from '../firebase/fbInstance';
 import { useNavigate } from "react-router-dom";
 import kookmin_logo from '../image/kookmin_logo.jpg';
-import style from "../styles/login.css";
+import styles from "../styles/login.css";
 
 const Login = () => {
     const [email, setEmail] = useState('');

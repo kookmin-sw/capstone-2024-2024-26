@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-import { authService } from '../firebase/fbInstance'; // firebase의 auth 모듈 불러오기
+import { authService } from '../firebase/fbInstance';
+import Sidebar from './sideBar';
+
 
 const Main = () => {
   const navigate = useNavigate(); // useHistory 훅을 사용하여 history 객체 생성
@@ -17,9 +19,8 @@ const Main = () => {
 
   return (
     <div>
-      <h2>Main Page입니다.</h2>
-      {/* 로그아웃 버튼 */}
-      <button onClick={handleLogout}>로그아웃</button>
+    
+      <Sidebar/>
     </div>
   );
 }
