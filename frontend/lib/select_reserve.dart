@@ -183,7 +183,7 @@ class _select extends State<Select_reserve> {
                         selectedDayPredicate: (date) {
                           return isSameDay(selectedDate, date);
                         },
-                        calendarFormat: CalendarFormat.month, //2주 출력가능
+                        calendarFormat: CalendarFormat.twoWeeks, //2주 출력가능
 
                         focusedDay: DateTime.now(),
                         firstDay: DateTime.now(),
