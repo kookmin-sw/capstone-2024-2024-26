@@ -434,12 +434,12 @@ class _Details extends State<Details> {
                   ),
                   Row(
                     children: [
-                      SizedBox(width: 30),
+                      SizedBox(width: 35),
                       TextButton(
                         child: new Text("돌아가기",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 15,
+                              fontSize: 12,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                             )),
@@ -459,7 +459,7 @@ class _Details extends State<Details> {
                         child: new Text(text2,
                             style: TextStyle(
                               color: Color(0XFF004F9E),
-                              fontSize: 15,
+                              fontSize: 12,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                             )),
