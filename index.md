@@ -41,7 +41,7 @@
 
 ## 팀 소개
 
-
+![image](https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg)
 <img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="180" width="200px;">
 
 ```markdown
