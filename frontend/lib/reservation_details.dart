@@ -143,9 +143,7 @@ class _Details extends State<Details> {
                   ),
                   SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () async {
-                      // 눌렀을때
-                    },
+                    onPressed: () => FlutterDialog("입장하시겠습니까?", "입장하기"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF004F9E),
                       minimumSize: const Size(330.11, 57.06),
@@ -173,12 +171,8 @@ class _Details extends State<Details> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => Details()),
-                            // );
-                          },
+                          onPressed: () =>
+                              FlutterDialog("예약을 변경하시겠습니까 ?", "변경하기"),
                           child: Text(
                             '예약 변경',
                             style: TextStyle(
@@ -198,12 +192,8 @@ class _Details extends State<Details> {
                         ),
                         SizedBox(width: 60),
                         TextButton(
-                          onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => Details()),
-                            // );
-                          },
+                          onPressed: () =>
+                              FlutterDialog("예약을 취소하시겠습니까 ?", "예약 취소"),
                           child: Text(
                             '예약 취소',
                             style: TextStyle(
@@ -395,6 +385,95 @@ class _Details extends State<Details> {
         unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  //alert dialog
+  void FlutterDialog(String text, String text2) {
+    showDialog(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3.0)),
+            //Dialog Main Title
+
+            //
+            content: Container(
+              width: 359.39,
+              height: 40.41, // Dialog 박스의 너비 조정
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            actions: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 1, // 선의 높이 조정
+                    width: 350, // 선의 너비 조정
+                    color:
+                        Colors.grey.withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                  ),
+                  Row(
+                    children: [
+                      SizedBox(width: 30),
+                      TextButton(
+                        child: new Text("돌아가기",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      SizedBox(width: 50), // 버튼 사이 간격 조정
+                      Container(
+                        height: 34.74, // 선의 높이 조정
+                        width: 1, // 선의 너비 조정
+                        color: Colors.grey
+                            .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                      ),
+                      SizedBox(width: 50), // 버튼 사이 간격 조정
+                      TextButton(
+                        child: new Text(text2,
+                            style: TextStyle(
+                              color: Color(0XFF004F9E),
+                              fontSize: 15,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          );
+        });
   }
 
   // 버튼을 생성하는 함수
