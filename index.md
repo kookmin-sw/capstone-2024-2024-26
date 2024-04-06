@@ -120,5 +120,6 @@
  ### ✔️협업 도구 및 디자인
  <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"><img src="https://img.shields.io/badge/Notion-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white">
  ## 추가적인 내용
-
+[중간발표자료.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/14880364/default.pdf)
+[중간보고서.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/14880368/default.pdf)
         
