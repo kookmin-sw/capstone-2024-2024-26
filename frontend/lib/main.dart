@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:frontend/reservation_details.dart';
 import 'package:frontend/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/sign_in.dart';
@@ -10,6 +11,7 @@ import 'package:frontend/myPage.dart';
 import 'package:frontend/lent_teamroom.dart';
 import 'package:frontend/lent_conference.dart';
 import 'loading.dart';
+import 'reservation_details.dart';
 
 void main() {
   runApp(MyApp());
@@ -87,8 +89,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final PageController _pageController = PageController();
-  int _currentIndex = 0;
   bool isloading = false;
 
   @override
@@ -108,6 +108,7 @@ class _MainPageState extends State<MainPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          leading: Container(),
           centerTitle: true,
           actions: [
             IconButton(
@@ -178,7 +179,7 @@ class _MainPageState extends State<MainPage> {
                         Text('동아리방 대여',
                             style: TextStyle(
                               fontSize: 18.75,
-                              color: Color(0xFF006282),
+                              color: Color(0xFF004f9e),
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
                             )),
@@ -218,7 +219,7 @@ class _MainPageState extends State<MainPage> {
                         Text('강의실 대여',
                             style: TextStyle(
                               fontSize: 18.75,
-                              color: Color(0xFF006282),
+                              color: Color(0xFF004f9e),
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
                             )),
@@ -233,32 +234,34 @@ class _MainPageState extends State<MainPage> {
 
         // 하단 바
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: 0, // Adjust the index according to your need
           onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-              if (index == 2) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (context) => MyPage()), // myPage.dart로 이동
+            switch (index) {
+              case 0:
+                break;
+
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Details()),
                 );
-              } else {
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPage()),
                 );
-              }
-            });
+                break;
+            }
           },
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/lent.svg'),
-              label: '대여하기',
+              label: '공간대여',
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/reserved.svg'),
-              label: '예약 내역',
+              label: '예약내역',
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/mypage.svg'),
@@ -267,21 +270,14 @@ class _MainPageState extends State<MainPage> {
           ],
           selectedLabelStyle:
               TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+
           selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
         ),
       );
       // 하단 바
     }
-  }
-
-  void addClick() {
-    setState(() {
-      _currentIndex = 1;
-      _pageController.animateToPage(
-        1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 }

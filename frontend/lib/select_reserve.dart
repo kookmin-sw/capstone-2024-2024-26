@@ -9,6 +9,8 @@ import 'sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'loading.dart';
 import 'complete.dart';
+import 'reservation_details.dart';
+import 'myPage.dart';
 
 class Select_reserve extends StatefulWidget {
   @override
@@ -26,9 +28,9 @@ class _select extends State<Select_reserve> {
   }
 
   final double intervalWidth = 50.0;
-  final PageController _pageController = PageController();
+
   final ExpansionTileController controller = ExpansionTileController();
-  int _currentIndex = 0;
+
   String startTime = ''; //server
   String endTime = '';
   String room_name = '미래관 601호'; //server
@@ -37,7 +39,7 @@ class _select extends State<Select_reserve> {
   int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
-  int _peopleValue = 0;
+
   int count = 0;
   int find = 0;
 
@@ -57,7 +59,6 @@ class _select extends State<Select_reserve> {
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
-    print(uid);
   }
 
   DateTime selectedDate = DateTime.utc(
@@ -74,7 +75,7 @@ class _select extends State<Select_reserve> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '동아리방 대여',
+            '공간대여',
             style: TextStyle(
               color: Colors.black,
               fontSize: 15,
@@ -182,7 +183,7 @@ class _select extends State<Select_reserve> {
                         selectedDayPredicate: (date) {
                           return isSameDay(selectedDate, date);
                         },
-                        calendarFormat: CalendarFormat.month, //2주 출력가능
+                        calendarFormat: CalendarFormat.twoWeeks, //2주 출력가능
 
                         focusedDay: DateTime.now(),
                         firstDay: DateTime.now(),
@@ -348,121 +349,10 @@ class _select extends State<Select_reserve> {
                           )
                         ],
                       ),
-
-                      const Divider(
-                        color: Colors.grey,
-                        thickness: 0.5,
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(height: 40),
-                          Text(
-                            '인원을 선택하세요',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                      SizedBox(
+                        height: 10,
                       ),
 
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 10),
-                              Text(
-                                '인원',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '최대 ?명까지 예약 가능합니다.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'Inter',
-                                  color: Color(0xFFA3A3A3),
-                                  height: 2,
-                                ),
-                                textAlign: TextAlign.left,
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 90),
-                          Container(
-                            width: 92.62,
-                            height: 30.72,
-                            constraints: BoxConstraints(
-                              maxWidth: 92.62,
-                              maxHeight: 30.72,
-                            ),
-                            decoration: ShapeDecoration(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      width: 0.50, color: Color(0xFFE3E3E3)),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                shadows: [
-                                  BoxShadow(
-                                    color: Color(0x0C000000),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 0),
-                                    spreadRadius: 0,
-                                  )
-                                ]),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(
-                                  width: 30,
-                                  child: IconButton(
-                                    icon: SvgPicture.asset(
-                                      'assets/icons/minus.svg',
-                                    ),
-                                    onPressed: _peopleValue > 0
-                                        ? _decrementCounter
-                                        : null,
-                                  ),
-                                ),
-                                SvgPicture.asset('assets/icons/line.svg'),
-                                SizedBox(
-                                  child: Center(
-                                    child: Text(
-                                      '  $_peopleValue  ',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SvgPicture.asset('assets/icons/line.svg'),
-                                SizedBox(
-                                  width: 30,
-                                  child: IconButton(
-                                    icon: SvgPicture.asset(
-                                      'assets/icons/plus.svg',
-                                      color: Colors.black,
-                                    ),
-                                    onPressed: _incrementCounter,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 10),
                       const Divider(
                         color: Colors.grey,
                         thickness: 0.5,
@@ -599,46 +489,48 @@ class _select extends State<Select_reserve> {
         ),
 
         // 하단 바
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: Colors.grey,
-                width: 0.5,
-              ),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 0, // Adjust the index according to your need
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                break;
+
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Details()),
                 );
-              });
-            },
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/lent.svg'),
-                label: '공간 대여',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/reserved.svg'),
-                label: '예약 내역',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset('assets/icons/mypage.svg'),
-                label: '마이페이지',
-              ),
-            ],
-            selectedLabelStyle:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            selectedItemColor: Colors.black,
-          ),
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPage()),
+                );
+                break;
+            }
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent.svg'),
+              label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved.svg'),
+              label: '예약내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+
+          selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
         ),
       );
     }
@@ -688,7 +580,6 @@ class _select extends State<Select_reserve> {
       'date': selectedDate.toString(),
       'startTime': startTime,
       'endTime': endTime,
-      'numberOfPeople': _peopleValue.toString(),
       'tableNumber': table_number.toString(),
     };
 
@@ -728,18 +619,6 @@ class _select extends State<Select_reserve> {
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
       selectedDate = selectedDay;
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _peopleValue++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _peopleValue--;
     });
   }
 

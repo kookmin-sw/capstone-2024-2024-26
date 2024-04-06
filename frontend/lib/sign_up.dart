@@ -5,6 +5,7 @@ import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -46,27 +47,37 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.only(right: 70.0, top: 20.0),
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(
-              '회원가입',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        title: Text(
+          '회원가입',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 15,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.bold,
           ),
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(30.0),
-          child: Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Divider(
-              color: Color(0xFFDFDFDF),
-              thickness: 1.0,
-            ),
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/back.svg', color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+
+        backgroundColor: Colors.transparent, // 상단바 배경색
+        foregroundColor: Colors.black, //상단바 아이콘색
+
+        //shadowColor: Colors(), 상단바 그림자색
+        bottomOpacity: 0.0,
+        elevation: 0.0,
+        scrolledUnderElevation: 0,
+
+        ///
+        // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
+        shape: const Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.5,
           ),
         ),
       ),
@@ -239,7 +250,12 @@ class _SignUpState extends State<SignUp> {
                     ),
                     const Text(
                       '개인정보 이용 및 약관에 동의하시겠습니까?',
-                      style: TextStyle(color: Color(0xFF7A7A7A)),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -262,7 +278,7 @@ class _SignUpState extends State<SignUp> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3694A8),
+                    backgroundColor: const Color(0xFF004F9E),
                     minimumSize: const Size(265.75, 39.46),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(3)),
@@ -298,7 +314,7 @@ class _SignUpState extends State<SignUp> {
                       );
                     },
                     child: const Text("로그인",
-                        style: TextStyle(color: Color(0xFF141D5B))),
+                        style: TextStyle(color: Color(0xFF004F9E))),
                   )
                 ],
               )
@@ -321,7 +337,10 @@ class _SignUpState extends State<SignUp> {
       child: TextField(
         obscureText: isPassword,
         controller: controller,
-        style: const TextStyle(fontSize: 13),
+        style: const TextStyle(
+          fontSize: 12,
+          fontFamily: 'Inter',
+        ),
         decoration: InputDecoration(
           hintText: labelText,
           hintStyle: const TextStyle(color: Color(0xFF9C9C9C)),

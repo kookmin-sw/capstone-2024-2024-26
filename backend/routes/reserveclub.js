@@ -37,7 +37,7 @@ reserveClub.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    numberOfPeople,
+    
     tableNumber,
   } = req.body;
   try {
@@ -110,7 +110,7 @@ reserveClub.post("/", async (req, res) => {
       date: date,
       startTime: startTime,
       endTime: endTime,
-      numberOfPeople: numberOfPeople,
+      
       tableNumber: tableNumber,
     });
 

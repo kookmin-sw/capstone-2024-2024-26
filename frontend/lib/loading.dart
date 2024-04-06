@@ -15,7 +15,7 @@ class LoadingScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(50.0),
               child: Container(
                 child: LoadingAnimationWidget.inkDrop(
-                  color: Color(0xFF3694A8),
+                  color: Color(0xFF004F9E),
                   size: 70.0,
                 ),
               ),

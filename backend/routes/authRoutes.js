@@ -174,12 +174,13 @@ router.post("/profile/update/:uid", async (req, res) => {
 });
 
 // 프로필 조회
-router.get("/profile/:uid", async (req, res) => {
-  const userId = req.params.uid;
+router.post("/profile/:uid", async (req, res) => {
+  const {uid} = req.body;
+  console.log(req.body) ;
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴
-    const userDoc = await getDoc(doc(db, "users", userId));
+    const userDoc = await getDoc(doc(db, "users", uid));
     if (!userDoc.exists()) {
       // 사용자 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "User not found" });
@@ -187,7 +188,7 @@ router.get("/profile/:uid", async (req, res) => {
 
     // 사용자 정보 반환
     const userData = userDoc.data();
-    res.status(200).json(userData);
+    res.status(200).json({message: "User checking success", userData:userData},);
   } catch (error) {
     // 오류 발생 시 오류 응답
     console.error("Error fetching profile", error);

@@ -56,9 +56,11 @@ class _SignInState extends State<SignIn> {
               SizedBox(
                 height: 10,
               ),
-              buildInputField(
-                '아이디를 입력하세요',
-                controller: emailController,
+              Container(
+                child: buildInputField(
+                  '아이디를 입력하세요',
+                  controller: emailController,
+                ),
               ),
               SizedBox(height: 20),
               Padding(
@@ -116,7 +118,7 @@ class _SignInState extends State<SignIn> {
                   await loginUser(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3694A8),
+                  backgroundColor: const Color(0xFF004F9E),
                   minimumSize: const Size(265.75, 39.46),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(3)),
@@ -153,7 +155,7 @@ class _SignInState extends State<SignIn> {
                       );
                     },
                     child: const Text("회원가입",
-                        style: TextStyle(color: Color(0xFF3694A8))),
+                        style: TextStyle(color: Color(0xFF004F9E))),
                   )
                 ],
               )
