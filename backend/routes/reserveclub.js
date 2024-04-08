@@ -37,7 +37,6 @@ reserveClub.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    numberOfPeople,
     tableNumber,
   } = req.body;
   try {
@@ -61,7 +60,6 @@ reserveClub.post("/", async (req, res) => {
     const overlappingReservation = existingReservationsSnapshot.docs.find(
       (doc) => {
         const reservation = doc.data();
-        console.log(reservation);
 
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;
@@ -113,7 +111,6 @@ reserveClub.post("/", async (req, res) => {
       date: date,
       startTime: startTime,
       endTime: endTime,
-      numberOfPeople: numberOfPeople,
       tableNumber: tableNumber,
     });
 
@@ -158,7 +155,6 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
         userReservations.push({
           id: doc.id, // 예약 문서 ID
           roomId: reservation.roomId,
-          numberOfPeople: reservation.numberOfPeople,
           date: reservation.date,
           startTime: reservation.startTime,
           endTime: reservation.endTime,
@@ -209,7 +205,6 @@ reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
         date: reservation.date,
         startTime: reservation.startTime,
         endTime: reservation.endTime,
-        numberOfPeople: reservation.numberOfPeople,
         tableNumber: reservation.tableNumber,
       });
     });
@@ -232,7 +227,7 @@ reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
 reserveClub.post("/update/:uid", async (req, res) => {
   try {
     const userId = req.params.uid;
-    const { roomId, date, startTime, endTime, numberOfPeople, tableNumber } =
+    const { roomId, date, startTime, endTime, tableNumber } =
       req.body;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
@@ -248,7 +243,6 @@ reserveClub.post("/update/:uid", async (req, res) => {
     if (date) updateFields.date = date;
     if (startTime) updateFields.startTime = startTime;
     if (endTime) updateFields.endTime = endTime;
-    if (numberOfPeople) updateFields.numberOfPeople = numberOfPeople;
     if (tableNumber) updateFields.tableNumber = tableNumber;
 
     // 겹치는 예약이 있는지 확인
@@ -335,7 +329,6 @@ reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
     date,
     startTime,
     endTime,
-    numberOfPeople,
     tableNumber,
   } = req.body;
 
@@ -349,7 +342,6 @@ reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
       date: date,
       startTime: startTime,
       endTime: endTime,
-      numberOfPeople: numberOfPeople,
       tableNumber: tableNumber,
     });
 
