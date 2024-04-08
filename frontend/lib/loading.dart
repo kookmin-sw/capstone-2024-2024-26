@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:frontend/lent_teamroom.dart';
 
 class LoadingScreen extends StatelessWidget {
   @override
@@ -14,7 +15,7 @@ class LoadingScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(50.0),
               child: Container(
                 child: LoadingAnimationWidget.inkDrop(
-                  color: Color(0xFF3694A8),
+                  color: Color(0xFF004F9E),
                   size: 70.0,
                 ),
               ),

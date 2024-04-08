@@ -5,6 +5,7 @@ import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -25,13 +26,60 @@ class _SignUpState extends State<SignUp> {
 
   String errorMessage = '';
 
+  List<String> _clubs = [
+    'Wink',
+    'D-Alpha',
+    'KoBot',
+    'Poska',
+  ];
+  List<String> _faculties = [
+    '소프트웨어 융합 대학',
+    '창의 공과 대학',
+    '조형 대학',
+    '경상 대학',
+  ];
+
+  String? _selectedClub;
+  String? _selectedFaculty;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('회원가입'),
-        backgroundColor: const Color(0xFF3694A8),
+        title: Text(
+          '회원가입',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 15,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/back.svg', color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+
+        backgroundColor: Colors.transparent, // 상단바 배경색
+        foregroundColor: Colors.black, //상단바 아이콘색
+
+        //shadowColor: Colors(), 상단바 그림자색
+        bottomOpacity: 0.0,
+        elevation: 0.0,
+        scrolledUnderElevation: 0,
+
+        ///
+        // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
+        shape: const Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.5,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -40,33 +88,177 @@ class _SignUpState extends State<SignUp> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              buildInputField('이름', controller: nameController),
-              buildInputField('학번', controller: studentIdController),
-              buildInputField('소속 단과대학', controller: facultyController),
-              buildInputField('학부', controller: departmentController),
-              buildInputField('소속 동아리', controller: clubController),
-              buildInputField('이메일', controller: emailController),
-              buildInputField('비밀번호',
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(right: 220),
+                child: const Text(
+                  '이름',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('이름을 입력하세요', controller: nameController),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 220),
+                child: const Text(
+                  '학번',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('학번을 입력하세요', controller: studentIdController),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 195),
+                child: const Text(
+                  '단과대학',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildDropdownField('단과대학', _faculties, _selectedFaculty),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 220),
+                child: const Text(
+                  '학과',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('학과를 입력하세요', controller: departmentController),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 180),
+                child: const Text(
+                  '소속 동아리',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildDropdownField('소속 동아리', _clubs, _selectedClub),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 170),
+                child: const Text(
+                  '이메일(아이디)',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('example@kookmin.ac.kr',
+                  controller: emailController),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 195),
+                child: const Text(
+                  '비밀번호',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('비밀번호를 입력하세요',
                   isPassword: true, controller: passwordController),
-              buildInputField('비밀번호 확인',
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 175),
+                child: const Text(
+                  '비밀번호 확인',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('비밀번호를 입력하세요',
                   isPassword: true, controller: confirmPasswordController),
-              buildInputField('휴대폰 번호', controller: phoneController),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.only(right: 180),
+                child: const Text(
+                  '휴대폰 번호',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    height: 0.13,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              buildInputField('휴대폰 번호를 입력하세요', controller: phoneController),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Checkbox(
-                    value: isChecked,
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
-                    },
-                  ),
-                  const Text(
-                    '개인정보 이용 및 약관에 동의하시겠습니까?',
-                    style: TextStyle(color: Color(0xFF7A7A7A)),
-                  ),
-                ],
+              Padding(
+                padding: EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value!;
+                        });
+                      },
+                    ),
+                    const Text(
+                      '개인정보 이용 및 약관에 동의하시겠습니까?',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
                   width: double.infinity,
@@ -86,7 +278,7 @@ class _SignUpState extends State<SignUp> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3694A8),
+                    backgroundColor: const Color(0xFF004F9E),
                     minimumSize: const Size(265.75, 39.46),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(3)),
@@ -122,7 +314,7 @@ class _SignUpState extends State<SignUp> {
                       );
                     },
                     child: const Text("로그인",
-                        style: TextStyle(color: Color(0xFF141D5B))),
+                        style: TextStyle(color: Color(0xFF004F9E))),
                   )
                 ],
               )
@@ -135,16 +327,75 @@ class _SignUpState extends State<SignUp> {
 
   Widget buildInputField(String labelText,
       {bool isPassword = false, TextEditingController? controller}) {
-    return TextField(
-      obscureText: isPassword,
-      controller: controller,
-      style: const TextStyle(fontSize: 13),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(color: Color(0xFF9C9C9C)),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF9C9C9C)),
+    return Container(
+      width: 265.75,
+      height: 28.97,
+      decoration: ShapeDecoration(
+        color: Color(0x4FECECEC),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      ),
+      child: TextField(
+        obscureText: isPassword,
+        controller: controller,
+        style: const TextStyle(
+          fontSize: 12,
+          fontFamily: 'Inter',
         ),
+        decoration: InputDecoration(
+          hintText: labelText,
+          hintStyle: const TextStyle(color: Color(0xFF9C9C9C)),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF9C9C9C)),
+          ),
+          border: InputBorder.none,
+          filled: true,
+          fillColor: Color.fromARGB(255, 246, 246, 246),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDropdownField(
+      String labelText, List<String> items, String? value) {
+    return Container(
+      width: 265.75,
+      height: 28.97,
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          hintText: labelText,
+          hintStyle: TextStyle(
+            color: Color(0xFF9C9C9C),
+            fontSize: 13,
+          ),
+          filled: true,
+          fillColor: Color.fromARGB(255, 246, 246, 246),
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          border: InputBorder.none,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(2.0),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
+        ),
+        value: value,
+        onChanged: (newValue) {
+          setState(() {
+            if (labelText == '소속 동아리') {
+              _selectedClub = newValue;
+            } else if (labelText == '단과대학') {
+              _selectedFaculty = newValue;
+            }
+          });
+        },
+        items: items.map<DropdownMenuItem<String>>((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: TextStyle(fontSize: 12),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
