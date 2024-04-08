@@ -47,7 +47,7 @@ reserveClub.post("/", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     const userData = userDoc.data();
-    console.log(userData);
+
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
@@ -323,8 +323,6 @@ function isAdmin(req, res, next) {
 reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
   const {
     userId,
-    userName,
-    userClub,
     roomId,
     date,
     startTime,
@@ -333,11 +331,26 @@ reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
   } = req.body;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found"});
+    }
+    const userData = userDoc.data();
+
+    const existingMyReservationSnapshot = await getDocs(
+      collection(db, "reservationClub"),
+      where("userEmail", "==", userData.email)
+    );
+
+    const reservationCount = existingMyReservationSnapshot.size;
+
     // 예약 추가
-    await addDoc(collection(db, "reservationClub"), {
-      userId: userId,
-      userName: userName,
-      userClub: userClub,
+    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
+      userEmail: userData.email,
+      userName: userData.name,
+      userClub: userData.club,
       roomId: roomId,
       date: date,
       startTime: startTime,
