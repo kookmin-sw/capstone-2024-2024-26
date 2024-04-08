@@ -37,7 +37,6 @@ reserveClub.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    
     tableNumber,
   } = req.body;
   try {
@@ -48,7 +47,7 @@ reserveClub.post("/", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
     const userData = userDoc.data();
-    console.log(userData);
+
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
       collection(db, "reservationClub"),
@@ -61,7 +60,6 @@ reserveClub.post("/", async (req, res) => {
     const overlappingReservation = existingReservationsSnapshot.docs.find(
       (doc) => {
         const reservation = doc.data();
-        console.log(reservation);
 
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;
@@ -75,8 +73,12 @@ reserveClub.post("/", async (req, res) => {
         if (
           (existingDate == date &&
             startTimeClub == existingStartTime &&
-            endTimeClub == existingEndTime && roomId == existingRoomId) ||
-          (existingDate == date && roomId == existingRoomId && startTimeClub < existingEndTime && endTimeClub > existingStartTime)
+            endTimeClub == existingEndTime &&
+            roomId == existingRoomId) ||
+          (existingDate == date &&
+            roomId == existingRoomId &&
+            startTimeClub < existingEndTime &&
+            endTimeClub > existingStartTime)
         ) {
           return true;
         }
@@ -90,7 +92,6 @@ reserveClub.post("/", async (req, res) => {
       return res
         .status(401)
         .json({ error: "The room is already reserved for this time" });
-       
     }
     // 전에 사용자가 한 예약이 있는지 확인
     const existingMyReservationSnapshot = await getDocs(
@@ -110,7 +111,6 @@ reserveClub.post("/", async (req, res) => {
       date: date,
       startTime: startTime,
       endTime: endTime,
-      
       tableNumber: tableNumber,
     });
 
@@ -155,7 +155,6 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
         userReservations.push({
           id: doc.id, // 예약 문서 ID
           roomId: reservation.roomId,
-          numberOfPeople: reservation.numberOfPeople,
           date: reservation.date,
           startTime: reservation.startTime,
           endTime: reservation.endTime,
@@ -206,7 +205,6 @@ reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
         date: reservation.date,
         startTime: reservation.startTime,
         endTime: reservation.endTime,
-        numberOfPeople: reservation.numberOfPeople,
         tableNumber: reservation.tableNumber,
       });
     });
@@ -225,10 +223,11 @@ reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
   }
 });
 
+// 추가 수정 필요
 reserveClub.post("/update/:uid", async (req, res) => {
   try {
     const userId = req.params.uid;
-    const { roomId, date, startTime, endTime, numberOfPeople, tableNumber } =
+    const { roomId, date, startTime, endTime, tableNumber } =
       req.body;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
@@ -244,7 +243,6 @@ reserveClub.post("/update/:uid", async (req, res) => {
     if (date) updateFields.date = date;
     if (startTime) updateFields.startTime = startTime;
     if (endTime) updateFields.endTime = endTime;
-    if (numberOfPeople) updateFields.numberOfPeople = numberOfPeople;
     if (tableNumber) updateFields.tableNumber = tableNumber;
 
     // 겹치는 예약이 있는지 확인
@@ -256,31 +254,43 @@ reserveClub.post("/update/:uid", async (req, res) => {
       where("userId", "!=", userId) // 현재 예약을 제외하고 조회
     );
 
-    // 겹치는 예약이 있는 경우 에러 반환
-    if (!existingReservationsSnapshot.empty) {
-      const overlappingReservation = existingReservationsSnapshot.docs.find(
-        (doc) => {
-          const reservation = doc.data();
-          const existingStartTime = reservation.startTime;
-          const existingEndTime = reservation.endTime;
+    // 겹치는 예약이 있는지 확인
+    const overlappingReservation = existingReservationsSnapshot.docs.find(
+      (doc) => {
+        const reservation = doc.data();
+        console.log(reservation);
 
-          // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-          if (
-            (startTime == existingStartTime && endTime == existingEndTime) ||
-            (startTime < existingEndTime && endTime > existingStartTime)
-          ) {
-            return true;
-          }
-          return false;
+        // 기존 예약의 시작 시간과 끝 시간
+        const existingStartTime = reservation.startTime;
+        const existingEndTime = reservation.endTime;
+        const existingDate = reservation.date;
+        const existingRoomId = reservation.roomId;
+        const startTimeClub = updateFields.startTime;
+        const endTimeClub = updateFields.endTime;
+
+        // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
+        if (
+          (existingDate == date &&
+            startTimeClub == existingStartTime &&
+            endTimeClub == existingEndTime &&
+            roomId == existingRoomId) ||
+          (existingDate == date &&
+            roomId == existingRoomId &&
+            startTimeClub < existingEndTime &&
+            endTimeClub > existingStartTime)
+        ) {
+          return true;
         }
-      );
+
+        return false;
+      }
+    );
 
       if (overlappingReservation) {
         return res
           .status(400)
           .json({ error: "The room is already reserved for this time" });
       }
-    }
 
     // 겹치는 예약이 없으면 예약 업데이트
     await updateDoc(doc(db, "reservationClub", userId), updateFields);
@@ -313,27 +323,38 @@ function isAdmin(req, res, next) {
 reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
   const {
     userId,
-    userName,
-    userClub,
     roomId,
     date,
     startTime,
     endTime,
-    numberOfPeople,
     tableNumber,
   } = req.body;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found"});
+    }
+    const userData = userDoc.data();
+
+    const existingMyReservationSnapshot = await getDocs(
+      collection(db, "reservationClub"),
+      where("userEmail", "==", userData.email)
+    );
+
+    const reservationCount = existingMyReservationSnapshot.size;
+
     // 예약 추가
-    await addDoc(collection(db, "reservationClub"), {
-      userId: userId,
-      userName: userName,
-      userClub: userClub,
+    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
+      userEmail: userData.email,
+      userName: userData.name,
+      userClub: userData.club,
       roomId: roomId,
       date: date,
       startTime: startTime,
       endTime: endTime,
-      numberOfPeople: numberOfPeople,
       tableNumber: tableNumber,
     });
 
