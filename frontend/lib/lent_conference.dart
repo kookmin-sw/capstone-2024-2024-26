@@ -1,8 +1,9 @@
-import 'main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Lent_Conference extends StatefulWidget {
+  const Lent_Conference({super.key});
+
   @override
   _Lentconference createState() => _Lentconference();
 }
@@ -10,11 +11,11 @@ class Lent_Conference extends StatefulWidget {
 class _Lentconference extends State<Lent_Conference> {
   @override
   Widget build(BuildContext context) {
-    final PageController _pageController = PageController();
-    int _currentIndex = 0;
+    final PageController pageController = PageController();
+    int currentIndex = 0;
     return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             '강의실 대여',
             style: TextStyle(
               color: Colors.black,
@@ -46,14 +47,14 @@ class _Lentconference extends State<Lent_Conference> {
 
           ///
           // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
-          shape: Border(
+          shape: const Border(
             bottom: BorderSide(
               color: Colors.grey,
               width: 0.5,
             ),
           ),
         ),
-        body: Center(
+        body: const Center(
           child: Text(
             'This is the Lent Teamroom page',
             style: TextStyle(fontSize: 24),
@@ -62,7 +63,7 @@ class _Lentconference extends State<Lent_Conference> {
 
         // 하단 바
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(
                 color: Colors.grey,
@@ -70,13 +71,13 @@ class _Lentconference extends State<Lent_Conference> {
               ),
             ),
           ),
-          padding: EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
+          padding: const EdgeInsets.symmetric(vertical: 10), // 모든 방향으로 바텀 패딩.
           child: BottomNavigationBar(
-            currentIndex: _currentIndex,
+            currentIndex: currentIndex,
             onTap: (index) {
               setState(() {
-                _currentIndex = index;
-                _pageController.animateToPage(
+                currentIndex = index;
+                pageController.animateToPage(
                   index,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
@@ -98,7 +99,7 @@ class _Lentconference extends State<Lent_Conference> {
               ),
             ],
             selectedLabelStyle:
-                TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             selectedItemColor: Colors.black,
           ),
         ));

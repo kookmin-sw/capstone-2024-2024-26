@@ -4,6 +4,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>카메라 사용</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>비디오 사용</string>
+	
+
 	<key>CFBundleDisplayName</key>
 	<string>Flutter Application 1</string>
 	<key>CFBundleExecutable</key>

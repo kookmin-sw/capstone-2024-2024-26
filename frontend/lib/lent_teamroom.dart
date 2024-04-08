@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'main.dart'; // 필요시 main.dart 파일을 import합니다.
+// 필요시 main.dart 파일을 import합니다.
 import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
 import 'select_reserve.dart'; // 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
 import 'myPage.dart'; // 마이페이지를 보여주는 데 사용할 MyPage 위젯을 import합니다.
 import 'reservation_details.dart';
 
 class Lent_Teamroom extends StatefulWidget {
+  const Lent_Teamroom({super.key});
+
   @override
   _Lentteam createState() => _Lentteam();
 }
@@ -23,11 +25,11 @@ class _Lentteam extends State<Lent_Teamroom> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return LoadingScreen();
+      return const LoadingScreen();
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             '공간대여',
             style: TextStyle(
               color: Colors.black,
@@ -55,7 +57,7 @@ class _Lentteam extends State<Lent_Teamroom> {
           bottomOpacity: 0.0,
           elevation: 0.0,
           scrolledUnderElevation: 0,
-          shape: Border(
+          shape: const Border(
             bottom: BorderSide(
               color: Colors.grey,
               width: 0.5,
@@ -63,7 +65,7 @@ class _Lentteam extends State<Lent_Teamroom> {
           ),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Center(
             child: Column(
               children: [
@@ -72,10 +74,10 @@ class _Lentteam extends State<Lent_Teamroom> {
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
+                      side: const BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    shadows: [
+                    shadows: const [
                       BoxShadow(
                         color: Color(0x0C000000),
                         blurRadius: 10,
@@ -90,7 +92,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                         Stack(
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(top: 5),
+                              padding: const EdgeInsets.only(top: 5),
                               child: Image.asset(
                                 'assets/images.png',
                                 width: 340.63,
@@ -113,7 +115,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                   onPressed: null,
                                   child: Text(
                                     room_name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 15,
                                       fontFamily: 'Inter',
@@ -157,7 +159,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                     ),
                                     Text(
                                       people,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
                                         fontFamily: 'Inter',
@@ -184,7 +186,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                                     ),
                                     Text(
                                       time,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
                                         fontFamily: 'Inter',
@@ -202,7 +204,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Select_reserve(),
+                                builder: (context) => const Select_reserve(),
                               ),
                             );
                           },
@@ -216,7 +218,7 @@ class _Lentteam extends State<Lent_Teamroom> {
                           ),
                           child: Text(
                             isLoading ? '로딩 중...' : '예약하기',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -242,13 +244,13 @@ class _Lentteam extends State<Lent_Teamroom> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Details()),
+                  MaterialPageRoute(builder: (context) => const Details()),
                 );
                 break;
               case 2:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyPage()),
+                  MaterialPageRoute(builder: (context) => const MyPage()),
                 );
                 break;
             }
@@ -268,11 +270,11 @@ class _Lentteam extends State<Lent_Teamroom> {
             ),
           ],
           selectedLabelStyle:
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
 
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
-              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
           unselectedItemColor: Colors.grey,
         ),
       );

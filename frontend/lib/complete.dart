@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'main.dart'; // 필요시 main.dart 파일을 import합니다.
+// 필요시 main.dart 파일을 import합니다.
 import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
-import 'select_reserve.dart'; // 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
+// 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
 import 'package:dotted_line/dotted_line.dart';
 import 'myPage.dart';
 import 'reservation_details.dart';
 
 class Complete extends StatefulWidget {
+  const Complete({super.key});
+
   @override
   _Complete createState() => _Complete();
 }
@@ -15,18 +17,18 @@ class Complete extends StatefulWidget {
 class _Complete extends State<Complete> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return LoadingScreen();
+      return const LoadingScreen();
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             '공간대여',
             style: TextStyle(
               color: Colors.black,
@@ -54,7 +56,7 @@ class _Complete extends State<Complete> {
           bottomOpacity: 0.0,
           elevation: 0.0,
           scrolledUnderElevation: 0,
-          shape: Border(
+          shape: const Border(
             bottom: BorderSide(
               color: Colors.grey,
               width: 0.5,
@@ -65,7 +67,7 @@ class _Complete extends State<Complete> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 '    예약이 완료되었습니다.',
                 style: TextStyle(
                   color: Colors.black,
@@ -75,9 +77,9 @@ class _Complete extends State<Complete> {
                   height: 0.09,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               SvgPicture.asset('assets/icons/completion.svg'),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -85,8 +87,8 @@ class _Complete extends State<Complete> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 35),
-                      Text(
+                      const SizedBox(height: 35),
+                      const Text(
                         '[ 미래관 610호 ]',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -97,8 +99,8 @@ class _Complete extends State<Complete> {
                           height: 0.21,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
+                      const SizedBox(height: 20),
+                      const Text(
                         '2024.3.19(화)',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -109,9 +111,9 @@ class _Complete extends State<Complete> {
                           height: 0.21,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        '오후 12:00 ~ 3:00 ' + ' | ' + '8인' + ' | ' + '좌석 2',
+                      const SizedBox(height: 20),
+                      const Text(
+                        '오후 12:00 ~ 3:00  | 8인 | 좌석 2',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -121,8 +123,8 @@ class _Complete extends State<Complete> {
                           height: 0.21,
                         ),
                       ),
-                      SizedBox(height: 23),
-                      DottedLine(
+                      const SizedBox(height: 23),
+                      const DottedLine(
                         direction: Axis.horizontal,
                         alignment: WrapAlignment.center,
                         lineLength: 200,
@@ -134,15 +136,15 @@ class _Complete extends State<Complete> {
                         dashGapColor: Colors.transparent,
                         dashGapRadius: 0.0,
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       TextButton(
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Details()),
+                            MaterialPageRoute(builder: (context) => const Details()),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           '예약내역 확인하기',
                           style: TextStyle(
                             color: Color(0xFF004F9E),
@@ -154,7 +156,7 @@ class _Complete extends State<Complete> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ],
@@ -173,13 +175,13 @@ class _Complete extends State<Complete> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Details()),
+                  MaterialPageRoute(builder: (context) => const Details()),
                 );
                 break;
               case 2:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyPage()),
+                  MaterialPageRoute(builder: (context) => const MyPage()),
                 );
                 break;
             }
@@ -199,11 +201,11 @@ class _Complete extends State<Complete> {
             ),
           ],
           selectedLabelStyle:
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
 
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
-              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
           unselectedItemColor: Colors.grey,
         ),
       );

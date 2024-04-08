@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
@@ -7,6 +6,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SignIn extends StatefulWidget {
+  const SignIn({super.key});
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -37,12 +38,12 @@ class _SignInState extends State<SignIn> {
                   height: 0.06,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 220),
-                child: const Text(
+              const Padding(
+                padding: EdgeInsets.only(right: 220),
+                child: Text(
                   '아이디',
                   style: TextStyle(
                     color: Colors.black,
@@ -53,7 +54,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Container(
@@ -62,10 +63,10 @@ class _SignInState extends State<SignIn> {
                   controller: emailController,
                 ),
               ),
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(right: 220),
-                child: const Text(
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.only(right: 220),
+                child: Text(
                   '비밀번호',
                   style: TextStyle(
                     color: Colors.black,
@@ -76,14 +77,14 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('비밀번호를 입력하세요',
                   isPassword: true, controller: passwordController),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: Text(
                   errorMessage,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -112,7 +113,7 @@ class _SignInState extends State<SignIn> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () async {
                   await loginUser(context);
@@ -125,14 +126,14 @@ class _SignInState extends State<SignIn> {
                 ),
                 child: Text(
                   isLoading ? '로딩 중...' : '로그인',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              Divider(
+              const Divider(
                 color: Colors.grey,
                 thickness: 0.5,
                 height: 60,
@@ -151,7 +152,7 @@ class _SignInState extends State<SignIn> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUp()),
+                        MaterialPageRoute(builder: (context) => const SignUp()),
                       );
                     },
                     child: const Text("회원가입",
@@ -185,7 +186,7 @@ class _SignInState extends State<SignIn> {
       'password': passwordController.text,
     };
 
-    debugPrint('${data}');
+    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -205,7 +206,7 @@ class _SignInState extends State<SignIn> {
 
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       } else {
         setState(() {
@@ -225,7 +226,7 @@ class _SignInState extends State<SignIn> {
       width: 265.75,
       height: 28.97,
       decoration: ShapeDecoration(
-        color: Color(0x4FECECEC),
+        color: const Color(0x4FECECEC),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       ),
       child: TextField(
@@ -236,11 +237,11 @@ class _SignInState extends State<SignIn> {
           hintText: labelText,
           hintStyle: const TextStyle(color: Color(0xFF9C9C9C)),
           filled: true,
-          fillColor: Color(0xFFEDEDED),
+          fillColor: const Color(0xFFEDEDED),
           focusedBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Color(0xFF9C9C9C)),
           ),
-          enabledBorder: UnderlineInputBorder(
+          enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFEDEDED)),
           ),
         ),
