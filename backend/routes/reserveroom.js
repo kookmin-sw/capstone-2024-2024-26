@@ -125,7 +125,7 @@ reserveroom.post("/", async (req, res) => {
 
     // 전에 사용자가 한 예약이 있는지 확인
     const existingMyReservationSnapshot = await getDocs(
-      collection(db, "reservationClub"),
+      collection(db, "reservationRoom"),
       where("userEmail", "==", userData.email)
     );
 
