@@ -67,7 +67,7 @@
      
 ```
 
-<img align=left src="./read.me_image/정일형형.jpg" height="180" width="200px;">
+<img align=left src="./read.me_image/정일형.jpg" height="180" width="200px;">
 
 ```markdown
 😁 Name : 정일형
@@ -104,11 +104,14 @@
 
 
 
-    
+
+ ## 시스템 아키텍처
+<img src="./read.me_image/아키텍.png" height="510" width="800px;">
+
  ## 🔍 사용된 기술 stack
  
  ### ✔️Front-end
- <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white">
+ <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
  
  ### ✔️Back-end
  <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"><img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white">
