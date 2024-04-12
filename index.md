@@ -106,18 +106,18 @@
 
 
 
- ## 🔍 사용된 기술 stack
+## 🔍 사용된 기술 stack
  
- ### ✔️Front-end
+ ✔️Front-end
  <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
  
- ### ✔️Back-end
+ ✔️Back-end
  <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"><img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white">
 
-  ### ✔️AI
+ ✔️AI
 <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"><img src="https://img.shields.io/badge/PyTorch-3776AB?style=for-the-badge&logo=Python&logoColor=white">
 
- ### ✔️협업 도구 및 디자인
+ ✔️협업 도구 및 디자인
  <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"><img src="https://img.shields.io/badge/Notion-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white">
  ## 추가적인 내용
 [중간발표자료.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/14880364/default.pdf)
