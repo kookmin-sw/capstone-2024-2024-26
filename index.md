@@ -18,9 +18,9 @@
 
 |공간대여 선택|공유공간 선택|예약내역|예약 폼|
 |---|---|---|---|
-<img src="./read.me_image/Group%2023.png">|<img src="./read.me_image/Group%2024.png">|<img src="./read.me_image/Group%2025.png">|<img src="./read.me_image/Group%2028%20(1).png">
+<img src="./read.me_image/Group%2023.png" height="340" width="200px;">|<img src="./read.me_image/Group%2024.png" height="340" width="200px;">|<img src="./read.me_image/Group%2025.png" height="340" width="200px;">|<img src="./read.me_image/Group%2028%20(1).png" height="340" width="200px;">
 반납 확인|반납 승인|채팅||
-<img src="./read.me_image/Group%2026.png">|<img src="./read.me_image/Group%2027.png">|<img src="./read.me_image/Group%2027%20(1).png">|
+<img src="./read.me_image/Group%2026.png" height="340" width="200px;">|<img src="./read.me_image/Group%2027.png" height="340" width="200px;">|<img src="./read.me_image/Group%2027%20(1).png" height="340" width="200px;">|
 
  ## 🔍Abstract
 #### 1️⃣Problem
@@ -41,7 +41,7 @@
 ## 팀 소개
 
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%95%88%EC%88%98%ED%98%84.jpg" height="180" width="200px;">
+<img align=left src="./read.me_image/안수현.jpg" height="180" width="200px;">
 
 ```markdown
 😁 Name : 안수현(팀장)
@@ -54,7 +54,7 @@
 
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%98%EC%84%9D.jpg" height="180" width="200px;" >
+<img align=left src="./read.me_image/정의석.jpg" height="180" width="200px;">
 
 ```markdown
 😁 Name : 정의석
@@ -67,7 +67,7 @@
      
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%A0%95%EC%9D%BC%ED%98%95.jpg" height="180" width="200px;" >
+<img align=left src="./read.me_image/정일형형.jpg" height="180" width="200px;">
 
 ```markdown
 😁 Name : 정일형
@@ -80,8 +80,7 @@
 
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/blob/master/read.me_image/%EC%9D%B4%EC%9E%AC%ED%9B%88.jpg" height="180"  width="200px;" >
-
+<img align=left src="./read.me_image/이재훈.jpg" height="180" width="200px;">
 ```markdown
 😁 Name : 이재훈
 👨🏻‍💻 ID   : 20213053
