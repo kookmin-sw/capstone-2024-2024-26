@@ -105,8 +105,6 @@
 
 
 
- ## 시스템 아키텍처
-  <img src="./read.me_image/아키텍.png" height="510" width="800px;">
 
  ## 🔍 사용된 기술 stack
  
