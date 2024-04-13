@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'dart:io';
 import 'settings.dart';
 import 'main.dart';
@@ -11,55 +10,35 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camera/camera.dart';
-
-late List<CameraDescription> _cameras;
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  _cameras = await availableCameras();
-  runApp(const Return());
-}
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Return extends StatefulWidget {
-  const Return({
-    super.key,
-  });
-
   @override
   _ReturnState createState() => _ReturnState();
 }
 
 class _ReturnState extends State<Return> {
-  late CameraController controller;
+  TakePictureScreen? _takePictureScreen;
 
   @override
   void initState() {
     super.initState();
-    controller = CameraController(_cameras[0], ResolutionPreset.max);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            // Handle access errors here.
-            break;
-          default:
-            // Handle other errors here.
-            break;
-        }
-      }
-    });
+    _initializeCamera(); // initState에서 카메라 초기화
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+  Future<void> _initializeCamera() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    final cameras = await availableCameras();
+    if (cameras.isEmpty) {
+      // 사용 가능한 카메라가 없는 경우에 대한 처리
+      print("No available cameras found.");
+      return;
+    }
+    final firstCamera = cameras.first;
+
+    setState(() {
+      _takePictureScreen = TakePictureScreen(camera: firstCamera);
+    });
   }
 
   @override
@@ -82,17 +61,11 @@ class _ReturnState extends State<Return> {
           },
         ),
         centerTitle: true,
-
-        backgroundColor: Colors.transparent, // 상단바 배경색
-        foregroundColor: Colors.black, //상단바 아이콘색
-
-        //shadowColor: Colors(), 상단바 그림자색
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         bottomOpacity: 0.0,
         elevation: 0.0,
         scrolledUnderElevation: 0,
-
-        ///
-        // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
         shape: const Border(
           bottom: BorderSide(
             color: Colors.grey,
@@ -100,46 +73,102 @@ class _ReturnState extends State<Return> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        // SingleChildScrollView로 감싸서 스크롤 가능하도록
-        child: Column(
-          children: [
-            // Add your existing widgets here
-
-            // Camera button
-          ],
-        ),
-      ),
+      body: _takePictureScreen ?? Container(), // null 체크 후 사용
     );
   }
+}
 
-  // 버튼을 생성하는 함수
-  Widget _buildButton(String label, VoidCallback onPressed) {
-    return Container(
-      // 버튼을 Container로 감싸서 margin 설정
-      margin: const EdgeInsets.only(left: 20), // 왼쪽에만 margin 설정
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 15),
+class TakePictureScreen extends StatefulWidget {
+  final CameraDescription camera;
+
+  const TakePictureScreen({Key? key, required this.camera}) : super(key: key);
+
+  @override
+  _TakePictureScreenState createState() => _TakePictureScreenState();
+}
+
+class _TakePictureScreenState extends State<TakePictureScreen> {
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCameraController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _initializeCameraController() async {
+    _controller = CameraController(
+      widget.camera,
+      ResolutionPreset.medium,
+    );
+
+    _initializeControllerFuture = _controller.initialize();
+    await _initializeControllerFuture;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_controller.value.isInitialized) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return Column(
+      children: [
+        Expanded(
+          child: CameraPreview(_controller),
         ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.black,
+        SizedBox(height: 20),
+        TextButton(
+          onPressed: () async {
+            try {
+              final image = await _controller.takePicture();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DisplayPictureScreen(imagePath: image.path),
+                ),
+              );
+            } catch (e) {
+              print("Error: $e");
+            }
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+          ),
+          child: Text(
+            '사진 촬영',
+            style: const TextStyle(
+              color: Colors.black,
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
+}
 
-  // Divider를 생성하는 함수
-  Widget _buildDivider() {
-    return const Divider(
-      thickness: 1, // 실선의 두께를 지정
-      color: Colors.grey, // 실선의 색상을 지정
-      indent: 20, // 시작점에서의 들여쓰기
-      endIndent: 20, // 끝점에서의 들여쓰기
+class DisplayPictureScreen extends StatelessWidget {
+  final String imagePath;
+
+  const DisplayPictureScreen({Key? key, required this.imagePath})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('사진 보기')),
+      body: Image.file(File(imagePath)),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'return.dart';
 
 class Details extends StatefulWidget {
   const Details({super.key});
@@ -12,6 +13,8 @@ class Details extends StatefulWidget {
 }
 
 class _Details extends State<Details> {
+  get firstCamera => null;
+
   @override
   Widget build(BuildContext context) {
     bool isLent = false;
@@ -462,6 +465,10 @@ class _Details extends State<Details> {
                             )),
                         onPressed: () {
                           Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Return()),
+                          );
                         },
                       ),
                     ],

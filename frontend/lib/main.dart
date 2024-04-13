@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null) {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const Return()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       });
     } else {

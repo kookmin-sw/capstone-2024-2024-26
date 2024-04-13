@@ -19,7 +19,6 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  String uid = '';
   String name = '';
   String club = '';
   String? studentId;
@@ -281,11 +280,12 @@ class _MyPageState extends State<MyPage> {
 
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    uid = prefs.getString('uid')!;
+    String? uid = prefs.getString('uid');
+
     const url = 'http://localhost:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
-      'uid': uid,
+      'uid': uid ?? '',
     };
 
     final response = await http.post(
