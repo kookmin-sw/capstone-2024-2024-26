@@ -20,20 +20,15 @@ function SideBar() {
     };
 
     const menus = [
-        { name: "Home", path: "/"},
+        { name: "home", path: "/main"},
         { name: "회원 관리", path: "/member"},
         { name: "문의 관리", path: "/inquiry"},
         { name: "페이지 관리", path: "/page-management"},
         { name: "알림 관리", path: "/notification"},
+        { name: "예약 관리", path: "/reserve"},
     ];
     
     return(
-
-        <div className="sidebar_container">
-            <div className="sidebar_top">
-                <h2 className="sidebar_title">K-SharePlace 관리자 웹</h2>
-                <button className="logout_button" onClick={handleLogout}>로그아웃</button>
-            </div>
             <div className="sidebar_middle">
                 <div className="sidebar">
                     {menus.map((menu, index) =>{
@@ -46,11 +41,7 @@ function SideBar() {
                         );
                         })}
                 </div>
-                <div className="sidebar_main">
-                    <h2>기능 구현 화면</h2>
-                </div>
             </div>
-        </div>
     );
 
 }

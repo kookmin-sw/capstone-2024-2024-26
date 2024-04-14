@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import Sidebar from './sideBar';
+import Banner from './banner';
 import '../styles/item.css';
 
 

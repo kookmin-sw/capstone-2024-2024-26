@@ -2,7 +2,8 @@ import React from 'react';
 import Sidebar from './sideBar';
 import Banner from './banner';
 
-const Notification = () => {
+const Reserve = () => {
+
     return (
         <div className="main-container"> {/* 최상단 컨테이너 */}
           <Banner /> {/* 배너 컴포넌트를 최상단에 표시 */}
@@ -14,5 +15,4 @@ const Notification = () => {
         </div>
       );
     }
-
-export default Notification;
+export default Reserve;
