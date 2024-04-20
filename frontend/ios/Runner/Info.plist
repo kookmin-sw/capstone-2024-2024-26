@@ -8,6 +8,11 @@
 	<string>카메라 사용</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>비디오 사용</string>
+	<key>FLTEnableImpeller</key>
+	<false />
+
+
+
 	
 
 	<key>CFBundleDisplayName</key>
