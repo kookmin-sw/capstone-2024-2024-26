@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   getFirestore,
   getDoc,
@@ -30,14 +31,7 @@ const reserveClub = express.Router();
 
 // 동아리방 예약
 reserveClub.post("/", async (req, res) => {
-  const {
-    userId,
-    roomId,
-    date,
-    startTime,
-    endTime,
-    tableNumber,
-  } = req.body;
+  const { userId, roomId, date, startTime, endTime, tableNumber } = req.body;
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -226,8 +220,7 @@ reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
 reserveClub.post("/update/:uid", async (req, res) => {
   try {
     const userId = req.params.uid;
-    const { roomId, date, startTime, endTime, tableNumber } =
-      req.body;
+    const { roomId, date, startTime, endTime, tableNumber } = req.body;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
     const reserveClubDoc = await getDoc(doc(db, "reservationClub", userId));
@@ -285,11 +278,11 @@ reserveClub.post("/update/:uid", async (req, res) => {
       }
     );
 
-      if (overlappingReservation) {
-        return res
-          .status(400)
-          .json({ error: "The room is already reserved for this time" });
-      }
+    if (overlappingReservation) {
+      return res
+        .status(400)
+        .json({ error: "The room is already reserved for this time" });
+    }
 
     // 겹치는 예약이 없으면 예약 업데이트
     await updateDoc(doc(db, "reservationClub", userId), updateFields);
@@ -299,85 +292,6 @@ reserveClub.post("/update/:uid", async (req, res) => {
   } catch (error) {
     console.error("Error updating reservationclub");
     res.status(500).json({ error: "Failed to update reservationclub" });
-  }
-});
-
-function isAdmin(req, res, next) {
-  const { email } = req.body;
-  // 관리자 이메일
-  const adminEmail = "admin@kookmin.ac.kr";
-
-  // 이메일이 관리자 이메일과 일치하는지 확인
-  if (email === adminEmail) {
-    // 관리자인 경우 다음 미들웨어로 진행
-    console.log("isAdmin OK");
-    next();
-  } else {
-    // 관리자가 아닌 경우 권한 없음 응답
-    res.status(403).json({ error: "Unauthorized: You are not an admin " });
-  }
-}
-
-// 동아리방 예약 생성 (관리자 모드)
-reserveClub.post("/adminMode/add", isAdmin, async (req, res) => {
-  const {
-    userId,
-    roomId,
-    date,
-    startTime,
-    endTime,
-    tableNumber,
-  } = req.body;
-
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found"});
-    }
-    const userData = userDoc.data();
-
-    const existingMyReservationSnapshot = await getDocs(
-      collection(db, "reservationClub"),
-      where("userEmail", "==", userData.email)
-    );
-
-    const reservationCount = existingMyReservationSnapshot.size;
-
-    // 예약 추가
-    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
-      userEmail: userData.email,
-      userName: userData.name,
-      userClub: userData.club,
-      roomId: roomId,
-      date: date,
-      startTime: startTime,
-      endTime: endTime,
-      tableNumber: tableNumber,
-    });
-
-    // 예약 성공 시 응답
-    res.status(201).json({ message: "Reservation club created successfully" });
-  } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error creating reservation club in admin mode", error);
-    res.status(500).json({ error: "Failed reservation club in admin mode" });
-  }
-});
-
-reserveClub.delete("/adminMode/delete/:uid", isAdmin, async (req, res) => {
-  try {
-    // Firestore reservationClub uid로 해야함!!
-    const userId = req.params.uid;
-
-    // Firestore에서 동아리 예약내역 삭제
-    await deleteDoc(doc(db, "reservationClub", userId));
-
-    res.status(200).json({ message: "Reservation club deleted successfully" });
-  } catch (error) {
-    console.log("Error deleting reservation club", error);
-    res.status(500).json({ error: "Failed to delete reservation club" });
   }
 });
 
