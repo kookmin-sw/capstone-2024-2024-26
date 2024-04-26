@@ -175,7 +175,6 @@ reserveroom.get("/reservationrooms/:date", async (req, res) => {
     reservationsSnapshot.forEach((doc) => {
       const reservation = doc.data();
       reservations.push({
-        id: doc.id, // 예약 문서 ID
         userId: reservation.userId,
         userName: reservation.userName,
         roomId: reservation.roomId,
@@ -183,6 +182,9 @@ reserveroom.get("/reservationrooms/:date", async (req, res) => {
         startTime: reservation.startTime,
         endTime: reservation.endTime,
         numberOfPeople: reservation.numberOfPeople,
+        studentIds: reservation.studentIdList,
+        studentNames: reservation.studentInfoList.map((student) => student.name),
+        studentFaculty: reservation.studentInfoList.map((student) => student.faculty),
       });
     });
 
