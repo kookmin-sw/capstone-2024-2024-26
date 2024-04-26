@@ -41,9 +41,31 @@ reserveClub.post("/", async (req, res) => {
     }
     const userData = userDoc.data();
 
+    const checkCollectionExists = async (collectionName) => {
+      try {
+        const collectionSnapshot = await getDocs(
+          collection(db, collectionName)
+        );
+        return !collectionSnapshot.empty;
+      } catch (error) {
+        console.error("Error checking collection existence", error);
+        return false;
+      }
+    };
+
+    const collectionName = `${userData.faculty}_ ${userData.department}_Club_${roomId}`;
+
+    const exists = await checkCollectionExists(collectionName);
+
+    if (exists) {
+      console.log(`Collection ${collectionName} exists.`);
+    } else {
+      console.error(`Collection ${collectionName} does not exist.`);
+    }
+
     // 예약된 시간대와 좌석 확인
     const existingReservationsSnapshot = await getDocs(
-      collection(db, "reservationClub"),
+      collection(db, `${collectionName}`),
       where("date", "==", date),
       where("roomId", "==", roomId),
       where("tableNumber", "==", tableNumber)
@@ -88,7 +110,7 @@ reserveClub.post("/", async (req, res) => {
     }
     // 전에 사용자가 한 예약이 있는지 확인
     const existingMyReservationSnapshot = await getDocs(
-      collection(db, "reservationClub"),
+      collection(db, `${collectionName}`),
       where("userEmail", "==", userData.email)
     );
 
@@ -96,16 +118,19 @@ reserveClub.post("/", async (req, res) => {
     const reservationCount = existingMyReservationSnapshot.size;
 
     // 겹치는 예약이 없으면 예약 추가
-    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
-      userEmail: userData.email,
-      userName: userData.name,
-      userClub: userData.club,
-      roomId: roomId,
-      date: date,
-      startTime: startTime,
-      endTime: endTime,
-      tableNumber: tableNumber,
-    });
+    await setDoc(
+      doc(db, `${collectionName}`, `${userId}_${reservationCount}`),
+      {
+        userEmail: userData.email,
+        userName: userData.name,
+        userClub: userData.club,
+        roomId: roomId,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        tableNumber: tableNumber,
+      }
+    );
 
     // 예약 성공 시 응답
     res.status(201).json({ message: "Reservation club created successfully" });
