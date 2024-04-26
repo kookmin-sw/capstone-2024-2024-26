@@ -53,7 +53,7 @@ reserveClub.post("/", async (req, res) => {
       }
     };
 
-    const collectionName = `${userData.faculty}_ ${userData.department}_Club_${roomId}`;
+    const collectionName = `${userData.faculty}_${userData.department}_Club_${roomId}`;
 
     const exists = await checkCollectionExists(collectionName);
 
