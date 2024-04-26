@@ -28,7 +28,7 @@ import {
   const db = getFirestore(app);
   
   const auth = getAuth(app);
-  const adminRouter = express.Router();
+  const adminAuth = express.Router();
   
   function isAdmin(req, res, next) {
     const { email } = req.body;
@@ -45,7 +45,7 @@ import {
     }
   }
   
-  adminRouter.delete("/delete/:uid", isAdmin, async (req, res) => {
+  adminAuth.delete("/delete/:uid", isAdmin, async (req, res) => {
     try {
       const userId = req.params.uid;
   
@@ -67,7 +67,7 @@ import {
   });
   
   
-  adminRouter.post("/create", isAdmin, async (req, res) => {
+  adminAuth.post("/create", isAdmin, async (req, res) => {
     const {
       useremail,
       password,
@@ -122,5 +122,5 @@ import {
     }
   });
   
-  export default adminRouter;
+  export default adminAuth;
   
