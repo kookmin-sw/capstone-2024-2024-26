@@ -4,9 +4,9 @@ import bodyParser from "body-parser";
 import router from "./routes/authRoutes.js";
 import reserveClub from "./routes/reserveclub.js";
 import reserveroom from "./routes/reserveroom.js";
-import adminAuth from "./admin/routes/adminAuth.js";
-import adminClub from "./admin/routes/adminClub.js";
-import adminRoom from "./admin/routes/adminRoom.js";
+import adminAuth from "./admin/adminAuth.js";
+import adminClub from "./admin/adminClub.js";
+import adminRoom from "./admin/adminRoom.js";
 
 const port = 3000;
 
