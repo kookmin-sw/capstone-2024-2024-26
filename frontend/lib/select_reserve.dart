@@ -8,6 +8,7 @@ import 'loading.dart';
 import 'complete.dart';
 import 'reservation_details.dart';
 import 'myPage.dart';
+import 'congestion.dart';
 
 class Select_reserve extends StatefulWidget {
   const Select_reserve({super.key});
@@ -494,6 +495,8 @@ class _select extends State<Select_reserve> {
 
         // 하단 바
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+
           currentIndex: 0, // Adjust the index according to your need
           onTap: (index) {
             switch (index) {
@@ -503,10 +506,16 @@ class _select extends State<Select_reserve> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Details()),
+                  MaterialPageRoute(builder: (context) => const Congestion()),
                 );
                 break;
               case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Details()),
+                );
+                break;
+              case 3:
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MyPage()),
@@ -520,6 +529,10 @@ class _select extends State<Select_reserve> {
               label: '공간대여',
             ),
             BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
+            ),
+            BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/reserved.svg'),
               label: '예약내역',
             ),
@@ -530,7 +543,6 @@ class _select extends State<Select_reserve> {
           ],
           selectedLabelStyle:
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
               const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),

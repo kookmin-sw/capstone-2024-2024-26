@@ -10,6 +10,7 @@ import 'reservation_details.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'congestion.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -212,7 +213,8 @@ class _MyPageState extends State<MyPage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Adjust the index according to your need
+        type: BottomNavigationBarType.fixed,
+        currentIndex: 3, // Adjust the index according to your need
         onTap: (index) {
           switch (index) {
             case 0:
@@ -225,11 +227,16 @@ class _MyPageState extends State<MyPage> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const Details()),
+                MaterialPageRoute(builder: (context) => const Congestion()),
               );
               break;
             case 2:
-              // Handle navigation to the third screen (current screen)
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Details()),
+              );
+              break;
+            case 3:
               break;
           }
         },
@@ -237,6 +244,10 @@ class _MyPageState extends State<MyPage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/lent_off.svg'),
             label: '공간대여',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+            label: '혼잡도',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/reserved.svg'),

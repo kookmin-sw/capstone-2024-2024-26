@@ -11,6 +11,7 @@ import 'package:frontend/lent_teamroom.dart';
 import 'package:frontend/lent_conference.dart';
 import 'return.dart';
 import 'select_reserve.dart';
+import 'congestion.dart';
 
 void main() {
   runApp(const MyApp());
@@ -223,6 +224,8 @@ class _MainPageState extends State<MainPage> {
       ),
       // 하단 바
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+
         currentIndex: 0, // Adjust the index according to your need
         onTap: (index) {
           switch (index) {
@@ -232,10 +235,16 @@ class _MainPageState extends State<MainPage> {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const Details()),
+                MaterialPageRoute(builder: (context) => const Congestion()),
               );
               break;
             case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Details()),
+              );
+              break;
+            case 3:
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const MyPage()),
@@ -247,6 +256,10 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/lent.svg'),
             label: '공간대여',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+            label: '혼잡도',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/reserved.svg'),

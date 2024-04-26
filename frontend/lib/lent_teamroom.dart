@@ -74,7 +74,8 @@ class _Lentteam extends State<Lent_Teamroom> {
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
-                      side: const BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
+                      side: const BorderSide(
+                          width: 0.50, color: Color(0xFFE3E3E3)),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     shadows: const [

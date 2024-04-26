@@ -4,6 +4,7 @@ import 'main.dart';
 import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'return.dart';
+import 'congestion.dart';
 
 class Details extends StatefulWidget {
   const Details({super.key});
@@ -341,7 +342,9 @@ class _Details extends State<Details> {
         ],
       )),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Adjust the index according to your need
+        type: BottomNavigationBarType.fixed,
+
+        currentIndex: 2, // Adjust the index according to your need
         onTap: (index) {
           switch (index) {
             case 0:
@@ -352,9 +355,14 @@ class _Details extends State<Details> {
               break;
 
             case 1:
-              // Handle navigation to the second screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Congestion()),
+              );
               break;
             case 2:
+              break;
+            case 3:
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const MyPage()),
@@ -366,6 +374,10 @@ class _Details extends State<Details> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/lent_off.svg'),
             label: '공간대여',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+            label: '혼잡도',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/icons/reserved_on.svg'),
