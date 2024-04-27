@@ -7,7 +7,7 @@ import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/myPage.dart';
-import 'package:frontend/lent_teamroom.dart';
+import 'lent_conference.dart';
 import 'package:frontend/lent_conference.dart';
 import 'return.dart';
 import 'select_reserve.dart';
@@ -95,6 +95,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final ExpansionTileController controller = ExpansionTileController();
+  bool is_tap = false;
 
   String time = ''; //server
   String people = ''; //server
@@ -145,7 +146,9 @@ class _MainPageState extends State<MainPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      // Add your logic here
+                      setState(() {
+                        is_tap = !is_tap;
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: TextStyle(
@@ -156,19 +159,31 @@ class _MainPageState extends State<MainPage> {
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(width: 0.50, color: Color(0xFF004F9E)),
+                        side: BorderSide(
+                            width: 0.50,
+                            color: is_tap
+                                ? Color(0xFFD6D6D6)
+                                : const Color(0xFF004F9E)),
                       ),
-                      minimumSize: Size(169, 55),
-                      backgroundColor: Color(0X0C004F9E),
+                      minimumSize: Size(169, 55), // Set the button minimum size
+                      backgroundColor:
+                          is_tap ? Colors.white : Color(0X0C004F9E),
+
                       elevation: 0, // Set the elevation for the button shadow
-                      shadowColor: Colors.white.withOpacity(0.5),
+                      shadowColor: Colors.white.withOpacity(
+                          0.5), // Set the color of the button shadow
                     ),
                     child: Text('공유공간 대여',
-                        style: TextStyle(color: Color(0XFF004F9E))),
+                        style: TextStyle(
+                            color: is_tap
+                                ? Color(0XFF7C7C7C)
+                                : Color(0xFF004F9E))),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Add your logic here
+                      setState(() {
+                        is_tap = !is_tap;
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: TextStyle(
@@ -179,44 +194,34 @@ class _MainPageState extends State<MainPage> {
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(width: 0.50, color: Color(0xFFD6D6D6)),
+                        side: BorderSide(
+                            width: 0.50,
+                            color: is_tap
+                                ? const Color(0xFF004F9E)
+                                : Color(0xFFD6D6D6)),
                       ),
                       minimumSize: Size(169, 55), // Set the button minimum size
-                      backgroundColor: Colors.white,
+                      backgroundColor:
+                          is_tap ? Color(0X0C004F9E) : Colors.white,
+
                       elevation: 0, // Set the elevation for the button shadow
                       shadowColor: Colors.white.withOpacity(
                           0.5), // Set the color of the button shadow
                     ),
                     child: Text('강의실 대여',
-                        style: TextStyle(color: Color(0XFF7C7C7C))),
+                        style: TextStyle(
+                            color: is_tap
+                                ? Color(0xFF004F9E)
+                                : Color(0XFF7C7C7C))),
                   ),
                 ],
               ),
               SizedBox(height: 20),
-              Container(
-                width: 353,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side:
-                        const BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  shadows: const [
-                    BoxShadow(
-                      color: Color(0x0C000000),
-                      blurRadius: 10,
-                      offset: Offset(0, 0),
-                      spreadRadius: 0,
-                    ),
-                  ],
-                ),
-                child: _CustomScrollViewWidget(
-                  time: time,
-                  people: people,
-                  roomName: roomName,
-                  isLoading: isLoading,
-                ),
+              _CustomScrollViewWidget(
+                time: time,
+                people: people,
+                roomName: roomName,
+                isLoading: isLoading,
               ),
             ],
           ),
@@ -297,7 +302,23 @@ class _CustomScrollViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Container(
+      width: 353,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        shadows: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 10,
+            offset: Offset(0, 0),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
       child: Column(
         children: [
           Stack(

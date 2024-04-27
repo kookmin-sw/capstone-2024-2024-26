@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,13 +23,32 @@ class Congestion extends StatefulWidget {
 }
 
 class _CongestionState extends State<Congestion> {
-  final _values = ['전체', '북악관', '미래관', '공학관'];
+  String location = '';
+  String location_detail = '';
+  String congestion = '';
+  bool tap = false;
+  final _values = [
+    '전체',
+    '북악관',
+    '미래관',
+    '공학관',
+    '복지관',
+    '예술관',
+    '과학관',
+    '본부관',
+    '법학관',
+    '조형관'
+  ];
+  final _sortValues = ['혼잡도 높은 순', '혼잡도 낮은 순'];
+
   String _selectedValue = '';
+  String _selectedSortValue = '';
   @override
   void initState() {
     super.initState();
     setState(() {
       _selectedValue = _values[0];
+      _selectedSortValue = _sortValues[0];
     });
   }
 
@@ -100,63 +120,76 @@ class _CongestionState extends State<Congestion> {
                   ),
                 ),
                 SizedBox(
-                  width: 50,
+                  width: 30,
                 ),
                 Container(
-                  width: 83, // Adjust the width according to your needs
-
-                  child: DropdownButton(
-                    isExpanded: true,
-                    value: _selectedValue,
-                    items: _values
-                        .map((e) => DropdownMenuItem(
-                              value: e, // 선택 시 onChanged 를 통해 반환할 value
-                              child: Text(e,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Inter',
-                                  )),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      // items 의 DropdownMenuItem 의 value 반환
-                      setState(() {
-                        _selectedValue = value!;
-                      });
-                    },
+                  width: 83,
+                  child: ButtonTheme(
+                    alignedDropdown:
+                        true, // DropdownButton의 너비를 ButtonTheme에 맞게 조정합니다.
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: _selectedValue,
+                      items: _values
+                          .map((e) => DropdownMenuItem(
+                                value: e, // 선택 시 onChanged 를 통해 반환할 value
+                                child: Text(e,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Inter',
+                                    )),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        // items 의 DropdownMenuItem 의 value 반환
+                        setState(() {
+                          _selectedValue = value!;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(
                   width: 10,
                 ),
                 Container(
-                  width: 83, // Adjust the width according to your needs
-
-                  child: DropdownButton(
-                    isExpanded: true,
-                    value: _selectedValue,
-                    items: _values
-                        .map((e) => DropdownMenuItem(
-                              value: e, // 선택 시 onChanged 를 통해 반환할 value
-                              child: Text(e,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontFamily: 'Inter',
-                                  )),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      // items 의 DropdownMenuItem 의 value 반환
-                      setState(() {
-                        _selectedValue = value!;
-                      });
-                    },
+                  width: 120,
+                  child: ButtonTheme(
+                    alignedDropdown:
+                        true, // DropdownButton의 너비를 ButtonTheme에 맞게 조정합니다.
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: _selectedSortValue,
+                      items: _sortValues
+                          .map((e) => DropdownMenuItem(
+                                value: e, // 선택 시 onChanged 를 통해 반환할 value
+                                child: Text(e,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Inter',
+                                    )),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        // items 의 DropdownMenuItem 의 value 반환
+                        setState(() {
+                          _selectedSortValue = value!;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
+            SizedBox(
+              height: 15,
+            ),
+            _CustomScrollViewWidget(
+                location: location,
+                location_detail: location_detail,
+                congestion: congestion),
 
             const SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
           ],
@@ -245,6 +278,100 @@ class _CongestionState extends State<Congestion> {
       color: Colors.grey, // 실선의 색상을 지정
       indent: 20, // 시작점에서의 들여쓰기
       endIndent: 20, // 끝점에서의 들여쓰기
+    );
+  }
+}
+
+class _CustomScrollViewWidget extends StatelessWidget {
+  final String location;
+  final String location_detail;
+  final String congestion;
+
+  const _CustomScrollViewWidget({
+    Key? key,
+    required this.location,
+    required this.location_detail,
+    required this.congestion,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          width: 361.65,
+          height: 54,
+          decoration: ShapeDecoration(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(width: 0.50, color: Color(0xFFFFFFFF)),
+              borderRadius: BorderRadius.circular(2),
+            ),
+            shadows: const [
+              BoxShadow(
+                color: Color(0x0C000000),
+                blurRadius: 10,
+                offset: Offset(0, 0),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                child: Text(
+                  '     위치 1',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                '| 북악관 2층',
+                style: TextStyle(
+                  color: Color(0XFFADADAD),
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(
+                width: 140,
+              ),
+              Container(
+                alignment: Alignment.center,
+                width: 67,
+                height: 30,
+                decoration: ShapeDecoration(
+                  color: Color(0x00D9D9D9),
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(width: 1, color: Color(0xFFE3E3E3)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                child: Text(
+                  '매우 혼잡',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0XFFD30000),
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

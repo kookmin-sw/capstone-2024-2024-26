@@ -198,10 +198,10 @@ class _select extends State<Select_reserve> {
                           formatButtonVisible: false,
                           leftChevronIcon:
                               (SvgPicture.asset('assets/icons/che_left.svg')),
-                          leftChevronMargin: const EdgeInsets.only(left: 84),
+                          leftChevronMargin: const EdgeInsets.only(left: 80),
                           rightChevronIcon:
                               (SvgPicture.asset('assets/icons/che_right.svg')),
-                          rightChevronMargin: const EdgeInsets.only(right: 84),
+                          rightChevronMargin: const EdgeInsets.only(right: 80),
                           headerMargin: const EdgeInsets.all(0),
                           titleTextStyle: const TextStyle(
                             fontSize: 15,
@@ -295,9 +295,6 @@ class _select extends State<Select_reserve> {
                                     ElevatedButton(
                                       onPressed: () {
                                         setState(() {
-                                          // Change the color here
-                                          // For example, change to red
-
                                           isButtonPressedList[index] =
                                               !isButtonPressedList[index];
                                         });
