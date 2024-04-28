@@ -24,7 +24,7 @@ def detect_and_draw(image_path):
     information = {"desk": 0, "person": 0}
 
     for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
-        if score.item() >= 0.95:
+        if score.item() >= 0.90:
             label_name = model.config.id2label[label.item()]
             if label_name in ["dining table", "person"]:
                 x1, y1, x2, y2 = box.tolist()
@@ -41,12 +41,12 @@ def detect_and_draw(image_path):
 
     image1_resized = cv2.resize(image1, (1080, 1080))
 
-    print(f"빈 책상수 : {information['desk']}\n사람수 : {information['person']}")
+    # print(f"빈 책상수 : {information['desk']}\n사람수 : {information['person']}")
 
     cv2.imshow("Detected Objects", image1_resized)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
+    print(information)
     return
 
 if __name__ == "__main__":

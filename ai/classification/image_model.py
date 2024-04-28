@@ -7,27 +7,34 @@ import matplotlib.image as mpimg
 from sklearn.metrics.pairwise import cosine_similarity
 import os
 from torchvision.models import densenet121, DenseNet121_Weights, vit_b_16, ViT_B_16_Weights, resnet50, ResNet50_Weights, inception_v3, Inception_V3_Weights
-
+import timm
 
 
 # model 3개 가지고 앙상블 
-# ResNet50
-weights = ResNet50_Weights.DEFAULT
-resnet = resnet50(weights=weights)
+# ResNet50 -> resnet34나 18로 바꿀예정
+# weights = ResNet50_Weights.DEFAULT
+# resnet = resnet50(weights=weights)
+# resnet.eval()
+
+# for param in resnet.parameters():
+#     param.requires_grad = False
+
+resnet = models.resnet34()
+resnet.load_state_dict(torch.load('./ai/classification/resnet34.pth'))
 resnet.eval()
 
-for param in resnet.parameters():
-    param.requires_grad = False
 
+# Inception v3 -> inceptionv1
+# weights = Inception_V3_Weights.DEFAULT
+# inception = inception_v3(weights=weights)
+# inception.eval()
 
-# Inception v3
-weights = Inception_V3_Weights.DEFAULT
-inception = inception_v3(weights=weights)
+# for param in inception.parameters():
+#     param.requires_grad = False
+
+inception = models.googlenet()
+inception.load_state_dict(torch.load('./ai/classification/googlenet.pth'))
 inception.eval()
-
-for param in inception.parameters():
-    param.requires_grad = False
-
 
 
 # DenseNet
@@ -39,14 +46,16 @@ for param in inception.parameters():
 
 
 # 모델 선택: Vision Transformer (ViT-B/16)
-weights = ViT_B_16_Weights.DEFAULT
-vit = vit_b_16(weights=weights)
+# weights = ViT_B_16_Weights.DEFAULT
+# vit = vit_b_16(weights=weights)
+# vit.eval()
+
+# for param in vit.parameters():
+#     param.requires_grad = False
+
+vit = timm.create_model('deit_tiny_patch16_224', pretrained=True)
+vit.load_state_dict(torch.load('./ai/classification/deit_tiny.pth'))
 vit.eval()
-
-for param in vit.parameters():
-    param.requires_grad = False
-
-
 
 # 이미지 로드 및 전처리 함수
 def load_image(image_path):
