@@ -197,9 +197,73 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
 });
 
 // 해당 날짜에 해당하는 모든 예약 내역 가져오기
-reserveClub.get("/reservationclubs/date/:userId/:requestDate", async (req, res) => {
-  const requestDate = req.params.requestDate;
+reserveClub.get(
+  "/reservationclubs/date/:userId/:requestDate",
+  async (req, res) => {
+    const requestDate = req.params.requestDate;
+    const userId = req.params.userId;
+
+    try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
+
+      if (!userDoc.exists()) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+
+      // 컬렉션 이름 설정
+      const collectionName = `${userData.faculty}_${userData.department}_Club`;
+
+      // 해당 날짜의 모든 예약 내역 가져오기
+      const reservationsSnapshot = await getDocs(
+        collection(db, `${collectionName}`),
+        where("date", "==", requestDate)
+      );
+
+      if (reservationsSnapshot.empty) {
+        return res
+          .status(404)
+          .json({ message: "No reservations found for this date" });
+      }
+
+      // 예약 내역 반환
+      const reservations = [];
+      reservationsSnapshot.forEach((doc) => {
+        const reservation = doc.data();
+        reservations.push({
+          id: doc.id, // 예약 문서 ID
+          userId: reservation.userId,
+          userName: reservation.userName,
+          userClub: reservation.userClub,
+          roomId: reservation.roomId,
+          date: reservation.date,
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+          tableNumber: reservation.tableNumber,
+        });
+      });
+
+      // 해당 날짜의 모든 예약 내역 반환
+      res.status(200).json({
+        message: "Reservations for the date fetched successfully",
+        reservations,
+      });
+    } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching reservations for the date", error);
+      res
+        .status(500)
+        .json({ error: "Failed to fetch reservations for the date" });
+    }
+  }
+);
+
+// 동아리방 예약 수정
+reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
   const userId = req.params.userId;
+  const reserveclubUID = req.params.reserveclubUID;
+  const { roomId, date, startTime, endTime, tableNumber } = req.body;
 
   try {
     // 사용자 정보 가져오기
@@ -213,57 +277,8 @@ reserveClub.get("/reservationclubs/date/:userId/:requestDate", async (req, res) 
     // 컬렉션 이름 설정
     const collectionName = `${userData.faculty}_${userData.department}_Club`;
 
-    // 해당 날짜의 모든 예약 내역 가져오기
-    const reservationsSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("date", "==", requestDate)
-    );
-
-    if (reservationsSnapshot.empty) {
-      return res
-        .status(404)
-        .json({ message: "No reservations found for this date" });
-    }
-
-    // 예약 내역 반환
-    const reservations = [];
-    reservationsSnapshot.forEach((doc) => {
-      const reservation = doc.data();
-      reservations.push({
-        id: doc.id, // 예약 문서 ID
-        userId: reservation.userId,
-        userName: reservation.userName,
-        userClub: reservation.userClub,
-        roomId: reservation.roomId,
-        date: reservation.date,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-        tableNumber: reservation.tableNumber,
-      });
-    });
-
-    // 해당 날짜의 모든 예약 내역 반환
-    res.status(200).json({
-      message: "Reservations for the date fetched successfully",
-      reservations,
-    });
-  } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error fetching reservations for the date", error);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch reservations for the date" });
-  }
-});
-
-// 추가 수정 필요
-reserveClub.post("/update/:uid", async (req, res) => {
-  try {
-    const userId = req.params.uid;
-    const { roomId, date, startTime, endTime, tableNumber } = req.body;
-
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
-    const reserveClubDoc = await getDoc(doc(db, "reservationClub", userId));
+    const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
     if (!reserveClubDoc.exists()) {
       // 예약 문서가 존재하지 않는 경우 오류 응답
       return res.status(404).json({ error: "Reservation not found" });
@@ -279,11 +294,11 @@ reserveClub.post("/update/:uid", async (req, res) => {
 
     // 겹치는 예약이 있는지 확인
     const existingReservationsSnapshot = await getDocs(
-      collection(db, "reservationClub"),
+      collection(db, `${collectionName}`),
       where("date", "==", date),
       where("roomId", "==", roomId),
       where("tableNumber", "==", tableNumber),
-      where("userId", "!=", userId) // 현재 예약을 제외하고 조회
+      where("reserveclubUID", "!=", reserveclubUID) // 현재 예약을 제외하고 조회
     );
 
     // 겹치는 예약이 있는지 확인
@@ -325,7 +340,7 @@ reserveClub.post("/update/:uid", async (req, res) => {
     }
 
     // 겹치는 예약이 없으면 예약 업데이트
-    await updateDoc(doc(db, "reservationClub", userId), updateFields);
+    await updateDoc(doc(db, `${collectionName}`, reserveclubUID), updateFields);
 
     // 업데이트 된 동아리방 예약 정보 반환
     res.status(200).json({ message: "Reservationclub updated successfully" });
