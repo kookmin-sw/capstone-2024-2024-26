@@ -99,10 +99,13 @@ adminClub.delete("/delete/:uid", isAdmin, async (req, res) => {
   }
 });
 
+// 관리자 동아리방 생성
 adminClub.post("/create/room", isAdmin, async (req, res) => {
   const { faculty, department, roomId } = req.body;
   try {
-    await setDoc(doc(db, `${faculty}_${department}_Club_${roomId}`, "adminAccount"), {});
+    await setDoc(doc(db, `${faculty}_${department}_Club`, `${roomId}`), {
+      adminMessage: `Admin has set up ${roomId} room.`,
+    });
 
     res.status(200).json({ message: "Register Club Room successfully" });
   } catch (error) {
@@ -110,5 +113,6 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
     res.status(500).json({ error: "Failed to register Club Room" });
   }
 });
+
 
 export default adminClub;
