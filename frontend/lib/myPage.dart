@@ -83,11 +83,8 @@ class _MyPageState extends State<MyPage> {
         ),
       ),
       body: SingleChildScrollView(
-        // SingleChildScrollView로 감싸서 스크롤 가능하도록
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            const Divider(),
             const SizedBox(height: 20),
             Container(
               width: 337,
@@ -97,7 +94,7 @@ class _MyPageState extends State<MyPage> {
                 borderRadius: BorderRadius.circular(11),
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(

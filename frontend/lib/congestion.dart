@@ -23,10 +23,34 @@ class Congestion extends StatefulWidget {
 }
 
 class _CongestionState extends State<Congestion> {
-  String location = '';
-  String location_detail = '';
-  String congestion = '';
-  bool tap = false;
+  List<Map<String, String>> congestionData = [
+    {
+      'location': 'Study Rounge',
+      'location_detail': '미래관 4층',
+      'congestion': '매우 혼잡',
+      'color': '0XFFD30000'
+    },
+    {
+      'location': '자율주행스튜디오',
+      'location_detail': '미래관 4층',
+      'congestion': '보통',
+      'color': '0XFF00A61B'
+    },
+    {
+      'location': '무한상상실',
+      'location_detail': '미래관 4층',
+      'congestion': '여유',
+      'color': '0XFF0081B9'
+    },
+    {
+      'location': '블루파빌리온',
+      'location_detail': '북악관 1층',
+      'congestion': '혼잡',
+      'color': '0XFFEF7300'
+    },
+    // 다른 위치 데이터도 추가할 수 있음
+  ];
+
   final _values = [
     '전체',
     '북악관',
@@ -183,15 +207,28 @@ class _CongestionState extends State<Congestion> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 15,
-            ),
-            _CustomScrollViewWidget(
-                location: location,
-                location_detail: location_detail,
-                congestion: congestion),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: congestionData.length,
+              itemBuilder: (context, index) {
+                print(index); // Add this line to print the index to the console
+                final data = congestionData[index];
+                print(data);
+                return Column(
+                  children: [
+                    SizedBox(height: 10), // Add spacing here
 
-            const SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
+                    _CustomScrollViewWidget(
+                      location: data['location']!,
+                      location_detail: data['location_detail']!,
+                      congestion: data['congestion']!,
+                      color: data['color']!,
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -286,12 +323,14 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String location;
   final String location_detail;
   final String congestion;
+  final String color;
 
   const _CustomScrollViewWidget({
     Key? key,
     required this.location,
     required this.location_detail,
     required this.congestion,
+    required this.color,
   }) : super(key: key);
 
   @override
@@ -322,7 +361,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
             children: [
               Container(
                 child: Text(
-                  '     위치 1',
+                  '     ' + location,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 15,
@@ -335,7 +374,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                 width: 20,
               ),
               Text(
-                '| 북악관 2층',
+                '|  ' + location_detail,
                 style: TextStyle(
                   color: Color(0XFFADADAD),
                   fontSize: 12,
@@ -343,9 +382,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              SizedBox(
-                width: 140,
-              ),
+              Spacer(), // 추가된 부분
               Container(
                 alignment: Alignment.center,
                 width: 67,
@@ -358,15 +395,18 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '매우 혼잡',
+                  congestion,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0XFFD30000),
+                    color: Color(int.parse(color.substring(2), radix: 16)),
                     fontSize: 12,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+              ),
+              SizedBox(
+                width: 10,
               ),
             ],
           ),
