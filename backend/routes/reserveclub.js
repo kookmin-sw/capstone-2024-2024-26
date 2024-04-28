@@ -142,6 +142,7 @@ reserveClub.post("/", async (req, res) => {
   }
 });
 
+// 사용자별 동아리 예약 내역 조회
 reserveClub.get("/reservationclubs/:userId", async (req, res) => {
   const userId = req.params.userId;
 
@@ -154,52 +155,35 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    const userReservations = [];
+    // 컬렉선 이름 설정
+    const collectionName = `${userData.faculty}_${userData.department}_Club`;
 
-    // 사용자의 부서와 학과를 기반으로 컬렉션 그룹 가져오기
-    const collectionGroupsSnapshot = await getDocs(
-      collectionGroup(db, `${userData.faculty}_${userData.department}_Club_`)
+    // 사용자의 모든 예약 내역 가져오기
+    const userReservationsSnapshot = await getDocs(
+      collection(db, `${collectionName}`),
+      where("userEmail", "==", userData.email)
     );
 
-    // 해당 문자열을 포함하는 컬렉션 찾기
-    collectionGroupsSnapshot.forEach(async (doc) => {
-      const collectionName = doc.id;
-
-      // 컬렉션 이름에 특정 문자열이 포함되어 있는지 확인합니다.
-      if (
-        collectionName.includes(
-          `${userData.faculty}_${userData.department}_Club_`
-        )
-      ) {
-        // 컬렉션 이름이 포함된 경우에만 해당 컬렉션을 가져옵니다.
-        if (collectionName) {
-          const reservationsSnapshot = await getDocs(
-            collection(db, collectionName)
-          );
-
-          // 컬렉션에서 예약 내역 가져오기
-          reservationsSnapshot.forEach((reservationDoc) => {
-            // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
-            if (reservationDoc.id.includes(userId)) {
-              const reservationData = reservationDoc.data();
-              userReservations.push({
-                id: reservationDoc.id, // 예약 문서 ID
-                roomId: reservationData.roomId,
-                date: reservationData.date,
-                startTime: reservationData.startTime,
-                endTime: reservationData.endTime,
-                tableNumber: reservationData.tableNumber,
-              });
-            }
-          });
-        }
-      }
-    });
-
-    // 사용자의 예약 정보가 없는 경우
-    if (userReservations.length === 0) {
+    if (userReservationsSnapshot.empty) {
       return res.status(404).json({ message: "No reservations found" });
     }
+
+    // 예약 내역 반환
+    const userReservations = [];
+    userReservationsSnapshot.forEach((doc) => {
+      // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
+      if (doc.id.includes(userData.studentId)) {
+        const reservation = doc.data();
+        userReservations.push({
+          id: doc.id, // 예약 문서 ID
+          roomId: reservation.roomId,
+          date: reservation.date,
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+          tableNumber: reservation.tableNumber,
+        });
+      }
+    });
 
     // 사용자의 예약 정보 반환
     res.status(200).json({
