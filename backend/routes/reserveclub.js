@@ -9,7 +9,6 @@ import {
   where,
   deleteDoc,
   updateDoc,
-  collectionGroup,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -198,13 +197,25 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
 });
 
 // 해당 날짜에 해당하는 모든 예약 내역 가져오기
-reserveClub.get("/reservationclubs/date/:requestDate", async (req, res) => {
+reserveClub.get("/reservationclubs/date/:userId/:requestDate", async (req, res) => {
   const requestDate = req.params.requestDate;
+  const userId = req.params.userId;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+
     // 해당 날짜의 모든 예약 내역 가져오기
     const reservationsSnapshot = await getDocs(
-      collection(db, "reservationClub"),
+      collection(db, `${collectionName}`),
       where("date", "==", requestDate)
     );
 
