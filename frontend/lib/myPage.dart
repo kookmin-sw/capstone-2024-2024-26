@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'dart:io';
@@ -202,7 +203,16 @@ class _MyPageState extends State<MyPage> {
                 _buildDivider(),
                 _buildButton('문의하기', () {}),
                 _buildDivider(),
-                _buildButton('로그아웃', () {}),
+                _buildButton('로그아웃', () {
+                  SharedPreferences.getInstance().then((prefs) {
+                    prefs.remove('uid');
+                    prefs.setString('token', 'false');
+                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SignIn()),
+                  );
+                }),
                 _buildDivider(),
               ],
             )

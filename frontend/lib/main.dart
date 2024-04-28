@@ -56,13 +56,13 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    if (token != null) {
+    if (token == 'true') {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const MainPage()),
         );
       });
-    } else {
+    } else if (token == 'false') {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const SignIn()),
@@ -76,12 +76,16 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Image.asset(
-          'assets/logo.png',
-          width: 200,
-          height: 200,
-        ),
-      ),
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'assets/icons/app_logo.svg',
+            width: 100,
+            height: 90,
+          ),
+        ],
+      )),
     );
   }
 }

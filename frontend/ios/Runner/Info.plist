@@ -16,7 +16,7 @@
 	
 
 	<key>CFBundleDisplayName</key>
-	<string>Flutter Application 1</string>
+	<string>K-SharePlace</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

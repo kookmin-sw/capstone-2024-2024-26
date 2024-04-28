@@ -566,7 +566,7 @@ class _select extends State<Select_reserve> {
         find = i;
       }
 
-      print(count);
+      print(uid);
 
       // 1시간일때
       if (count == 1) {
