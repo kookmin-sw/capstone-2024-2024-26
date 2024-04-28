@@ -9,6 +9,7 @@ import {
   where,
   deleteDoc,
   updateDoc,
+  query,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -198,9 +199,9 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
 
 // 해당 날짜에 해당하는 모든 예약 내역 가져오기
 reserveClub.get(
-  "/reservationclubs/date/:userId/:requestDate",
+  "/reservationclubs/date/:userId/:date",
   async (req, res) => {
-    const requestDate = req.params.requestDate;
+    const date = req.params.date;
     const userId = req.params.userId;
 
     try {
@@ -216,10 +217,9 @@ reserveClub.get(
       const collectionName = `${userData.faculty}_${userData.department}_Club`;
 
       // 해당 날짜의 모든 예약 내역 가져오기
-      const reservationsSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("date", "==", requestDate)
-      );
+    const reservationsSnapshot = await getDocs(
+      query(collection(db, `${collectionName}`), where("date", "==", date))
+    );
 
       if (reservationsSnapshot.empty) {
         return res
