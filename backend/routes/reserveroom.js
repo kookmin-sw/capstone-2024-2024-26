@@ -147,7 +147,11 @@ reserveroom.post("/", async (req, res) => {
       const reservationCount = existingMyReservationSnapshot.size;
       // 겹치는 예약이 없으면 예약 추가
       await setDoc(
-        doc(db, `${collectionName}`, `${roomId}_${userData.studentId}_${reservationCount}`),
+        doc(
+          db,
+          `${collectionName}`,
+          `${roomId}_${userData.studentId}_${reservationCount}`
+        ),
         {
           mainName: userData.name,
           roomId: roomId,
@@ -174,16 +178,28 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
-reserveroom.get("/reservationrooms/:date", async (req, res) => {
+reserveroom.get("/reservationrooms/:userId/:date", async (req, res) => {
+  const userId = req.params.userId;
   const date = req.params.date;
 
   try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_${userData.department}_Classroom`;
+
     // 해당 날짜의 모든 예약 내역 가져오기
     const reservationsSnapshot = await getDocs(
-      collection(db, "reservationRoom"),
-      where("date", "==", date)
+      query(collection(db, `${collectionName}`), where("date", "==", date))
     );
 
+    // 예약이 없는 경우
     if (reservationsSnapshot.empty) {
       return res
         .status(404)
