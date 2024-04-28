@@ -199,7 +199,7 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
 
 // 해당 날짜에 해당하는 모든 예약 내역 가져오기
 reserveClub.get(
-  "/reservationclubs/date/:userId/:date",
+  "/reservationclubs/:userId/:date",
   async (req, res) => {
     const date = req.params.date;
     const userId = req.params.userId;
