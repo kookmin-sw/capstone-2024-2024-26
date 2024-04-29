@@ -137,14 +137,13 @@ reserveroom.post("/", async (req, res) => {
       // 비동기 함수들을 병렬로 실행하여 학생 정보를 가져옵니다.
       const studentInfoList = await Promise.all(getUserInfoPromises);
 
-      // 전에 사용자가 한 예약이 있는지 확인
       const existingMyReservationSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("userEmail", "==", userData.email)
+        query(collection(db, `${collectionName}`),
+        where("roomId", "==", roomId))
       );
 
       // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
-      const reservationCount = existingMyReservationSnapshot.size;
+      const reservationCount = existingMyReservationSnapshot.size + 1;
       // 겹치는 예약이 없으면 예약 추가
       await setDoc(
         doc(
@@ -170,6 +169,8 @@ reserveroom.post("/", async (req, res) => {
       res
         .status(201)
         .json({ message: "Reservation room created successfully" });
+    } else {
+      return res.status(402).json({ error: "Does not have a roomId." });
     }
   } catch (error) {
     // 오류 발생 시 오류 응답
