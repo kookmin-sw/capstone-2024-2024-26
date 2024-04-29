@@ -30,8 +30,52 @@ const db = getFirestore(app);
 
 const reserveClub = express.Router();
 
+// 관리자가 등록한 공유공간 대여 페이지 예약 가능 강의실 조회 (메인)
+reserveClub.post("/main_lentroom/:uid", async (req, res) => {
+  const { uid } = req.body;
+  console.log(uid);
+  try {
+    const share_room_data = [{
+
+      'time' : '09:00-22:00',
+      'people' : "12" ,
+      'roomName' : "미래관 101호",
+    },
+    {
+      'time' : '09:00-22:00',
+      'people' : "18" ,
+      'roomName' : "복지관 101호",
+    }
+    ,{
+      'time' : '09:00-22:00',
+      'people' : "8" ,
+      'roomName' : "공학관 101호",
+    }
+  
+  ]
+      // 
+      
+      
+      
+    
+
+    // 사용자의 예약 정보 반환
+    res.status(200).json({
+      message: "successfully get lentroom", share_room_data : share_room_data,
+      
+    });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("no room ", error);
+    res.status(500).json({ error: "fail_ no_room" });
+  }
+});
+
+//////////******************* */
+
 reserveClub.post("/", async (req, res) => {
   const { userId, roomId, date, startTime, endTime, tableNumber } = req.body;
+  console.log(req.body);
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -52,6 +96,7 @@ reserveClub.post("/", async (req, res) => {
     const existingReservation = existingReservationSnapshot.docs.find((doc) =>
       doc.id.includes(roomId)
     );
+   
 
     // roomId와 같은 문자열이 포함되어 있는 경우 예약 진행
     if (existingReservation) {
