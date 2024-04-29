@@ -49,7 +49,7 @@ function isAdmin(req, res, next) {
 adminRoom.post("/create/room", isAdmin, async (req, res) => {
   const { faculty, roomId } = req.body;
   try {
-    await setDoc(doc(db, `${faculty}_Classroom`, `${roomId}`), {
+    await setDoc(doc(db, `${faculty}_Classroom_queue`, `${roomId}`), {
       adminMessage: `Admin has set up ${roomId} classroom.`,
     });
 
