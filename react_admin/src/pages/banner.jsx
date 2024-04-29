@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { authService } from '../firebase/fbInstance';
-import '../styles/banner.css'; // 배너에 대한 CSS 파일 import
+import logo_white from '../image/logo_white.png';
+import '../styles/banner.css';
 
 function Banner() {
   const navigate = useNavigate(); // useHistory 훅을 사용하여 history 객체 생성
@@ -18,7 +19,7 @@ function Banner() {
 
   return (
     <div className="banner-container">
-      <div className='banner_title'>K-SharePlace 관리자 웹</div>
+      <img src={logo_white} alt="K-SharePlace Logo" className="banner_title"/>
       <button className="logout_button" onClick={handleLogout}>로그아웃</button>
     </div>
   );

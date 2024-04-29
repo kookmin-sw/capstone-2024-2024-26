@@ -10,7 +10,7 @@ function SideBar() {
         { name: "home", path: "/main"},
         { name: "회원 관리", path: "/member"},
         { name: "문의 관리", path: "/inquiry"},
-        { name: "페이지 관리", path: "/page-management"},
+        { name: "공간 관리", path: "/page-management"},
         { name: "알림 관리", path: "/notification"},
         { name: "예약 관리", path: "/reserve"},
     ];

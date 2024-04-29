@@ -8,9 +8,7 @@
 }
 .banner_title{
     margin-left: 2vw;
-    font-size: 4vh;
-    font-weight: bold   ;
-    color: white;
+    height: 6vh;
 }
 .logout_button{
     position: absolute;
