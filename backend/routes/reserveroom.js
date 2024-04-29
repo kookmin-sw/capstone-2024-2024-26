@@ -51,7 +51,7 @@ reserveroom.post("/", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    const collectionName = `${userData.faculty}_${userData.department}_Classroom`;
+    const collectionName = `${userData.faculty}_Classroom`;
 
     // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
     const existingReservationSnapshot = await getDocs(
@@ -162,6 +162,7 @@ reserveroom.post("/", async (req, res) => {
           studentIds: studentIdList,
           studentNames: studentInfoList.map((student) => student.name),
           studentFaculty: studentInfoList.map((student) => student.faculty),
+          boolAgree: false,
         }
       );
 
@@ -179,6 +180,7 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
+// 해당 날짜에 모든 예약 내역 조회
 reserveroom.get("/reservationrooms/:userId/:date", async (req, res) => {
   const userId = req.params.userId;
   const date = req.params.date;
@@ -193,7 +195,7 @@ reserveroom.get("/reservationrooms/:userId/:date", async (req, res) => {
     const userData = userDoc.data();
 
     // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_${userData.department}_Classroom`;
+    const collectionName = `${userData.faculty}_Classroom`;
 
     // 해당 날짜의 모든 예약 내역 가져오기
     const reservationsSnapshot = await getDocs(
