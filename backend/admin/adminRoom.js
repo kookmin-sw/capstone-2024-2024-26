@@ -47,9 +47,9 @@ function isAdmin(req, res, next) {
 
 // 관리자 강의실 생성
 adminRoom.post("/create/room", isAdmin, async (req, res) => {
-  const { faculty, department, roomId } = req.body;
+  const { faculty, roomId } = req.body;
   try {
-    await setDoc(doc(db, `${faculty}_${department}_Classroom`, `${roomId}`), {
+    await setDoc(doc(db, `${faculty}_Classroom`, `${roomId}`), {
       adminMessage: `Admin has set up ${roomId} classroom.`,
     });
 
