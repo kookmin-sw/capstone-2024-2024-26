@@ -41,8 +41,8 @@ class _select extends State<Select_reserve> {
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
   int setting = 0;
-  int count = 0;
-  int count2 = 0;
+  int st = 0;
+  int ed = 0;
   int find = 0;
 
   List<bool> isButtonPressedList =
@@ -301,31 +301,20 @@ class _select extends State<Select_reserve> {
                                           if (isButtonPressedList[index] ==
                                               true) {
                                             setting += 1;
-                                            if (setting > 3) {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: const Text(
-                                                        '2시간 이상 예약할 수 없습니다'),
-                                                    actions: <Widget>[
-                                                      ElevatedButton(
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                          setState(() {
-                                                            isButtonPressedList[
-                                                                index] = false;
-                                                            setting -= 1;
-                                                          });
-                                                        },
-                                                        child: const Text('확인'),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
+                                            if (setting == 1) {
+                                              st = hour;
+                                            } else if (setting == 2) {
+                                              ed = hour;
+                                            }
+
+                                            if (setting > 2) {
+                                              setState(() {
+                                                isButtonPressedList[index] =
+                                                    false;
+                                                setting -= 1;
+                                              });
+                                              FlutterDialog(
+                                                  '예약은 최대 2시간까지 가능합니다.', '확인');
                                             }
                                           } else {
                                             setting -= 1;
@@ -589,33 +578,16 @@ class _select extends State<Select_reserve> {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
-    if (startTime != '' && endTime != '') {
-      for (int i = 0; i < isButtonPressedList.length; i++) {
-        if (isButtonPressedList[i] == true) {
-          startTime = (i + 9).toString();
-          endTime = (i + 10).toString();
-        }
-      }
+    if (st > ed) {
+      int tmp;
+      tmp = ed;
+      ed = st;
+      st = tmp;
+      startTime = '$st:00';
+      endTime = '$ed:00';
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('시간을 선택해주세요'),
-            actions: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    isLoading = false;
-                  });
-                },
-                child: const Text('확인'),
-              ),
-            ],
-          );
-        },
-      );
+      startTime = '$st:00';
+      endTime = '$ed:00';
     }
 
     // 테이블 번호선택 알고리즘
@@ -665,6 +637,95 @@ class _select extends State<Select_reserve> {
         //errorMessage = '아이디와 비밀번호를 확인해주세요';
       });
     }
+  }
+
+  //alert dialog
+  void FlutterDialog(String text, String text2) {
+    showDialog(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3.0)),
+            //Dialog Main Title
+
+            //
+            content: SizedBox(
+              width: 359.39,
+              height: 45.41, // Dialog 박스의 너비 조정
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    text,
+                    style: const TextStyle(
+                      fontSize: 15.0,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            actions: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 1, // 선의 높이 조정
+                    width: 350, // 선의 너비 조정
+                    color:
+                        Colors.grey.withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                  ),
+                  Row(
+                    children: [
+                      const SizedBox(width: 35),
+                      TextButton(
+                        child: const Text("돌아가기",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 35), // 버튼 사이 간격 조정
+                      Container(
+                        height: 34.74, // 선의 높이 조정
+                        width: 1, // 선의 너비 조정
+                        color: Colors.grey
+                            .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                      ),
+                      const SizedBox(width: 50), // 버튼 사이 간격 조정
+                      TextButton(
+                        child: Text(text2,
+                            style: const TextStyle(
+                              color: Color(0XFF004F9E),
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          );
+        });
   }
 
   // onDaySelected 함수 추가
