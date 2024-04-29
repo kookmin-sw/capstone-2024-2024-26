@@ -159,6 +159,7 @@ if __name__ == '__main__':
     print(os.getcwd())
     
     #이미지 경로
+    #첫번째 이미지는 내 폴더에서, 두번째는 사진찍은거 받아와서
     before_image = './ai/classification/image/6.jpg'
     after_image = './ai/classification/image/7.jpg'
 

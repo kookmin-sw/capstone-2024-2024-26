@@ -44,7 +44,8 @@ def make_layers(cfg, in_channels = 3, batch_norm=False, dilation = False):
 
 def detect_and_draw(image_path):
     model = CSRNet()
-    model_weights = torch.load('./ai/information/model.pt')
+    # model_weights = torch.load('./ai/information/model.pt')
+    model_weights = torch.load('./ai/information/model.pt', map_location=torch.device('cpu'))
     model.load_state_dict(model_weights)
     model.eval()
     # 이미지를 처리할 트랜스폼 설정
@@ -72,6 +73,8 @@ def detect_and_draw(image_path):
     plt.colorbar()  # 밀도 값의 색상 막대 표시
     plt.show()
 
+    #밑에꺼 지우고 여기서 바로 수치 return 할듯
+
 if __name__ == "__main__":
-    image_path = "./ai/information/office_image/21.jpg"  # 사용자가 이미지 경로로 변경
+    image_path = "./ai/information/office_image/23.jpg"  # 사용자가 이미지 경로로 변경
     detect_and_draw(image_path)
