@@ -48,7 +48,7 @@ class _CongestionState extends State<Congestion> {
       'congestion': '혼잡',
       'color': '0XFFEF7300'
     },
-    // 다른 위치 데이터도 추가할 수 있음
+    // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
   ];
 
   final _values = [

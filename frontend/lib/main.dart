@@ -101,10 +101,25 @@ class _MainPageState extends State<MainPage> {
   final ExpansionTileController controller = ExpansionTileController();
   bool is_tap = false;
 
-  String time = ''; //server
-  String people = ''; //server
-  String roomName = ''; //server
-  String roomCount = ''; // server
+  List<Map<String, String>> spaceData = [
+    {
+      'time': '09:00 - 22:00',
+      'people': '12',
+      'roomName': '복지관 B101호',
+    },
+    {
+      'time': '09:00 - 22:00',
+      'people': '18',
+      'roomName': '미래관(구) 612호',
+    },
+    {
+      'time': '09:00 - 22:00',
+      'people': '12',
+      'roomName': '복지관 B101호',
+    },
+
+    // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
+  ];
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
 
   @override
@@ -221,11 +236,27 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
               SizedBox(height: 20),
-              _CustomScrollViewWidget(
-                time: time,
-                people: people,
-                roomName: roomName,
-                isLoading: isLoading,
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: spaceData.length,
+                itemBuilder: (context, index) {
+                  print(
+                      index); // Add this line to print the index to the console
+                  final data = spaceData[index];
+                  print(data);
+                  return Column(
+                    children: [
+                      SizedBox(height: 10), // Add spacing here
+
+                      _CustomScrollViewWidget(
+                        time: data['time']!,
+                        people: data['people']!,
+                        roomName: data['roomName']!,
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -294,14 +325,12 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String time;
   final String people;
   final String roomName;
-  final bool isLoading;
 
   const _CustomScrollViewWidget({
     Key? key,
     required this.time,
     required this.people,
     required this.roomName,
-    required this.isLoading,
   }) : super(key: key);
 
   @override
@@ -353,7 +382,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                       roomName,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 15,
+                        fontSize: 10,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.bold,
                       ),
@@ -383,9 +412,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                 top: 15,
                 right: 105,
                 child: GestureDetector(
-                  onTap: () {
-                    // 맵 버튼 눌렀을 때 이동할 화면
-                  },
+                  onTap: () {},
                   child: Row(
                     children: [
                       Image.asset(
@@ -393,6 +420,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         width: 14,
                         height: 14,
                       ),
+                      SizedBox(width: 2), // Add spacing here
                       Text(
                         people,
                         style: const TextStyle(
@@ -402,6 +430,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(width: 2), // Add spacing here
                     ],
                   ),
                 ),
@@ -420,6 +449,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         width: 14,
                         height: 14,
                       ),
+                      SizedBox(width: 2), // Add spacing here
                       Text(
                         time,
                         style: const TextStyle(
@@ -453,7 +483,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
               elevation: 0, // Remove button shadow
             ),
             child: Text(
-              isLoading ? '로딩 중...' : '예약하기',
+              '예약하기',
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 12,

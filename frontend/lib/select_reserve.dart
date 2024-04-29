@@ -40,8 +40,9 @@ class _select extends State<Select_reserve> {
   int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
-
+  int setting = 0;
   int count = 0;
+  int count2 = 0;
   int find = 0;
 
   List<bool> isButtonPressedList =
@@ -297,6 +298,40 @@ class _select extends State<Select_reserve> {
                                         setState(() {
                                           isButtonPressedList[index] =
                                               !isButtonPressedList[index];
+                                          if (isButtonPressedList[index] ==
+                                              true) {
+                                            setting += 1;
+                                            if (setting > 3) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        '2시간 이상 예약할 수 없습니다'),
+                                                    actions: <Widget>[
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          setState(() {
+                                                            isButtonPressedList[
+                                                                index] = false;
+                                                            setting -= 1;
+                                                          });
+                                                        },
+                                                        child: const Text('확인'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          } else {
+                                            setting -= 1;
+                                          }
+
+                                          print(setting);
                                         });
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -554,29 +589,33 @@ class _select extends State<Select_reserve> {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
-    //시간선택 알고리즘
-    for (int i = 0; i < isButtonPressedList.length; i++) {
-      count = 0;
-      if (isButtonPressedList[i] == true &&
-          isButtonPressedList[i + 1] == true) {
-        count += 2;
-        find = i;
-      } else if (isButtonPressedList[i] == true) {
-        count += 1;
-        find = i;
+    if (startTime != '' && endTime != '') {
+      for (int i = 0; i < isButtonPressedList.length; i++) {
+        if (isButtonPressedList[i] == true) {
+          startTime = (i + 9).toString();
+          endTime = (i + 10).toString();
+        }
       }
-
-      print(uid);
-
-      // 1시간일때
-      if (count == 1) {
-        startTime = '${find + 9}:00';
-        endTime = '${find + 10}:00';
-      } // 2시간일때
-      else if (count == 2) {
-        startTime = '${find + 9}:00';
-        endTime = '${find + 11}:00';
-      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('시간을 선택해주세요'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: const Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
     }
 
     // 테이블 번호선택 알고리즘

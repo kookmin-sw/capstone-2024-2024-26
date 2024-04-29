@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
 import 'dart:io';
 import 'settings.dart';
@@ -196,23 +197,64 @@ class _MyPageState extends State<MyPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildButton(
-                  '이용안내',
-                  () {},
+                TextButton(
+                  onPressed: () => {
+                    //
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shadowColor: Colors.transparent, // Remove shadow color
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    '    이용안내',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 _buildDivider(),
-                _buildButton('문의하기', () {}),
+                TextButton(
+                  onPressed: () => {
+                    //
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shadowColor: Colors.transparent, // Remove shadow color
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    '    문의하기',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 _buildDivider(),
-                _buildButton('로그아웃', () {
-                  SharedPreferences.getInstance().then((prefs) {
-                    prefs.remove('uid');
-                    prefs.setString('token', 'false');
-                  });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignIn()),
-                  );
-                }),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => {
+                        _flutterDialog(context, "로그아웃 하시겠습니까?", "로그아웃"),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shadowColor: Colors.transparent, // Remove shadow color
+                        backgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        '    로그아웃',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SvgPicture.asset('assets/icons/logout.svg'),
+                  ],
+                ),
                 _buildDivider(),
               ],
             )
@@ -274,6 +316,102 @@ class _MyPageState extends State<MyPage> {
         unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  void _flutterDialog(BuildContext context, String text, String text2) {
+    showDialog(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3.0)),
+            //Dialog Main Title
+
+            //
+            content: SizedBox(
+              width: 359.39,
+              height: 45.41, // Dialog 박스의 너비 조정
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    text,
+                    style: const TextStyle(
+                      fontSize: 15.0,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            actions: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 1, // 선의 높이 조정
+                    width: 350, // 선의 너비 조정
+                    color:
+                        Colors.grey.withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                  ),
+                  Row(
+                    children: [
+                      const SizedBox(width: 35),
+                      TextButton(
+                        child: const Text("돌아가기",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 35), // 버튼 사이 간격 조정
+                      Container(
+                        height: 34.74, // 선의 높이 조정
+                        width: 1, // 선의 너비 조정
+                        color: Colors.grey
+                            .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
+                      ),
+                      SizedBox(width: 50), // 버튼 사이 간격 조정
+                      TextButton(
+                        child: Text(text2,
+                            style: const TextStyle(
+                              color: Color(0XFF004F9E),
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                            )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          SharedPreferences.getInstance().then((prefs) {
+                            prefs.remove('uid');
+                            prefs.setString('token', 'false');
+                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignIn()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          );
+        });
   }
 
   // 버튼을 생성하는 함수
@@ -340,4 +478,6 @@ class _MyPageState extends State<MyPage> {
       endIndent: 20, // 끝점에서의 들여쓰기
     );
   }
+
+  //alert dialog
 }
