@@ -103,7 +103,7 @@ adminClub.delete("/delete/:uid", isAdmin, async (req, res) => {
 adminClub.post("/create/room", isAdmin, async (req, res) => {
   const { faculty, department, roomId } = req.body;
   try {
-    await setDoc(doc(db, `${faculty}_${department}_Club`, `${roomId}`), {
+    await setDoc(doc(db, `${faculty}_Club`, `${roomId}`), {
       adminMessage: `Admin has set up ${roomId} room.`,
     });
 
