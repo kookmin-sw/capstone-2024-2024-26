@@ -34,16 +34,16 @@ class _select extends State<Select_reserve> {
 
   String startTime = ''; //server
   String endTime = '';
-  String room_name = '미래관 601호'; //server
+  String room_name = '123'; //server
   int table_number = 0; // server
 
   int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
   int setting = 0;
+  int table_setting = 0;
   int st = 0;
   int ed = 0;
-  int find = 0;
 
   List<bool> isButtonPressedList =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
@@ -303,8 +303,19 @@ class _select extends State<Select_reserve> {
                                             setting += 1;
                                             if (setting == 1) {
                                               st = hour;
+                                              print(st);
                                             } else if (setting == 2) {
                                               ed = hour;
+                                              print(ed);
+                                              if ((ed - st).abs() >= 2) {
+                                                setState(() {
+                                                  isButtonPressedList[index] =
+                                                      false;
+                                                  setting -= 1;
+                                                });
+                                                FlutterDialog(
+                                                    '예약은 연속 2시간 가능합니다.', '확인');
+                                              }
                                             }
 
                                             if (setting > 2) {
@@ -318,9 +329,14 @@ class _select extends State<Select_reserve> {
                                             }
                                           } else {
                                             setting -= 1;
+                                            if (setting == 0) {
+                                              st = 0;
+                                              ed = 0;
+                                            } else if (setting == 1) {
+                                              st = ed;
+                                              ed = st;
+                                            }
                                           }
-
-                                          print(setting);
                                         });
                                       },
                                       style: ElevatedButton.styleFrom(
@@ -424,6 +440,13 @@ class _select extends State<Select_reserve> {
                                             setState(() {
                                               isButtonPressedTable[index] =
                                                   !isButtonPressedTable[index];
+
+                                              if (isButtonPressedTable[index] ==
+                                                  true) {
+                                                table_setting += 1;
+                                              } else {
+                                                table_setting -= 1;
+                                              }
                                             });
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -577,24 +600,61 @@ class _select extends State<Select_reserve> {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
+    // Initialize start and end time
+    int startHour = 0;
+    int endHour = 0;
 
-    if (st > ed) {
-      int tmp;
-      tmp = ed;
-      ed = st;
-      st = tmp;
-      startTime = '$st:00';
-      endTime = '$ed:00';
-    } else {
-      startTime = '$st:00';
-      endTime = '$ed:00';
+    // Find selected time range
+    for (int i = 0; i < isButtonPressedList.length; i++) {
+      if (isButtonPressedList[i]) {
+        startHour = i + 9; // Assuming index 0 corresponds to 9 AM
+        break;
+      }
     }
 
-    // 테이블 번호선택 알고리즘
-    for (int i = 0; i < isButtonPressedTable.length; i++) {
-      if (isButtonPressedTable[i] == true) {
-        table_number = i + 1;
+    for (int i = isButtonPressedList.length - 1; i >= 0; i--) {
+      if (isButtonPressedList[i]) {
+        endHour = i + 10; // Assuming index 0 corresponds to 9 AM
+        break;
       }
+    }
+
+    // Check if both start and end time are selected
+    if (startHour == 0 || endHour == 0) {
+      FlutterDialog('시간을 선택해주세요', '확인');
+      setState(() {
+        isLoading = false; // 요청 완료 시 로딩 숨김
+      });
+      return;
+    }
+
+    // Validate time range
+    if (endHour - startHour > 2) {
+      FlutterDialog('예약은 최대 2시간까지 가능합니다.', '확인');
+      setState(() {
+        isLoading = false; // 요청 완료 시 로딩 숨김
+      });
+      return;
+    }
+
+    // Set start and end time strings
+    startTime = '$startHour:00';
+    endTime = '$endHour:00';
+
+    // Find selected table number
+    for (int i = 0; i < isButtonPressedTable.length; i++) {
+      if (isButtonPressedTable[i]) {
+        table_number = i + 1;
+        break;
+      }
+    }
+
+    if (table_number == 0) {
+      FlutterDialog('좌석을 선택해주세요', '확인');
+      setState(() {
+        isLoading = false; // 요청 완료 시 로딩 숨김
+      });
+      return;
     }
 
     const url = 'http://localhost:3000/reserveclub/';
@@ -684,42 +744,20 @@ class _select extends State<Select_reserve> {
                     color:
                         Colors.grey.withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
                   ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 35),
-                      TextButton(
-                        child: const Text("돌아가기",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold,
-                            )),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const SizedBox(width: 35), // 버튼 사이 간격 조정
-                      Container(
-                        height: 34.74, // 선의 높이 조정
-                        width: 1, // 선의 너비 조정
-                        color: Colors.grey
-                            .withOpacity(0.2), // 투명도를 조정하여 희미한 색상으로 설정
-                      ),
-                      const SizedBox(width: 50), // 버튼 사이 간격 조정
-                      TextButton(
-                        child: Text(text2,
-                            style: const TextStyle(
-                              color: Color(0XFF004F9E),
-                              fontSize: 12,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold,
-                            )),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
+                  SizedBox(height: 10),
+                  Center(
+                    child: TextButton(
+                      child: Text(text2,
+                          style: const TextStyle(
+                            color: Color(0XFF004F9E),
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          )),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ],
               )

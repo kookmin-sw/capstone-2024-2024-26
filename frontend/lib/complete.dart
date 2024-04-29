@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// 필요시 main.dart 파일을 import합니다.
-import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
-// 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
+
+import 'loading.dart';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'myPage.dart';
 import 'reservation_details.dart';
+import 'congestion.dart';
 
 class Complete extends StatefulWidget {
   const Complete({super.key});
@@ -141,7 +142,8 @@ class _Complete extends State<Complete> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const Details()),
+                            MaterialPageRoute(
+                                builder: (context) => const Details()),
                           );
                         },
                         child: const Text(
@@ -166,6 +168,8 @@ class _Complete extends State<Complete> {
         ),
         // 하단 바
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+
           currentIndex: 0, // Adjust the index according to your need
           onTap: (index) {
             switch (index) {
@@ -175,10 +179,16 @@ class _Complete extends State<Complete> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Details()),
+                  MaterialPageRoute(builder: (context) => const Congestion()),
                 );
                 break;
               case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Details()),
+                );
+                break;
+              case 3:
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MyPage()),
@@ -192,6 +202,10 @@ class _Complete extends State<Complete> {
               label: '공간대여',
             ),
             BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
+            ),
+            BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/reserved.svg'),
               label: '예약내역',
             ),
@@ -202,7 +216,6 @@ class _Complete extends State<Complete> {
           ],
           selectedLabelStyle:
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
               const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
