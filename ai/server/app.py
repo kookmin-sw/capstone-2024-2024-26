@@ -8,7 +8,8 @@ import base64
 from PIL import Image
 import io
 import os
-
+from count import count
+from image_class import classification
 
 cred = credentials.Certificate('./ai/server/auth/firebase_auth.json')
 firebase_admin.initialize_app(cred)
@@ -20,35 +21,34 @@ app = Flask(__name__)
 def index():
     return "서버실행 테스트"
 
-
-@app.route('/api/information', methods=['POST'])
-def class_information():
-    try:
-        #여기서 받아온 정보를 바로 보내준뒤 information 파일 안에서 디코딩
-        #이후 정보 처리해서 결과값 파일에서 리턴 후 flutter에 주면됨
-        result = subprocess.run(['python', './ai/information/information_model.py'], text=True, capture_output=True)
-        
-
-        #이런식으로 json 으로 보내줄 예정
-        # return jsonify(result)
-        return f"Script executed. Output:\n{result.stdout}"
-    except Exception as e:
-        return str(e)
+@app.route('/api/count', methods=['POST'])
+def handle_request():
+    data = request.get_json()
+    if not data or 'image' not in data or 'info' not in data:
+        return jsonify({"error": "Invalid data"}), 400
     
 
-@app.route('/classification', methods=['POST'])
-def image_classification():
-    try:
-        data = request.get_json()
-        # subprocess.run을 사용하여 외부 스크립트 실행
-        # 예를 들어, 'script.py'가 실행하고자 하는 스크립트라면
-        result = subprocess.run(['python', './ai/classification/image_model.py', 'data.json'], text=True, capture_output=True)
-        # 실행 결과 반환
 
-        # return jsonify(result)
-        return f"Script executed. Output:\n{result.stdout}"
-    except Exception as e:
-        return str(e)
+
+    # 이미지 데이터와 추가 정보를 추출
+    base64_image = data['image']
+    info = data['info']
+    
+
+    image_data = base64.b64decode(base64_image)
+    image = Image.open(io.BytesIO(image_data)).convert('RGB')
+
+
+    result = count(image, info)
+    # 결과에 따라 firebase에 저장 or flutter에 재요청
+    
+    return jsonify(result)
+
+
+@app.route('/api/class', methods=['POST'])
+def classi():
+    result = classification()
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -45,7 +45,7 @@ def make_layers(cfg, in_channels = 3, batch_norm=False, dilation = False):
 
 # 이걸 이제 입력받은 이미지, 강의실 정보 가지고
 #임계값 알아서 지정 후 return 하면됨
-def count(base64_image, info):
+def count(image, info):
     model = CSRNet()
     # model_weights = torch.load('./ai/information/model.pt')
     model_weights = torch.load('./ai/information/model.pt', map_location=torch.device('cpu'))
@@ -57,8 +57,8 @@ def count(base64_image, info):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    image_data = base64.b64decode(base64_image)
-    image = Image.open(io.BytesIO(image_data)).convert('RGB')
+
+
     input_tensor = transform(image).unsqueeze(0)
  # 배치 차원 추가
 
