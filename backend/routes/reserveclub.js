@@ -350,4 +350,38 @@ reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
   }
 });
 
+// 동아리방 예약 취소
+reserveClub.delete("/delete/:userId/:reserveclubUID", async(req, res) => {
+  const userId = req.params.userId;
+  const reserveclubUID = req.params.reserveclubUID;
+
+  try{
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+
+    // Firestore reservationClub에서 해당 예약 문서를 가져옴
+    const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
+    if (!reserveClubDoc.exists()) {
+      // 예약 문서가 존재하지 않는 경우 오류 응답
+      return res.status(404).json({ error: "Reservation not found" });
+    }
+
+    // 동아리방 예약 내역 삭제
+    await deleteDoc(doc(db, `${collectionName}`, reserveclubUID));
+
+    res.status(200).json({ message: "Reservation club deleted success"})
+  } catch(error) {
+    console.error("Error deleting reservation club", error);
+    res.status(500).json({ error: "Failed to delete reservation club"});
+  }
+});
+
 export default reserveClub;
