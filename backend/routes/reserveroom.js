@@ -51,7 +51,7 @@ reserveroom.post("/", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    const collectionName = `${userData.faculty}_Classroom`;
+    const collectionName = `${userData.faculty}_Classroom_queue`;
 
     // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
     const existingReservationSnapshot = await getDocs(
