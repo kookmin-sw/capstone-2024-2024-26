@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -18,10 +20,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원정보 수정'),
+        title: const Text('회원정보 수정'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,12 +34,12 @@ class _SettingsPageState extends State<SettingsPage> {
             buildInputField('학부', controller: departmentController),
             buildInputField('소속 동아리', controller: clubController),
             buildInputField('휴대폰 번호', controller: phoneController),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Handle update profile action
               },
-              child: Text('회원정보 수정'),
+              child: const Text('회원정보 수정'),
             ),
           ],
         ),
@@ -52,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: labelText,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
       ),
     );

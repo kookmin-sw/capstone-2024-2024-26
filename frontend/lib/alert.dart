@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'dart:async';
 
 class AlertPage extends StatelessWidget {
+  const AlertPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
+            icon: const Icon(Icons.arrow_back_ios),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
-          title: Text('알림'),
+          title: const Text('알림'),
           centerTitle: true,
         ),
       ),
-      body: Column(
+      body: const Column(
         children: [
           SizedBox(height: 16),
           Divider(),

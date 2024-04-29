@@ -8,6 +8,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SignUp extends StatefulWidget {
+  const SignUp({super.key});
+
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -26,13 +28,13 @@ class _SignUpState extends State<SignUp> {
 
   String errorMessage = '';
 
-  List<String> _clubs = [
+  final List<String> _clubs = [
     'Wink',
     'D-Alpha',
     'KoBot',
     'Poska',
   ];
-  List<String> _faculties = [
+  final List<String> _faculties = [
     '소프트웨어 융합 대학',
     '창의 공과 대학',
     '조형 대학',
@@ -47,7 +49,7 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '회원가입',
           style: TextStyle(
             color: Colors.black,
@@ -88,10 +90,10 @@ class _SignUpState extends State<SignUp> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(right: 220),
-                child: const Text(
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.only(right: 220),
+                child: Text(
                   '이름',
                   style: TextStyle(
                     color: Colors.black,
@@ -102,12 +104,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('이름을 입력하세요', controller: nameController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 220),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 220),
+                child: Text(
                   '학번',
                   style: TextStyle(
                     color: Colors.black,
@@ -118,12 +120,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('학번을 입력하세요', controller: studentIdController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 195),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 195),
+                child: Text(
                   '단과대학',
                   style: TextStyle(
                     color: Colors.black,
@@ -134,12 +136,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildDropdownField('단과대학', _faculties, _selectedFaculty),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 220),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 220),
+                child: Text(
                   '학과',
                   style: TextStyle(
                     color: Colors.black,
@@ -150,12 +152,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('학과를 입력하세요', controller: departmentController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 180),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 180),
+                child: Text(
                   '소속 동아리',
                   style: TextStyle(
                     color: Colors.black,
@@ -166,12 +168,12 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildDropdownField('소속 동아리', _clubs, _selectedClub),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 170),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 170),
+                child: Text(
                   '이메일(아이디)',
                   style: TextStyle(
                     color: Colors.black,
@@ -182,13 +184,13 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('example@kookmin.ac.kr',
                   controller: emailController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 195),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 195),
+                child: Text(
                   '비밀번호',
                   style: TextStyle(
                     color: Colors.black,
@@ -199,13 +201,13 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('비밀번호를 입력하세요',
                   isPassword: true, controller: passwordController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 175),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 175),
+                child: Text(
                   '비밀번호 확인',
                   style: TextStyle(
                     color: Colors.black,
@@ -216,13 +218,13 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('비밀번호를 입력하세요',
                   isPassword: true, controller: confirmPasswordController),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 180),
-                child: const Text(
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.only(right: 180),
+                child: Text(
                   '휴대폰 번호',
                   style: TextStyle(
                     color: Colors.black,
@@ -233,11 +235,11 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               buildInputField('휴대폰 번호를 입력하세요', controller: phoneController),
               const SizedBox(height: 10),
               Padding(
-                padding: EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
+                padding: const EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
                 child: Row(
                   children: [
                     Checkbox(
@@ -260,11 +262,11 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
               ),
-              Container(
+              SizedBox(
                   width: double.infinity,
                   child: Text(
                     errorMessage,
-                    style: TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red),
                     textAlign: TextAlign.left,
                   )),
               const SizedBox(height: 10),
@@ -310,7 +312,7 @@ class _SignUpState extends State<SignUp> {
                       // Handle login action
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignIn()),
+                        MaterialPageRoute(builder: (context) => const SignIn()),
                       );
                     },
                     child: const Text("로그인",
@@ -331,7 +333,7 @@ class _SignUpState extends State<SignUp> {
       width: 265.75,
       height: 28.97,
       decoration: ShapeDecoration(
-        color: Color(0x4FECECEC),
+        color: const Color(0x4FECECEC),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       ),
       child: TextField(
@@ -349,7 +351,7 @@ class _SignUpState extends State<SignUp> {
           ),
           border: InputBorder.none,
           filled: true,
-          fillColor: Color.fromARGB(255, 246, 246, 246),
+          fillColor: const Color.fromARGB(255, 246, 246, 246),
         ),
       ),
     );
@@ -357,24 +359,24 @@ class _SignUpState extends State<SignUp> {
 
   Widget buildDropdownField(
       String labelText, List<String> items, String? value) {
-    return Container(
+    return SizedBox(
       width: 265.75,
       height: 28.97,
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           hintText: labelText,
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             color: Color(0xFF9C9C9C),
             fontSize: 13,
           ),
           filled: true,
-          fillColor: Color.fromARGB(255, 246, 246, 246),
+          fillColor: const Color.fromARGB(255, 246, 246, 246),
           contentPadding:
-              EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           border: InputBorder.none,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(2.0),
-            borderSide: BorderSide(color: Colors.transparent),
+            borderSide: const BorderSide(color: Colors.transparent),
           ),
         ),
         value: value,
@@ -392,7 +394,7 @@ class _SignUpState extends State<SignUp> {
             value: item,
             child: Text(
               item,
-              style: TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12),
             ),
           );
         }).toList(),
@@ -462,7 +464,7 @@ class _SignUpState extends State<SignUp> {
         // 회원가입 성공 시 회원가입 완료 화면으로 이동
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SignupSuccess()),
+          MaterialPageRoute(builder: (context) => const SignupSuccess()),
         );
       } else {
         debugPrint('회원가입 실패');

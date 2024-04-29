@@ -1,18 +1,18 @@
-import 'main.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'loading.dart';
 import 'complete.dart';
 import 'reservation_details.dart';
 import 'myPage.dart';
+import 'congestion.dart';
 
 class Select_reserve extends StatefulWidget {
+  const Select_reserve({super.key});
+
   @override
   _select createState() => _select();
 }
@@ -22,6 +22,7 @@ class _select extends State<Select_reserve> {
     width: 50,
     // Customize your empty data representation
   );
+  @override
   void initState() {
     super.initState();
     _checkUidStatus();
@@ -39,8 +40,9 @@ class _select extends State<Select_reserve> {
   int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
-
+  int setting = 0;
   int count = 0;
+  int count2 = 0;
   int find = 0;
 
   List<bool> isButtonPressedList =
@@ -49,12 +51,12 @@ class _select extends State<Select_reserve> {
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
 
   List<Offset> circlePositions = [
-    Offset(10, 0),
-    Offset(40, 0),
-    Offset(70, 0),
-    Offset(10, 30),
-    Offset(40, 30),
-    Offset(70, 30),
+    const Offset(10, 0),
+    const Offset(40, 0),
+    const Offset(70, 0),
+    const Offset(10, 30),
+    const Offset(40, 30),
+    const Offset(70, 30),
   ]; // 의자 위치
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -70,11 +72,11 @@ class _select extends State<Select_reserve> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return LoadingScreen();
+      return const LoadingScreen();
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             '공간대여',
             style: TextStyle(
               color: Colors.black,
@@ -124,10 +126,11 @@ class _select extends State<Select_reserve> {
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 0.50, color: Color(0xFFE3E3E3)),
+                      side: const BorderSide(
+                          width: 0.50, color: Color(0xFFE3E3E3)),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    shadows: [
+                    shadows: const [
                       BoxShadow(
                         color: Color(0x0C000000),
                         blurRadius: 10,
@@ -196,11 +199,11 @@ class _select extends State<Select_reserve> {
                           formatButtonVisible: false,
                           leftChevronIcon:
                               (SvgPicture.asset('assets/icons/che_left.svg')),
-                          leftChevronMargin: const EdgeInsets.only(left: 84),
+                          leftChevronMargin: const EdgeInsets.only(left: 80),
                           rightChevronIcon:
                               (SvgPicture.asset('assets/icons/che_right.svg')),
-                          rightChevronMargin: const EdgeInsets.only(right: 84),
-                          headerMargin: EdgeInsets.all(0),
+                          rightChevronMargin: const EdgeInsets.only(right: 80),
+                          headerMargin: const EdgeInsets.all(0),
                           titleTextStyle: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -211,7 +214,7 @@ class _select extends State<Select_reserve> {
                         //몸통부분 달력 .
                         calendarStyle: const CalendarStyle(
                           isTodayHighlighted: true,
-                          todayTextStyle: const TextStyle(
+                          todayTextStyle: TextStyle(
                             color: Color(0xFF004F9E),
                             fontFamily: 'Inter',
                             fontSize: 10,
@@ -219,14 +222,14 @@ class _select extends State<Select_reserve> {
                           todayDecoration: BoxDecoration(
                             color: Colors.transparent,
                           ),
-                          selectedTextStyle: const TextStyle(
+                          selectedTextStyle: TextStyle(
                             color: Colors.white,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
                           ),
                           selectedDecoration: BoxDecoration(
-                              color: const Color(0xFF004F9E),
+                              color: Color(0xFF004F9E),
                               shape: BoxShape.rectangle),
                           outsideDaysVisible: false,
                           defaultTextStyle: TextStyle(
@@ -241,16 +244,16 @@ class _select extends State<Select_reserve> {
                           ),
                         ),
                       ),
-                      Divider(
+                      const Divider(
                         color: Colors.grey,
                         thickness: 0.5,
                         height: 20,
                       ),
 
-                      Row(
+                      const Row(
                         children: [
                           SizedBox(height: 40),
-                          const Text(
+                          Text(
                             '시간을 선택하세요',
                             style: TextStyle(
                               fontSize: 15,
@@ -258,10 +261,10 @@ class _select extends State<Select_reserve> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Text(
                             '일일 최대 2시간 이용가능',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFFA3A3A3),
                             ),
@@ -284,7 +287,7 @@ class _select extends State<Select_reserve> {
                                   children: [
                                     Text(
                                       '$hour시',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFA3A3A3),
                                         fontSize: 10,
                                         fontFamily: 'Inter',
@@ -293,23 +296,55 @@ class _select extends State<Select_reserve> {
                                     ElevatedButton(
                                       onPressed: () {
                                         setState(() {
-                                          // Change the color here
-                                          // For example, change to red
-
                                           isButtonPressedList[index] =
                                               !isButtonPressedList[index];
+                                          if (isButtonPressedList[index] ==
+                                              true) {
+                                            setting += 1;
+                                            if (setting > 3) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        '2시간 이상 예약할 수 없습니다'),
+                                                    actions: <Widget>[
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          setState(() {
+                                                            isButtonPressedList[
+                                                                index] = false;
+                                                            setting -= 1;
+                                                          });
+                                                        },
+                                                        child: const Text('확인'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          } else {
+                                            setting -= 1;
+                                          }
+
+                                          print(setting);
                                         });
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        primary: isButtonPressedList[index]
-                                            ? Color(0XFF004F9E)
-                                            : Color(
+                                        backgroundColor: isButtonPressedList[
+                                                index]
+                                            ? const Color(0XFF004F9E)
+                                            : const Color(
                                                 0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
-                                        minimumSize: Size(50, 30),
-                                        shape: RoundedRectangleBorder(),
+                                        minimumSize: const Size(50, 30),
+                                        shape: const RoundedRectangleBorder(),
                                         elevation: 0.2, // 그림자 제거
                                       ),
-                                      child: Text('  '),
+                                      child: const Text('  '),
                                     ),
                                   ],
                                 ),
@@ -319,13 +354,13 @@ class _select extends State<Select_reserve> {
                         ),
                       ),
 
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
                       Row(
                         children: [
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           SvgPicture.asset('assets/icons/dead.svg'),
-                          Text(
+                          const Text(
                             '마감     ',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -336,8 +371,8 @@ class _select extends State<Select_reserve> {
                             ),
                           ),
                           SvgPicture.asset('assets/icons/possible.svg',
-                              color: Color(0XFF004F9E)),
-                          Text(
+                              color: const Color(0XFF004F9E)),
+                          const Text(
                             '  예약 가능',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -349,7 +384,7 @@ class _select extends State<Select_reserve> {
                           )
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
 
@@ -359,7 +394,7 @@ class _select extends State<Select_reserve> {
                         height: 20,
                       ),
 
-                      Row(
+                      const Row(
                         children: [
                           SizedBox(height: 40),
                           Text(
@@ -403,15 +438,17 @@ class _select extends State<Select_reserve> {
                                             });
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            primary: isButtonPressedTable[index]
-                                                ? Color(0xFF004F9E)
-                                                : Color(0xFFEAEAEA),
-                                            minimumSize: Size(98.655, 37.61),
+                                            backgroundColor:
+                                                isButtonPressedTable[index]
+                                                    ? const Color(0xFF004F9E)
+                                                    : const Color(0xFFEAEAEA),
+                                            minimumSize:
+                                                const Size(98.655, 37.61),
                                             elevation: 0.0,
                                           ),
                                           child: Text(
                                             'T ${index + 1}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 15,
                                               fontFamily: 'Inter',
@@ -428,11 +465,11 @@ class _select extends State<Select_reserve> {
                           //의자 위치 6명이면 6개
                         ],
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Row(
                         children: [
                           SvgPicture.asset('assets/icons/dead.svg'),
-                          Text(
+                          const Text(
                             '마감     ',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -444,9 +481,9 @@ class _select extends State<Select_reserve> {
                           ),
                           SvgPicture.asset(
                             'assets/icons/possible.svg',
-                            color: Color(0XFF004F9E),
+                            color: const Color(0XFF004F9E),
                           ),
-                          Text(
+                          const Text(
                             '  예약 가능',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -459,7 +496,7 @@ class _select extends State<Select_reserve> {
                         ],
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       ElevatedButton(
                         onPressed: () async {
@@ -471,7 +508,7 @@ class _select extends State<Select_reserve> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3)),
                         ),
-                        child: Text(
+                        child: const Text(
                           '예약하기',
                           style: TextStyle(
                             color: Colors.white,
@@ -490,6 +527,8 @@ class _select extends State<Select_reserve> {
 
         // 하단 바
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+
           currentIndex: 0, // Adjust the index according to your need
           onTap: (index) {
             switch (index) {
@@ -499,13 +538,19 @@ class _select extends State<Select_reserve> {
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Details()),
+                  MaterialPageRoute(builder: (context) => const Congestion()),
                 );
                 break;
               case 2:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyPage()),
+                  MaterialPageRoute(builder: (context) => const Details()),
+                );
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyPage()),
                 );
                 break;
             }
@@ -514,6 +559,10 @@ class _select extends State<Select_reserve> {
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/lent.svg'),
               label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/reserved.svg'),
@@ -525,11 +574,10 @@ class _select extends State<Select_reserve> {
             ),
           ],
           selectedLabelStyle:
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
-              TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
           unselectedItemColor: Colors.grey,
         ),
       );
@@ -541,29 +589,33 @@ class _select extends State<Select_reserve> {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
-    //시간선택 알고리즘
-    for (int i = 0; i < isButtonPressedList.length; i++) {
-      count = 0;
-      if (isButtonPressedList[i] == true &&
-          isButtonPressedList[i + 1] == true) {
-        count += 2;
-        find = i;
-      } else if (isButtonPressedList[i] == true) {
-        count += 1;
-        find = i;
+    if (startTime != '' && endTime != '') {
+      for (int i = 0; i < isButtonPressedList.length; i++) {
+        if (isButtonPressedList[i] == true) {
+          startTime = (i + 9).toString();
+          endTime = (i + 10).toString();
+        }
       }
-
-      print(count);
-
-      // 1시간일때
-      if (count == 1) {
-        startTime = (find + 9).toString() + ':00';
-        endTime = (find + 10).toString() + ':00';
-      } // 2시간일때
-      else if (count == 2) {
-        startTime = (find + 9).toString() + ':00';
-        endTime = (find + 11).toString() + ':00';
-      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('시간을 선택해주세요'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: const Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
     }
 
     // 테이블 번호선택 알고리즘
@@ -583,7 +635,7 @@ class _select extends State<Select_reserve> {
       'tableNumber': table_number.toString(),
     };
 
-    debugPrint('${data}');
+    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -601,7 +653,7 @@ class _select extends State<Select_reserve> {
       if (responseData['message'] == 'Reservation club created successfully') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Complete()),
+          MaterialPageRoute(builder: (context) => const Complete()),
         );
       } else {
         setState(() {
