@@ -41,7 +41,7 @@ reserveClub.post("/", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+    const collectionName = `${userData.faculty}_Club`;
 
     // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
     const existingReservationSnapshot = await getDocs(
@@ -155,8 +155,8 @@ reserveClub.get("/reservationclubs/:userId", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    // 컬렉선 이름 설정
-    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_Club`;
 
     // 사용자의 모든 예약 내역 가져오기
     const userReservationsSnapshot = await getDocs(
@@ -214,7 +214,7 @@ reserveClub.get(
       const userData = userDoc.data();
 
       // 컬렉션 이름 설정
-      const collectionName = `${userData.faculty}_${userData.department}_Club`;
+      const collectionName = `${userData.faculty}_Club`;
 
       // 해당 날짜의 모든 예약 내역 가져오기
     const reservationsSnapshot = await getDocs(
@@ -275,7 +275,7 @@ reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
     const userData = userDoc.data();
 
     // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+    const collectionName = `${userData.faculty}_Club`;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
     const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
@@ -365,7 +365,7 @@ reserveClub.delete("/delete/:userId/:reserveclubUID", async(req, res) => {
     const userData = userDoc.data();
 
     // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_${userData.department}_Club`;
+    const collectionName = `${userData.faculty}_Club`;
 
     // Firestore reservationClub에서 해당 예약 문서를 가져옴
     const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
