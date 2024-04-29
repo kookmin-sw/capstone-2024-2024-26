@@ -226,7 +226,7 @@ class _MyPageState extends State<MyPage> {
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    '    이용안내',
+                    '     이용안내',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 15,
@@ -244,7 +244,7 @@ class _MyPageState extends State<MyPage> {
                     backgroundColor: Colors.transparent,
                   ),
                   child: Text(
-                    '    문의하기',
+                    '     문의하기',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 15,
@@ -264,7 +264,7 @@ class _MyPageState extends State<MyPage> {
                         backgroundColor: Colors.transparent,
                       ),
                       child: Text(
-                        '    로그아웃',
+                        '     로그아웃',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15,

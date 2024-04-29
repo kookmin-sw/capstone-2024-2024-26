@@ -10,6 +10,8 @@ import 'package:frontend/myPage.dart';
 import 'lent_conference.dart';
 import 'package:frontend/lent_conference.dart';
 import 'return.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'select_reserve.dart';
 import 'congestion.dart';
 
@@ -100,24 +102,49 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final ExpansionTileController controller = ExpansionTileController();
   bool is_tap = false;
+  String time = '';
+  String people = '';
+  String roomName = '';
 
-  List<Map<String, String>> spaceData = [
-    {
-      'time': '09:00 - 22:00',
-      'people': '12',
-      'roomName': '복지관 B101호',
-    },
-    {
-      'time': '09:00 - 22:00',
-      'people': '18',
-      'roomName': '미래관(구) 612호',
-    },
-    {
-      'time': '09:00 - 22:00',
-      'people': '12',
-      'roomName': '복지관 B101호',
-    },
+  @override
+  void initState() {
+    super.initState();
+    _checkRoomStatus();
+  }
 
+  _checkRoomStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? uid = prefs.getString('uid');
+
+    const url = 'http://localhost:3000/reserveclub/main_lentroom/:uid';
+
+    final Map<String, String> data = {
+      'uid': uid ?? '',
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: json.encode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    debugPrint('${response.statusCode}');
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['message'] == 'successfully get lentroom') {
+        setState(() {
+          spaceData.add(responseData['share_room_data']);
+        });
+      } else {}
+    } else {
+      setState(() {
+        String errorMessage = ''; // Define the variable errorMessage
+        errorMessage = 'no room';
+      });
+    }
+  }
+
+  List<dynamic> spaceData = [
     // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
   ];
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
@@ -239,21 +266,21 @@ class _MainPageState extends State<MainPage> {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: spaceData.length,
+                itemCount: spaceData.isEmpty ? 0 : spaceData[0].length,
                 itemBuilder: (context, index) {
-                  print(
-                      index); // Add this line to print the index to the console
-                  final data = spaceData[index];
-                  print(data);
+                  final data =
+                      spaceData.isNotEmpty ? spaceData[0][index] : null;
                   return Column(
                     children: [
                       SizedBox(height: 10), // Add spacing here
 
-                      _CustomScrollViewWidget(
-                        time: data['time']!,
-                        people: data['people']!,
-                        roomName: data['roomName']!,
-                      ),
+                      data != null
+                          ? _CustomScrollViewWidget(
+                              time: data['time']!,
+                              people: data['people']!,
+                              roomName: data['roomName']!,
+                            )
+                          : Container(), // Return empty container if data is null
                     ],
                   );
                 },
