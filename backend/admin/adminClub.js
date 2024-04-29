@@ -101,7 +101,7 @@ adminClub.delete("/delete/:uid", isAdmin, async (req, res) => {
 
 // 관리자 동아리방 생성
 adminClub.post("/create/room", isAdmin, async (req, res) => {
-  const { faculty, department, roomId } = req.body;
+  const { faculty, roomId } = req.body;
   try {
     await setDoc(doc(db, `${faculty}_Club`, `${roomId}`), {
       adminMessage: `Admin has set up ${roomId} room.`,
