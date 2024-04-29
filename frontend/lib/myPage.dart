@@ -105,21 +105,22 @@ class _MyPageState extends State<MyPage> {
                       onTap: getImage,
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundColor: Colors.grey,
+                        backgroundColor: Color(0XF5F5F5F5),
                         backgroundImage:
                             _image != null ? FileImage(_image!) : null,
                         child: _image == null
                             ? const Icon(
                                 Icons.camera_alt,
                                 size: 40,
-                                color: Colors.white,
+                                color: Color(0XC8C8C8C8),
                               )
                             : null,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 50),
+                  const SizedBox(width: 10),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -135,6 +136,12 @@ class _MyPageState extends State<MyPage> {
                                 fontFamily: 'Inter',
                               ),
                             ),
+                          ),
+                          Text(' 님',
+                              style: const TextStyle(
+                                  fontFamily: 'Inter', fontSize: 16)),
+                          SizedBox(
+                            width: 70,
                           ),
                           IconButton(
                             onPressed: () {
@@ -178,14 +185,27 @@ class _MyPageState extends State<MyPage> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          '학번 $studentId',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 0),
+                            child: Text(
+                              '학번',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Inter',
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
-                        ),
+                          Text(
+                            ' $studentId',
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
