@@ -11,7 +11,9 @@ import 'myPage.dart';
 import 'congestion.dart';
 
 class Select_reserve extends StatefulWidget {
-  const Select_reserve({super.key});
+  final String roomName;
+
+  Select_reserve({Key? key, required this.roomName}) : super(key: key);
 
   @override
   _select createState() => _select();

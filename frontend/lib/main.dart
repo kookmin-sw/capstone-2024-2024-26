@@ -144,9 +144,42 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  List<dynamic> spaceData = [
-    // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
-  ];
+  _checkRoom2Status() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? uid = prefs.getString('uid');
+
+    const url = 'http://localhost:3000/reserveclub/main_conference_room/:uid';
+
+    final Map<String, String> data = {
+      'uid': uid ?? '',
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: json.encode(data),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    debugPrint('${response.statusCode}');
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['message'] == 'successfully get lentroom') {
+        setState(() {
+          spaceData2.add(responseData['share_room_data']);
+        });
+      } else {}
+    } else {
+      setState(() {
+        String errorMessage = ''; // Define the variable errorMessage
+        errorMessage = 'no room';
+      });
+    }
+  }
+
+  List<dynamic> spaceData = [];
+
+  List<dynamic> spaceData2 = [];
+
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
 
   @override
@@ -195,6 +228,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         is_tap = !is_tap;
                       });
+                      _checkRoomStatus();
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: TextStyle(
@@ -230,6 +264,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         is_tap = !is_tap;
                       });
+                      _checkRoom2Status();
                     },
                     style: ElevatedButton.styleFrom(
                       textStyle: TextStyle(
@@ -266,10 +301,13 @@ class _MainPageState extends State<MainPage> {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: spaceData.isEmpty ? 0 : spaceData[0].length,
+                itemCount: is_tap
+                    ? (spaceData2.isEmpty ? 0 : spaceData2[0].length)
+                    : (spaceData.isEmpty ? 0 : spaceData[0].length),
                 itemBuilder: (context, index) {
-                  final data =
-                      spaceData.isNotEmpty ? spaceData[0][index] : null;
+                  final data = is_tap
+                      ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
+                      : (spaceData.isNotEmpty ? spaceData[0][index] : null);
                   return Column(
                     children: [
                       SizedBox(height: 10), // Add spacing here
@@ -497,7 +535,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const Select_reserve(),
+                  builder: (context) => Select_reserve(roomName: roomName),
                 ),
               );
             },
