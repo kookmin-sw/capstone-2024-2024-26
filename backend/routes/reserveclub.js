@@ -30,7 +30,7 @@ const db = getFirestore(app);
 
 const reserveClub = express.Router();
 
-// 관리자가 등록한 공유공간 대여 페이지 예약 가능 강의실 조회 (메인)
+// 관리자가 등록한 예약 가능 공유공간 조회 (메인)
 reserveClub.post("/main_lentroom/:uid", async (req, res) => {
   const { uid } = req.body;
   console.log(uid);
@@ -53,11 +53,42 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
     }
   
   ]
-      // 
+
+    // 사용자의 예약 정보 반환
+    res.status(200).json({
+      message: "successfully get lentroom", share_room_data : share_room_data,
       
-      
-      
-    
+    });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("no room ", error);
+    res.status(500).json({ error: "fail_ no_room" });
+  }
+});
+
+// 관리자가 등록한 예약 가능 강의실 조회 (메인)
+reserveClub.post("/main_conference_room/:uid", async (req, res) => {
+  const { uid } = req.body;
+  console.log(uid);
+  try {
+    const share_room_data = [{
+
+      'time' : '09:00-21:00',
+      'people' : "70" ,
+      'roomName' : "미래관 611호",
+    },
+    {
+      'time' : '09:00-21:00',
+      'people' : "75" ,
+      'roomName' : "미래관 232호",
+    }
+    ,{
+      'time' : '09:00-21:00',
+      'people' : "80" ,
+      'roomName' : "미래관 424호",
+    }
+  
+  ]
 
     // 사용자의 예약 정보 반환
     res.status(200).json({
