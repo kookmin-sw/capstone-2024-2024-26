@@ -15,9 +15,24 @@ const Main = () => {
           <div className='home_container'>
             <div className='todo_container'>
               <div className='todo_name'>
-                <p className='name_todo'>오늘의 할 일</p>
+                <div className='todo_box1'>
+                  <p className='name_todo1'>오늘의 할 일</p> <div className='todo_number1'>14</div>
+                </div>
                 <hr></hr>
-                <div className='todo_function'></div>
+                <div className='todo_function'>
+                <div className='todo_box'>
+                  <p className='name_todo'>강의실 예약</p> <div className='todo_number'>10</div>
+                </div>
+                <div className='todo_box'>
+                  <p className='name_todo'>공유공간 예약</p> <div className='todo_number'>5</div>
+                </div>
+                <div className='todo_box'>
+                  <p className='name_todo'>방문자 수</p> <div className='todo_number'>41</div>
+                </div>
+                <div className='todo_box'>
+                  <p className='name_todo'>문의</p> <div className='todo_number'>4</div>
+                </div>
+                </div>
               </div>
             </div>
             <div className='graph_container'>

@@ -1,17 +1,17 @@
 .member_container{
     width: 90vw;
-    height: 90vh;
-    background-color: rgb(208, 208, 208);
+    height: 93vh;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    background-color: rgb(208, 208, 208);
 
 }
 .member_box{
     width: 86vw;
     height: 88vh;
-    background-color: rgb(160, 160, 160);
+    background-color: rgb(255, 255, 255);
 }
 .member_button{
     height: 8vh;
@@ -22,15 +22,12 @@
 .member_title{
     font-weight: bolder;
     font-size: larger;
-    margin: 0 10px;
-}
-.date_button{
-    background-color: blue;
+    margin: 0 20px;
 }
 .member_chart{
     height: 72vh;
     width: 86vw;
-    background-color: rgb(94, 94, 94);
+    background-color: rgb(207, 207, 207);
 }
 .table{
     width: 100%; /* 테이블이 부모 컨테이너를 가득 채움 */
@@ -39,7 +36,7 @@
 th, td {
     text-align: center;
     padding: 15px; /* 셀 내부 여백 */
-    border-bottom: 1px solid #ddd; /* 행 간 구분선 */
+    border-bottom: 1.5px solid rgb(208, 208, 208); /* 행 간 구분선 */
 }
 
 th {
@@ -50,9 +47,34 @@ th {
 td {
     font-size: 1em;
 }
+.name-header{
+    width: 4vw;
+}
+.number-header{
+    width: 5vw;
+}
+.faculty-header{
+    width: 8vw;
+}
+.mail-header{
+    width: 12vw;
+}
 .contact-header{
     width: 20vw;
 }
 .alert-header{
     width: 25vw;
+}
+.search_member{
+    border-radius: 5px;
+    border: solid 0.2px black;
+    position: absolute;
+    right: 10vw;
+    height: 4vh;
+}
+.search_button{
+    position: absolute;
+    right: 4vw;
+    height: 4vh;
+    width: 5vw;
 }

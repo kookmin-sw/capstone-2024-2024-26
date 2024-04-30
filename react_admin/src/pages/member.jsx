@@ -38,10 +38,10 @@ const Member = () => {
     <table>
       <thead>
         <tr>
-          <th>이름</th>
-          <th>학번</th>
-          <th>단과대</th>
-          <th>메일</th>
+          <th className='name-header'>이름</th>
+          <th className='number-header'>학번</th>
+          <th className='faculty-header'>단과대</th>
+          <th className='mail-header'>메일</th>
           <th className="contact-header">연락처</th>
           <th className="alert-header">알림보내기</th>
         </tr>
@@ -78,7 +78,7 @@ const Member = () => {
                  value={searchTerm}
                  onChange={e => setSearchTerm(e.target.value)}
                  />
-                 <button className='date_button'>검색</button>
+                 <button className='search_button'>검색</button>
               </div>
               <hr></hr>
               <MemberTable members={filteredMembers} />
