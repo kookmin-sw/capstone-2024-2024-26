@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'select_reserve.dart';
 import 'congestion.dart';
+import 'select_reserve_cf.dart';
 
 void main() {
   runApp(const MyApp());
@@ -317,6 +318,7 @@ class _MainPageState extends State<MainPage> {
                               time: data['time']!,
                               people: data['people']!,
                               roomName: data['roomName']!,
+                              istap: is_tap,
                             )
                           : Container(), // Return empty container if data is null
                     ],
@@ -390,12 +392,13 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String time;
   final String people;
   final String roomName;
-
+  final bool istap;
   const _CustomScrollViewWidget({
     Key? key,
     required this.time,
     required this.people,
     required this.roomName,
+    required this.istap,
   }) : super(key: key);
 
   @override
@@ -535,7 +538,11 @@ class _CustomScrollViewWidget extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Select_reserve(roomName: roomName),
+                  builder: (context) => istap
+                      ? Select_reserve_cf(roomName: roomName)
+                      : Select_reserve(
+                          roomName: roomName,
+                        ),
                 ),
               );
             },
