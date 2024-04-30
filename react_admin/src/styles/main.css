@@ -1,6 +1,44 @@
 .sidebar-and-content{
     display: flex;
 }
-.main_test{
-    background-color: black;
+.home_container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90vw;
+
+}
+.todo_container{
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+    height: 20vh;
+    width: 86vw;
+    border: solid 0.5px black;
+}
+.todo_name{
+}
+.name_todo{
+    font-size: 3vh;
+    margin: 0;
+}
+.graph_container{
+    display: flex;
+    flex-direction: row;
+    height: 58vh;
+}
+.graph1{
+    width: 42vw;
+    height: 56vh;
+    margin-right: 2vw;
+    margin-top: 1vh;
+    background-color: white;
+    border: solid 0.5px black;
+}
+.graph2{
+    width: 42vw;
+    height: 56vh;
+    margin-top: 1vh;
+    background-color: white;
+    border: solid 0.5px black;
 }

@@ -1,0 +1,34 @@
+.member_container{
+    width: 90vw;
+    height: 90vh;
+    background-color: rgb(208, 208, 208);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+}
+.member_box{
+    width: 86vw;
+    height: 88vh;
+    background-color: rgb(160, 160, 160);
+}
+.member_button{
+    height: 8vh;
+    display: flex;
+    flex: row;
+    align-items: center;
+}
+.member_title{
+    font-weight: bolder;
+    font-size: larger;
+    margin: 0 10px;
+}
+.date_button{
+    background-color: blue;
+}
+.member_chart{
+    height: 72vh;
+    width: 86vw;
+    background-color: rgb(94, 94, 94);
+}
