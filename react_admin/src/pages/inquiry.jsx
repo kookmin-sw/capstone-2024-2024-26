@@ -32,11 +32,11 @@ const Inquiry = () => {
     <table>
       <thead>
         <tr>
-          <th>문의 번호</th>
-          <th>신청 날짜</th>
-          <th>메일</th>
-          <th>연락처</th>
-          <th>답변 작성</th>
+          <th className='inq-numb-header'>문의 번호</th>
+          <th className='inq-date-header'>신청 날짜</th>
+          <th className='inq-mail-header'>메일</th>
+          <th className='inq-contact-header'>연락처</th>
+          <th className='inq-response-header'>답변 작성</th>
         </tr>
       </thead>
       <tbody>
@@ -46,7 +46,7 @@ const Inquiry = () => {
             <td>{inquiry.date}</td>
             <td>{inquiry.email}</td>
             <td>{inquiry.phone}</td>
-            <td><button onClick={() => handleResponse(inquiry)}>답변</button></td>
+            <td><button onClick={() => handleResponse(inquiry)}>답변 작성하기</button></td>
           </tr>
         ))}
       </tbody>
@@ -63,12 +63,13 @@ const Inquiry = () => {
       <div className="sidebar-and-content">
         <Sidebar />
         <div className="main-content">
-          <div className='inquiry_container'>
-            <div className='inquiry_box'>
-              <div className='inquiry_button'>
+          <div className='member_container'>
+            <div className='member_box'>
+              <div className='member_button'>
+                <p className='member_title'>문의 관리</p>
                 <input
                   type='date'
-                  className='search_date'
+                  className='search_member'
                   value={searchDate}
                   onChange={e => setSearchDate(e.target.value)}
                 />

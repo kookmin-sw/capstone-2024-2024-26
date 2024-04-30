@@ -1,0 +1,39 @@
+.notice_container{
+    width: 90vw;
+    height: 93vh;
+    background-color: rgb(208, 208, 208);
+}
+.notice{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.notice_box{
+    height: 42vh;
+    width: 86vw;
+    background-color: white;
+    margin-top: 3.5vh;
+}
+.notice_box_upper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.notice_title{
+    font-weight: bold;
+    margin: 0.5vw 0;
+}
+.notice_add_button{
+    position: absolute;
+    right: 5vw;
+    height: 4vh;
+    width: 3vw;
+    color: rgb(102, 102, 206);
+    font-size: 3vh;
+    font-weight: bolder;
+    background-color: white;
+    border: solid 1px black;
+    border-radius: 5px;
+}
