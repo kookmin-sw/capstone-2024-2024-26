@@ -2,7 +2,7 @@ import React from 'react';
 import Sidebar from './sideBar';
 import Banner from './banner';
 
-const Notification = () => {
+const Traffic = () => {
     return (
         <div className="main-container">
           <Banner />
@@ -15,4 +15,4 @@ const Notification = () => {
       );
     }
 
-export default Notification;
+export default Traffic;

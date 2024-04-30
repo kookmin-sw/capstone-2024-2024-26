@@ -13,6 +13,7 @@ function SideBar() {
         { name: "공간 관리", path: "/page-management"},
         { name: "알림 관리", path: "/notification"},
         { name: "예약 관리", path: "/reserve"},
+        { name: "혼잡도 관리", path: "/traffic"},
     ];
     
     return(
