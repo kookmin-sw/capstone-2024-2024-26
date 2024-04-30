@@ -42,8 +42,8 @@ const Member = () => {
           <th>학번</th>
           <th>단과대</th>
           <th>메일</th>
-          <th>연락처</th>
-          <th>알림보내기</th>
+          <th className="contact-header">연락처</th>
+          <th className="alert-header">알림보내기</th>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +70,15 @@ const Member = () => {
           <div className='member_container'>
             <div className='member_box'>
               <div className='member_button'>
-                <p className='member_title'>회원관리</p> <div className='date_select'>날짜 고르기</div> <button className='date_button'>검색</button>
+                <p className='member_title'>회원관리</p>
+                <input
+                 type='text'
+                 className='search_member'
+                 placeholder='학번 또는 이름'
+                 value={searchTerm}
+                 onChange={e => setSearchTerm(e.target.value)}
+                 />
+                 <button className='date_button'>검색</button>
               </div>
               <hr></hr>
               <MemberTable members={filteredMembers} />
