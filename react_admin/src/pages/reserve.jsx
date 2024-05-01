@@ -48,10 +48,10 @@ const Reserve = () => {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>예약공간</th>
-                                    <th>예약시간</th>
-                                    <th>이름</th>
-                                    <th>이메일</th>
+                                    <th className='reserve-room'>예약공간</th>
+                                    <th className='reserve-time'>예약시간</th>
+                                    <th className='reserve-name'>이름</th>
+                                    <th className='reserve-email'>이메일</th>
                                 </tr>
                             </thead>
                             <tbody>

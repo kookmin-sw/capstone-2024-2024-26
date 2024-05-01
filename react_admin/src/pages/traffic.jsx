@@ -1,75 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import React from 'react';
 import Sidebar from './sideBar';
 import Banner from './banner';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 import '../styles/traffic.css';
 
 const Traffic = () => {
-    const [date, setDate] = useState(new Date());
-    const [reservations, setReservations] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const db = firebase.firestore();
-            const formattedDate = date.toISOString().split('T')[0]; // 날짜 포맷 "YYYY-MM-DD"
-            const querySnapshot = await db.collection('reservationClub')
-                .where('date', '==', formattedDate + " 00:00:00.000Z")
-                .get();
-            const fetchedReservations = querySnapshot.docs.map(doc => doc.data());
-            setReservations(fetchedReservations);
-        };
-        fetchData();
-    }, [date]);
-
-    const formatDate = (date) => {
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        const dayOfWeek = days[date.getDay()];
-        return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${dayOfWeek})`;
-    };
-
-     return (
+    return (
         <div className="main-container">
-            <Banner />
-            <div className="sidebar-and-content">
-                <Sidebar />
-                <div className="main-content">
-                    <div className='calendar_box'>
-                        <Calendar
-                            onChange={setDate}
-                            value={date}
-                        />
+          <Banner />
+          <div className="sidebar-and-content">
+            <Sidebar />
+            <div className="main-content">
+                <div className='member_container'>
+                    <div className='member_box'>
+                        <div className='member_button'>
+                        <p className='member_title'>혼잡도 카메라</p>
+                        <button className='search_button'>+추가하기</button>
+                        </div>
+                        <hr></hr>
                     </div>
-                    <div className='calendar_show'>
-                        <h2>예약 내역: {formatDate(date)}</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>예약공간</th>
-                                    <th>예약시간</th>
-                                    <th>이름</th>
-                                    <th>이메일</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {reservations.map((reservation, index) => (
-                                    <tr key={index}>
-                                        <td>{reservation.roomId}</td>
-                                        <td>{`${reservation.startTime} - ${reservation.endTime}`}</td>
-                                        <td>{reservation.userName}</td>
-                                        <td>{reservation.userEmail}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    
                 </div>
             </div>
+          </div>
         </div>
-    );
-};
+      );
+    }
 
 export default Traffic;

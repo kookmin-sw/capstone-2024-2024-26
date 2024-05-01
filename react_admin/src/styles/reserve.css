@@ -26,3 +26,19 @@
     height: 100%; /* 부모 컨테이너에 맞춰서 크기 조정 */
     max-width: none; /* 필요한 경우 최대 너비 제한 해제 */
 }
+.calendar_show table {
+    width: 100%;
+    table-layout: fixed; /* 고정된 테이블 레이아웃을 사용 */
+}
+.reserve-room{
+    width: 5vw;
+}
+.reserve-time{
+    width: 6vw;
+}
+.reserve-name{
+    width: 4vw;
+}
+.reserve-email{
+    width: 10vw;
+}
