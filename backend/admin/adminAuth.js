@@ -123,7 +123,7 @@ import {
   });
   
   // 프로필 수정
-router.post("/profile/update/:uid", isAdmin, async (req, res) => {
+adminAuth.post("/profile/update/:uid", isAdmin, async (req, res) => {
   const userId = req.params.uid;
   const {
     password,
