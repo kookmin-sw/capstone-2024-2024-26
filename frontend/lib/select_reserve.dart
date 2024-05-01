@@ -16,7 +16,7 @@ class Select_reserve extends StatefulWidget {
   Select_reserve({Key? key, required this.roomName}) : super(key: key);
 
   @override
-  _select createState() => _select();
+  State<Select_reserve> createState() => _select(roomName: roomName);
 }
 
 class _select extends State<Select_reserve> {
@@ -30,13 +30,18 @@ class _select extends State<Select_reserve> {
     _checkUidStatus();
   }
 
+  String roomName;
+  _select({
+    required this.roomName,
+  });
+
   final double intervalWidth = 50.0;
 
   final ExpansionTileController controller = ExpansionTileController();
 
   String startTime = ''; //server
   String endTime = '';
-  String room_name = '123'; //server
+  String room_name = '';
   int table_number = 0; // server
 
   int total_table = 1;
@@ -145,8 +150,8 @@ class _select extends State<Select_reserve> {
                     crossAxisAlignment:
                         CrossAxisAlignment.start, // 예약 정보를 왼쪽 상단에 정렬
                     children: [
-                      const Text(
-                        '예약 정보',
+                      Text(
+                        roomName,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

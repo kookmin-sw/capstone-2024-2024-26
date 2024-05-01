@@ -15,10 +15,13 @@ import 'document.dart';
 class Select_reserve_cf extends StatefulWidget {
   final String roomName;
 
-  Select_reserve_cf({Key? key, required this.roomName}) : super(key: key);
+  const Select_reserve_cf({
+    Key? key,
+    required this.roomName,
+  }) : super(key: key);
 
   @override
-  _select_cf createState() => _select_cf();
+  State<Select_reserve_cf> createState() => _select_cf(roomName: roomName);
 }
 
 class _select_cf extends State<Select_reserve_cf> {
@@ -26,11 +29,17 @@ class _select_cf extends State<Select_reserve_cf> {
     width: 50,
     // Customize your empty data representation
   );
+
   @override
   void initState() {
     super.initState();
     _checkUidStatus();
   }
+
+  String roomName;
+  _select_cf({
+    required this.roomName,
+  });
 
   final double intervalWidth = 50.0;
 
@@ -147,8 +156,8 @@ class _select_cf extends State<Select_reserve_cf> {
                     crossAxisAlignment:
                         CrossAxisAlignment.start, // 예약 정보를 왼쪽 상단에 정렬
                     children: [
-                      const Text(
-                        '예약 정보',
+                      Text(
+                        roomName,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

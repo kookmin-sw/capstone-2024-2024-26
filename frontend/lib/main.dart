@@ -538,12 +538,11 @@ class _CustomScrollViewWidget extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => istap
-                      ? Select_reserve_cf(roomName: roomName)
-                      : Select_reserve(
-                          roomName: roomName,
-                        ),
-                ),
+                    builder: (context) => istap
+                        ? Select_reserve_cf(
+                            roomName: roomName,
+                          )
+                        : Select_reserve(roomName: roomName)),
               );
             },
             style: ElevatedButton.styleFrom(
