@@ -44,9 +44,8 @@ function isAdmin(req, res, next) {
 }
 
 // 동아리방 예약 생성 (관리자 모드)
-adminClub.post("/create", isAdmin, async (req, res) => {
+adminClub.post("/", isAdmin, async (req, res) => {
   const { userId, roomId, date, startTime, endTime, tableNumber } = req.body;
-
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -56,31 +55,104 @@ adminClub.post("/create", isAdmin, async (req, res) => {
     }
     const userData = userDoc.data();
 
-    const existingMyReservationSnapshot = await getDocs(
-      collection(db, "reservationClub"),
-      where("userEmail", "==", userData.email)
+    const collectionName = `${userData.faculty}_Club`;
+
+    // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
+    const existingReservationSnapshot = await getDocs(
+      collection(db, `${collectionName}`),
+      where("roomId", "==", roomId)
     );
 
-    const reservationCount = existingMyReservationSnapshot.size;
+    const existingReservation = existingReservationSnapshot.docs.find((doc) =>
+      doc.id.includes(roomId)
+    );
 
-    // 예약 추가
-    await setDoc(doc(db, "reservationClub", `${userId}_${reservationCount}`), {
-      userEmail: userData.email,
-      userName: userData.name,
-      userClub: userData.club,
-      roomId: roomId,
-      date: date,
-      startTime: startTime,
-      endTime: endTime,
-      tableNumber: tableNumber,
-    });
+    // roomId와 같은 문자열이 포함되어 있는 경우 예약 진행
+    if (existingReservation) {
+      // 예약된 시간대와 좌석 확인
+      const existingReservationsSnapshot = await getDocs(
+        collection(db, `${collectionName}`),
+        where("date", "==", date),
+        where("roomId", "==", roomId),
+        where("tableNumber", "==", tableNumber)
+      );
 
-    // 예약 성공 시 응답
-    res.status(201).json({ message: "Reservation club created successfully" });
+      // 겹치는 예약이 있는지 확인
+      const overlappingReservation = existingReservationsSnapshot.docs.find(
+        (doc) => {
+          const reservation = doc.data();
+          // 기존 예약의 시작 시간과 끝 시간
+          const existingStartTime = reservation.startTime;
+          const existingEndTime = reservation.endTime;
+          const existingDate = reservation.date;
+          const existingRoomId = reservation.roomId;
+          const startTimeClub = startTime;
+          const endTimeClub = endTime;
+
+          // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
+          if (
+            (existingDate == date &&
+              startTimeClub == existingStartTime &&
+              endTimeClub == existingEndTime &&
+              roomId == existingRoomId) ||
+            (existingDate == date &&
+              roomId == existingRoomId &&
+              startTimeClub < existingEndTime &&
+              endTimeClub > existingStartTime)
+          ) {
+            return true;
+          }
+          return false;
+        }
+      );
+
+      // 겹치는 예약이 있는 경우 에러 반환
+      if (overlappingReservation) {
+        return res
+          .status(401)
+          .json({ error: "The room is already reserved for this time" });
+      }
+
+      // 전에 사용자가 한 예약이 있는지 확인
+      const existingMyReservationSnapshot = await getDocs(
+        collection(db, `${collectionName}`),
+        where("userEmail", "==", userData.email)
+      );
+
+      // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
+      const reservationCount = existingMyReservationSnapshot.size;
+
+      // 겹치는 예약이 없으면 예약 추가
+      await setDoc(
+        doc(
+          db,
+          `${collectionName}`,
+          `${roomId}_${userData.studentId}_${reservationCount}`
+        ),
+        {
+          userEmail: userData.email,
+          userName: userData.name,
+          userClub: userData.club,
+          roomId: roomId,
+          date: date,
+          startTime: startTime,
+          endTime: endTime,
+          tableNumber: tableNumber,
+        }
+      );
+
+      // 예약 성공 시 응답
+      res
+        .status(201)
+        .json({ message: "Reservation club created successfully" });
+    } else {
+      // roomId와 같은 문자열이 포함되어 있지 않은 경우 에러 반환
+      return res.status(404).json({ error: "Room not found" });
+    }
   } catch (error) {
     // 오류 발생 시 오류 응답
-    console.error("Error creating reservation club in admin mode", error);
-    res.status(500).json({ error: "Failed reservation club in admin mode" });
+    console.error("Error creating reservation club", error);
+    res.status(500).json({ error: "Failed reservation club" });
   }
 });
 
