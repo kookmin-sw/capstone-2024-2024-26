@@ -4,7 +4,8 @@
     flex-direction: row;
     align-items: center;
     height: 7vh;
-    background-color: #004F9E;
+    background-color: rgb(243, 243, 243);
+    border: solid 1px rgb(192, 192, 192);
 }
 .banner_title{
     margin-left: 2vw;

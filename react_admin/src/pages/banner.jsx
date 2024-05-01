@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { authService } from '../firebase/fbInstance';
-import logo_white from '../image/logo_white.png';
+import logo_blue from '../image/logo_blue.png';
 import '../styles/banner.css';
 
 function Banner() {
@@ -19,7 +19,7 @@ function Banner() {
 
   return (
     <div className="banner-container">
-      <img src={logo_white} alt="K-SharePlace Logo" className="banner_title"/>
+      <img src={logo_blue} alt="K-SharePlace Logo" className="banner_title"/>
       <button className="logout_button" onClick={handleLogout}>로그아웃</button>
     </div>
   );
