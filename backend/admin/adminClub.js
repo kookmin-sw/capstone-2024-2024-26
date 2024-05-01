@@ -156,13 +156,24 @@ adminClub.post("/", isAdmin, async (req, res) => {
   }
 });
 
-adminClub.delete("/delete/:uid", isAdmin, async (req, res) => {
+adminClub.delete("/delete/:userId/:reservationUID", isAdmin, async (req, res) => {
+  const userId = req.params.userId;
+  const reservationUID = req.params.reservationUID;
+
   try {
-    // Firestore reservationClub uid로 해야함!!
-    const userId = req.params.uid;
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_Club`;
 
     // Firestore에서 동아리 예약내역 삭제
-    await deleteDoc(doc(db, "reservationClub", userId));
+    await deleteDoc(doc(db, `${collectionName}`, reservationUID));
 
     res.status(200).json({ message: "Reservation club deleted successfully" });
   } catch (error) {
@@ -185,6 +196,5 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
     res.status(500).json({ error: "Failed to register Club Room" });
   }
 });
-
 
 export default adminClub;
