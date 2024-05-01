@@ -98,6 +98,9 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
         boolAgree: true,
       });
 
+      // Firestore에서 강의실 대기열 예약내역 삭제
+      await deleteDoc(doc(db, collectionNameQueue, reserveroomUID));
+
       res.status(200).json({ message: "Register Classroom successfully" });
     } else {
       res.status(400).json({ error: "Administrator denied your reservation" });
@@ -242,37 +245,42 @@ adminRoom.post("/create", isAdmin, async (req, res) => {
 });
 
 // 관리자 강의실 예약 내역 삭제
-adminRoom.delete("/delete/:userId/:reservationUID", isAdmin, async (req, res) => {
-  const userId = req.params.userId;
-  const reservationUID = req.params.reservationUID;
+adminRoom.delete(
+  "/delete/:userId/:reservationUID",
+  isAdmin,
+  async (req, res) => {
+    const userId = req.params.userId;
+    const reservationUID = req.params.reservationUID;
 
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
+    try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
 
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
+      if (!userDoc.exists()) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+
+      // 컬렉션 이름 설정(예약내역)
+      const collectionName = `${userData.faculty}_Classroom`;
+
+      // 컬렉션 이름 설정(대기열)
+      const collectionNameQueue = `${userData.faculty}_Classroom_queue`;
+
+      // Firestore에서 강의실 예약내역 삭제
+      await deleteDoc(doc(db, `${collectionName}`, reservationUID));
+
+      // Firestore에서 강의실 대기열 예약내역 삭제
+      await deleteDoc(doc(db, `${collectionNameQueue}`, reservationUID));
+
+      res
+        .status(200)
+        .json({ message: "Reservation club deleted successfully" });
+    } catch (error) {
+      console.log("Error deleting reservation club", error);
+      res.status(500).json({ error: "Failed to delete reservation club" });
     }
-    const userData = userDoc.data();
-
-    // 컬렉션 이름 설정(예약내역)
-    const collectionName = `${userData.faculty}_Classroom`;
-
-    // 컬렉션 이름 설정(대기열)
-    const collectionNameQueue = `${userData.faculty}_Classroom_queue`;
-
-    // Firestore에서 강의실 예약내역 삭제
-    await deleteDoc(doc(db, `${collectionName}`, reservationUID));
-
-    // Firestore에서 강의실 대기열 예약내역 삭제
-    await deleteDoc(doc(db, `${collectionNameQueue}`, reservationUID));
-
-    res.status(200).json({ message: "Reservation club deleted successfully" });
-  } catch (error) {
-    console.log("Error deleting reservation club", error);
-    res.status(500).json({ error: "Failed to delete reservation club" });
   }
-});
-
+);
 
 export default adminRoom;
