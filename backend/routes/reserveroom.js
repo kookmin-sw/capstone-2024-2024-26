@@ -241,6 +241,116 @@ reserveroom.get("/reservationrooms/:userId/:date", async (req, res) => {
   }
 });
 
+// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
+reserveroom.get(
+  "/reservationrooms/:userId/:startDate/:endDate",
+  async (req, res) => {
+    const userId = req.params.userId;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
+
+      if (!userDoc.exists()) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+
+      // 컬렉션 이름 설정
+      const collectionName = `${userData.faculty}_Classroom`;
+
+      // 모든 예약 내역 가져오기
+      const reservationsSnapshot = await getDocs(
+        collection(db, `${collectionName}`)
+      );
+
+      // 예약이 없는 경우
+      if (reservationsSnapshot.empty) {
+        return res.status(404).json({ message: "No reservations found" });
+      }
+
+      // 예약 내역 반환
+      const userReservations = [];
+      await Promise.all(reservationsSnapshot.docs.map(async (doc) => {
+        // 문서 ID에 특정 문자열이 포함되어있는 경우에만 추가
+        if (doc.id.includes(userData.studentId)) {
+          const reservation = doc.data();
+          const reservationDate = new Date(reservation.date);
+
+          // 특정 시작 날짜부터 특정 끝 날짜까지의 범위 내에 있는 예약인지 확인
+          if (
+            reservationDate >= new Date(startDate) &&
+            reservationDate <= new Date(endDate)
+          ) {
+            // 학생들의 학번을 공백을 기준으로 분할하여 리스트를 만듦
+            const studentIdList = reservation.studentIds;
+            if (studentIdList.length != reservation.numberOfPeople) {
+              return res.status(400).json({
+                error:
+                  "The numberOfPeople does not match the number of given studentIds",
+              });
+            }
+
+            // 각 학생의 정보를 가져오는 비동기 함수
+            const getUserInfoPromises = studentIdList.map(async (studentId) => {
+              const userQuerySnapshot = await getDocs(
+                query(
+                  collection(db, "users"),
+                  where("studentId", "==", studentId)
+                )
+              );
+              if (!userQuerySnapshot.empty) {
+                const userData = userQuerySnapshot.docs[0].data();
+                return {
+                  studentId: studentId,
+                  name: userData.name,
+                  faculty: userData.faculty,
+                };
+              } else {
+                throw new Error(`User with ID ${studentId} not found`);
+              }
+            });
+
+            // 비동기 함수들을 병렬로 실행하여 학생 정보를 가져옵니다.
+            const studentInfoList = await Promise.all(getUserInfoPromises);
+
+            userReservations.push({
+              id: doc.id, // 예약 문서 ID
+              userId: reservation.userId,
+              userName: reservation.userName,
+              roomId: reservation.roomId,
+              date: reservation.date,
+              startTime: reservation.startTime,
+              endTime: reservation.endTime,
+              numberOfPeople: reservation.numberOfPeople,
+              studentIds: studentIdList,
+              studentNames: studentInfoList.map((student) => student.name),
+              studentFaculty: studentInfoList.map((student) => student.faculty),
+            });
+          }
+        } else {
+          res
+            .status(401)
+            .json({ message: "No reservations found for this user" });
+        }
+      }));
+
+      // 해당 날짜의 모든 예약 내역 반환
+      res.status(200).json({
+        message: "User reservations fetched successfully",
+        reservations: userReservations,
+      });
+    } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
+    }
+  }
+);
+
+
 // 강의실 예약 수정
 reserveroom.post("/update/:userId/:reservationUID", async (req, res) => {
   const userId = req.params.userId;
