@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/member.css';
@@ -10,19 +8,20 @@ const Member = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [members, setMembers] = useState([]);
 
-  const fetchData = async () => {
-    const db = firebase.firestore();
-    const usersCollection = await db.collection('users').get();
-    return usersCollection.docs.map(doc => doc.data());
+  // 서버에서 회원 데이터를 가져오는 함수
+  const fetchMembers = async () => {
+    try {
+      const response = await axios.get('http://localhost:4000/adminAuth/users');
+      console.log(response.data);  // 받아온 데이터 확인
+      setMembers(response.data);
+    } catch (error) {
+      console.error('Error fetching members:', error);
+      console.log(error.response); // 에러 응답도 확인
+    }
   };
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const fetchedMembers = await fetchData();
-      setMembers(fetchedMembers);
-    };
-
-    fetchMembers();
+    fetchMembers(); // 컴포넌트 마운트 시 회원 정보 가져오기
   }, []);
 
   const filteredMembers = members.filter(member =>

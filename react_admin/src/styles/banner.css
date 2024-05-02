@@ -18,8 +18,8 @@
     border: 1px solid white;
     border-radius: 4px;
     color: white;
-    background-color: transparent;
+    background-color: #0372e0;
 }
 .logout_button:hover{
-    background-color: #0372e0;
+    background-color: #0251a0;
 }

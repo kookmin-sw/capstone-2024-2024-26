@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-
+import cors from 'cors';
 import router from "./routes/authRoutes.js";
 import reserveClub from "./routes/reserveclub.js";
 import reserveroom from "./routes/reserveroom.js";
@@ -8,10 +8,14 @@ import adminAuth from "./admin/adminAuth.js";
 import adminClub from "./admin/adminClub.js";
 import adminRoom from "./admin/adminRoom.js";
 
-const port = 3000;
 
+const port = 4000;
 const app = express();
 
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:4000']
+}));
+//서로다른 포트의 요청을 허용하게 해줌
 app.use(express.json());
 app.use(bodyParser.json());
 // 회원가입, 로그인, 로그아웃

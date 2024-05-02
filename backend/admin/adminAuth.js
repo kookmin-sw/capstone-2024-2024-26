@@ -44,7 +44,7 @@ import {
       res.status(403).json({ error: "Unauthorized: You are not an admin " });
     }
   }
-  
+
   adminAuth.delete("/delete/:uid", isAdmin, async (req, res) => {
     try {
       const userId = req.params.uid;
@@ -65,8 +65,7 @@ import {
       res.status(500).json({ error: "Failed to delete user" });
     }
   });
-  
-  
+
   adminAuth.post("/create", isAdmin, async (req, res) => {
     const {
       useremail,
