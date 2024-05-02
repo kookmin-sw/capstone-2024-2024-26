@@ -1,0 +1,25 @@
+.banner-container{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 7vh;
+    background-color: rgb(243, 243, 243);
+    border: solid 1px rgb(192, 192, 192);
+}
+.banner_title{
+    margin-left: 2vw;
+    height: 6vh;
+}
+.logout_button{
+    position: absolute;
+    height: 4vh;
+    right: 4vw;
+    border: 1px solid white;
+    border-radius: 4px;
+    color: white;
+    background-color: transparent;
+}
+.logout_button:hover{
+    background-color: #0372e0;
+}
