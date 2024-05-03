@@ -44,11 +44,10 @@ class _select extends State<Select_reserve> {
   String room_name = '';
   int table_number = 0; // server
 
-  int total_table = 1;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
   int setting = 0;
-  int table_setting = 0;
+
   int st = 0;
   int ed = 0;
 
@@ -56,6 +55,19 @@ class _select extends State<Select_reserve> {
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
   List<bool> isButtonPressedTable =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
+
+  List<dynamic> tableList = [
+    {
+      'available': '4',
+      'table_name': 'T1',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T2',
+      'table_status': 'true',
+    },
+  ];
 
   List<Offset> circlePositions = [
     const Offset(10, 0),
@@ -65,6 +77,14 @@ class _select extends State<Select_reserve> {
     const Offset(40, 30),
     const Offset(70, 30),
   ]; // 의자 위치
+
+  List<Offset> circlePositions_4 = [
+    const Offset(10, 0),
+    const Offset(40, 0),
+    const Offset(10, 30),
+    const Offset(40, 30),
+  ]; // 의자 위치
+
   _checkUidStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
@@ -420,70 +440,27 @@ class _select extends State<Select_reserve> {
                         ],
                       ),
 
-                      Stack(
-                        children: [
-                          for (var position in circlePositions)
-                            Positioned(
-                              top: position.dy,
-                              left: position.dx,
-                              child: SvgPicture.asset(
-                                'assets/icons/circle.svg',
-                              ),
-                            ),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(
-                                1,
-                                (index) {
-                                  return Padding(
-                                    padding: EdgeInsets.zero,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isButtonPressedTable[index] =
-                                                  !isButtonPressedTable[index];
-
-                                              if (isButtonPressedTable[index] ==
-                                                  true) {
-                                                table_setting += 1;
-                                              } else {
-                                                table_setting -= 1;
-                                              }
-                                            });
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                isButtonPressedTable[index]
-                                                    ? const Color(0xFF004F9E)
-                                                    : const Color(0xFFEAEAEA),
-                                            minimumSize:
-                                                const Size(98.655, 37.61),
-                                            elevation: 0.0,
-                                          ),
-                                          child: Text(
-                                            'T ${index + 1}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                              fontFamily: 'Inter',
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          //의자 위치 6명이면 6개
-                        ],
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: tableList.length,
+                        itemBuilder: (context, index) {
+                          return _CustomTableWidget(
+                            isButtonPressedTable: isButtonPressedTable,
+                            circlePositions: circlePositions,
+                            circlePositions_4: circlePositions_4,
+                            onTablePressed: (index) {
+                              setState(() {
+                                isButtonPressedTable[index] =
+                                    !isButtonPressedTable[index];
+                              });
+                            },
+                            tableIndex: index, // 인덱스 전달
+                            tableList: tableList,
+                          );
+                        },
                       ),
+
                       const SizedBox(height: 30),
                       Row(
                         children: [
@@ -784,5 +761,95 @@ class _select extends State<Select_reserve> {
   bool isDateBeforeToday(DateTime date) {
     final now = DateTime.now();
     return date.isBefore(DateTime(now.year, now.month, now.day));
+  }
+}
+
+class _CustomTableWidget extends StatefulWidget {
+  final List<bool> isButtonPressedTable;
+  final List<Offset> circlePositions;
+  final List<Offset> circlePositions_4;
+  final int tableIndex; // 테이블의 인덱스
+  final ValueSetter<int> onTablePressed;
+  final List<dynamic> tableList;
+  const _CustomTableWidget({
+    Key? key,
+    required this.isButtonPressedTable,
+    required this.circlePositions,
+    required this.circlePositions_4,
+    required this.onTablePressed,
+    required this.tableIndex,
+    required this.tableList,
+  }) : super(key: key);
+
+  @override
+  _CustomTableWidgetState createState() => _CustomTableWidgetState();
+}
+
+class _CustomTableWidgetState extends State<_CustomTableWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        width: 100.655,
+        height: 50.61,
+        child: Stack(
+          children: [
+            for (var position
+                in widget.tableList[widget.tableIndex]['available'] == '4'
+                    ? widget.circlePositions_4
+                    : widget.circlePositions)
+              Positioned(
+                top: position.dy,
+                left: position.dx,
+                child: SvgPicture.asset(
+                  'assets/icons/circle.svg',
+                ),
+              ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            widget.onTablePressed(widget.tableIndex);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                widget.isButtonPressedTable[widget.tableIndex]
+                                    ? const Color(0xFF004F9E)
+                                    : const Color(0xFFEAEAEA),
+                            minimumSize: Size(
+                                widget.tableList[widget.tableIndex]
+                                            ['available'] ==
+                                        '4'
+                                    ? 49.3275
+                                    : 98.655,
+                                37.61),
+                            elevation: 0.0,
+                          ),
+                          child: Text(
+                            'T ${widget.tableIndex + 1}', // 테이블 번호 표시
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -47,7 +47,7 @@ class _select_cf extends State<Select_reserve_cf> {
 
   String startTime = ''; //server
   String endTime = '';
-  String room_name = '123'; //server
+  String room_name = ''; //server
   int table_number = 0; // server
 
   int total_table = 1;

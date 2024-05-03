@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/main.dart';
 
 import 'loading.dart';
 
@@ -174,6 +175,10 @@ class _Complete extends State<Complete> {
           onTap: (index) {
             switch (index) {
               case 0:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainPage()),
+                );
                 break;
 
               case 1:
