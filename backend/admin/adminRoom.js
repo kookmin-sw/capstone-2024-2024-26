@@ -13,7 +13,7 @@ import {
 import { initializeApp } from "firebase/app";
 import express from "express";
 import dotenv from "dotenv";
-import mime from "mime-types"
+import mime from "mime-types";
 import fs from "fs";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 dotenv.config();
@@ -30,7 +30,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
-
 
 const adminRoom = express.Router();
 
@@ -51,48 +50,34 @@ function isAdmin(req, res, next) {
   }
 }
 
-// 이미지 파일을 읽어들여 base64로 인코딩
-function encodeImageToBase64(imagePath) {
-  try {
-    const imageBuffer = fs.readFileSync(imagePath);
-    const base64Image = imageBuffer.toString('base64');
-    return base64Image;
-  } catch (error) {
-    console.error('Error encoding image to base64:', error);
-    return null;
-  }
-}
-const imagePath = 'C:/Users/luki2/capstone-2024-26/backend/admin/강의실 ex.jpg';
-
-const base64ImageEx = encodeImageToBase64(imagePath);
-// console.log(base64Image);
-
+// 강의실 생성 설정
 adminRoom.post("/create/room", isAdmin, async (req, res) => {
-  const { faculty, roomName, available_People } = req.body;
+  const { faculty, roomName, available_People, base64Image } = req.body;
 
   try {
-    // // 요청 본문에서 이미지 데이터를 받아왔는지 확인
-    // if (!roomLayoutImage) {
-    //   throw new Error("Room layout image is missing in the request");
-    // }
-
     // base64 데이터 디코딩
-    const base64Image = base64ImageEx.split(';base64,').pop();
-    const buffer = Buffer.from(base64Image, 'base64');
+    const base64ImageInfo = base64Image.split(";base64,").pop();
+    const buffer = Buffer.from(base64ImageInfo, "base64");
 
     // 파일 확장자 추출
     const mimeType = mime.lookup(roomName);
     const ext = mime.extension(mimeType);
 
     // 이미지를 Firebase Storage에 업로드
-    const storageRef = ref(storage, `roomLayouts/${faculty}/${roomName}.${ext}`);
+    const storageRef = ref(
+      storage,
+      `roomLayouts/${faculty}/${roomName}.${ext}`
+    );
     await uploadBytes(storageRef, buffer); // 이미지 업로드
 
     // Firebase Storage에서 이미지 URL 가져오기
     const imageUrl = await getDownloadURL(storageRef);
 
     // 단과대학 동아리 컬렉션 생성
-    const facultyClubCollectionRef = collection(db, `${faculty}_Classroom_queue`);
+    const facultyClubCollectionRef = collection(
+      db,
+      `${faculty}_Classroom_queue`
+    );
 
     // 동아리방 위치 문서 생성
     const classRoomDocRef = doc(facultyClubCollectionRef, `${roomName}`);
@@ -103,7 +88,7 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
       available_People: `${available_People}`,
       available_Time: "09:00 - 22:00",
       roomLayoutImageUrl: `${imageUrl}`, // 이미지 URL 저장
-    }
+    };
 
     // 강의실 정보 및 이미지 URL 저장
     await setDoc(classRoomDocRef, data);
