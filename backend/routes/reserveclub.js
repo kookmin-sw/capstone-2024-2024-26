@@ -43,6 +43,12 @@ reserveClub.post("/", async (req, res) => {
 
     const collectionName = `${userData.faculty}_Club`;
 
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists"});
+    } 
     const facultyClubCollection = collection(db, collectionName);
     const clubRoomDoc = doc(facultyClubCollection, roomName);
     const clubRoomDocSnap = await getDoc(clubRoomDoc);
