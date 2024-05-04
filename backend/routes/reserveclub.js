@@ -138,8 +138,8 @@ reserveClub.get(
   "/reservationclubs/:userId/:startDate/:endDate",
   async (req, res) => {
     const userId = req.params.userId;
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
 
     try {
       // 사용자 정보 가져오기
@@ -153,42 +153,58 @@ reserveClub.get(
       // 컬렉션 이름 설정
       const collectionName = `${userData.faculty}_Club`;
 
-      // 사용자의 모든 예약 내역 가져오기
-      const userReservationsSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("userEmail", "==", userData.email)
-      );
-
-      if (userReservationsSnapshot.empty) {
-        return res.status(404).json({ message: "No reservations found" });
-      }
-
-      // 예약 내역 필터링하여 반환
+      // 사용자 예약 내역
       const userReservations = [];
-      userReservationsSnapshot.forEach((doc) => {
-        // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
-        if (doc.id.includes(userData.studentId)) {
-          const reservation = doc.data();
-          const reservationDate = new Date(reservation.date);
 
-          // 특정 시작 날짜부터 특정 끝 날짜까지의 범위 내에 있는 예약인지 확인
-          if (
-            reservationDate >= new Date(startDate) &&
-            reservationDate <= new Date(endDate)
+      // 동아리방 컬렉션 참조
+      const facultyClubCollectionRef = collection(db, collectionName);
+
+      const querySnapshot = await getDocs(facultyClubCollectionRef);
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
           ) {
-            userReservations.push({
-              id: doc.id, // 예약 문서 ID
-              roomId: reservation.roomId,
-              date: reservation.date,
-              startTime: reservation.startTime,
-              endTime: reservation.endTime,
-              tableNumber: reservation.tableNumber,
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData && reservationData.tableData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                console.log(reservationData.tableData);
+                // 예약된 테이블 정보 조회
+                reservationData.tableData.forEach((table) => {
+                  if (table.studentId === userData.studentId) {
+                    userReservations.push({
+                      roomName: roomName,
+                      date: dateString,
+                      startTime: startTime,
+                      endTime: endTime,
+                      tableData: table,
+                    });
+                  }
+                });
+              }
             });
           }
-        }
-      });
+        })
+      );
 
-      // 사용자의 예약 정보 반환
+      // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
         reservations: userReservations,
