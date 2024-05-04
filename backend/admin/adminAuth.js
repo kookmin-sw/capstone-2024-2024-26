@@ -5,7 +5,7 @@ import {
   fetchSignInMethodsForEmail,
   signInWithEmailAndPassword
 } from "firebase/auth";
-import { setDoc, getFirestore, doc, deleteDoc, getDoc } from "firebase/firestore";
+import { setDoc, getFirestore, doc, deleteDoc, getDoc, getDocs, query, collection} from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
 import dotenv from "dotenv";
@@ -188,6 +188,28 @@ adminAuth.post("/profile/update/:uid", isAdmin, async (req, res) => {
     res.status(500).json({ error: "Failed to update profile" });
   }
 });
+
+// 관리자 모든 사용자 프로필 조회
+adminAuth.get("/profile", isAdmin, async (req, res) => {
+
+  try {
+    const allUserDocs = await getDocs(query(collection(db, "users")));
+
+    const allUserData = [];
+
+    allUserDocs.forEach((doc) => {
+      allUserData.push(doc.data());
+    })
+    res
+      .status(200)
+      .json({ message: "All User checking success", allUserData: allUserData });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error fetching all profile", error);
+    res.status(500).json({ error: "Failed to fetch all profile" });
+  }
+});
+
 
 // 관리자 특정 사용자 프로필 조회
 adminAuth.get("/profile/:uid", isAdmin, async (req, res) => {
