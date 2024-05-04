@@ -300,11 +300,24 @@ adminClub.post("/update/:userId/:reserveclubUID", isAdmin, async (req, res) => {
 
 // 관리자 동아리방 설정 생성
 adminClub.post("/create/room", isAdmin, async (req, res) => {
-  const { faculty, roomId } = req.body;
+  const { faculty, roomName , location, available_Table } = req.body;
   try {
-    await setDoc(doc(db, `${faculty}_Club`, `${roomId}`), {
-      adminMessage: `Admin has set up ${roomId} room.`,
-    });
+    // 단과대학 동아리 컬렉션 생성
+    const facultyClubCollectionRef = collection(db, `${faculty}_Club`);
+
+    // 동아리방 위치 문서 생성
+    const clubRoomDocRef = doc(facultyClubCollectionRef, `${roomName}`);
+
+    // 정보 생성
+    const data = {
+      roomName: `${roomName}`,
+      location: `${location}`,
+      available_Table: `${available_Table}`,
+      available_Time: "09:00 - 22:00"
+    }
+
+    // 정보 저장
+    await setDoc(clubRoomDocRef, data);
 
     res.status(200).json({ message: "Register Club Room successfully" });
   } catch (error) {
