@@ -3,6 +3,7 @@ import {
     createUserWithEmailAndPassword,
     deleteUser,
     fetchSignInMethodsForEmail,
+    signInWithEmailAndPassword,
   } from "firebase/auth";
   import {
     setDoc,
@@ -33,7 +34,7 @@ import {
   function isAdmin(req, res, next) {
     const { email } = req.body;
     // 관리자 이메일
-    const adminEmail = "admin@kookmin.ac.kr";
+    const adminEmail = "react@kookmin.ac.kr";
   
     // 이메일이 관리자 이메일과 일치하는지 확인
     if (email === adminEmail) {
@@ -44,6 +45,33 @@ import {
       res.status(403).json({ error: "Unauthorized: You are not an admin " });
     }
   }
+  
+  // 로그인
+  adminAuth.post("/signin", isAdmin, async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+      // Firebase를 이용하여 이메일과 비밀번호로 로그인
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+  
+      // 로그인 성공 시 사용자 정보 반환
+      res.status(200).json({
+        message: "Signin successful",
+        uid: user.uid,
+        email: user.email,
+        token: "true",
+      });
+    } catch (error) {
+      // 로그인 실패 시 오류 응답
+      console.error("Error signing in", error);
+      res.status(401).json({ error: "Signin failed" });
+    }
+  });
 
   adminAuth.delete("/delete/:uid", isAdmin, async (req, res) => {
     try {

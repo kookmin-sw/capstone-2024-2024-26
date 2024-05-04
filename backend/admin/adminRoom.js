@@ -32,7 +32,7 @@ const adminRoom = express.Router();
 function isAdmin(req, res, next) {
   const { email } = req.body;
   // 관리자 이메일
-  const adminEmail = "admin@kookmin.ac.kr";
+  const adminEmail = "react@kookmin.ac.kr";
 
   // 이메일이 관리자 이메일과 일치하는지 확인
   if (email === adminEmail) {

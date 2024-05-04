@@ -1,31 +1,44 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { authService } from '../firebase/fbInstance';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import kookmin_logo from '../image/kookmin_logo.jpg';
-import styles from "../styles/login.css";
+import '../styles/login.css';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
+  
+    const handleLogin = async () => {
+        console.log("Attempting to log in with email:", email);
 
-    const onChange = (event) => {
-        const { name, value } = event.target;
-        if (name === "email") setEmail(value);
-        else if (name === "password") setPassword(value);
-    }
+      try {
+        const response = await axios.post("http://localhost:3000/adminAuth/signin", {
+          email,
+          password,
+        });
 
-    const onSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            await signInWithEmailAndPassword(authService, email, password);
-            navigate('/Main');
-        } catch (error) {
-            setError(error.message);
+        console.log("Server response:", response);
+  
+        if (response.data.message === "Signin successful") {
+          // 로그인 성공 시 리다이렉션
+          console.log("Login successful"); // 로그인 성공
+          navigate("/main");
+        } else {
+          console.error("Login failed:", response.data.message); // 로그인 실패
+          setError("로그인 실패: " + response.data.message);
         }
-    }
+      } catch (error) {
+        console.error("Error logging in:", error); //예외 발생
+        setError("로그인 실패: 서버 오류가 발생했습니다.");
+      }
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();  // 폼의 기본 제출 동작을 막습니다.
+        handleLogin();
+    };
 
     const backgroundImageStyle = {
         backgroundImage: `url(${kookmin_logo})`,
@@ -50,7 +63,7 @@ const Login = () => {
                             placeholder='exmaple@kookmin.ac.kr'
                             required
                             value={email}
-                            onChange={onChange} />
+                            onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <div className='form_group'>
                         <label htmlFor="Password">비밀번호</label>
@@ -61,7 +74,7 @@ const Login = () => {
                             placeholder="Password"
                             required
                             value={password}
-                            onChange={onChange} />
+                            onChange={(e) => setPassword(e.target.value)} />
                 </div>
                         <input
                             className='login_box_button'
