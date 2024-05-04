@@ -7,6 +7,8 @@ import reserveroom from "./routes/reserveroom.js";
 import adminAuth from "./admin/adminAuth.js";
 import adminClub from "./admin/adminClub.js";
 import adminRoom from "./admin/adminRoom.js";
+import adminCamera from "./admin/adminCamera.js";
+import adminNotify from "./admin/adminNotify.js";
 
 const port = 3000;
 
@@ -26,6 +28,10 @@ app.use("/adminAuth", adminAuth);
 app.use("/adminClub", adminClub);
 // 관리자 강의실 관리 api
 app.use("/adminRoom", adminRoom);
+// 카메라 관리 api
+app.use("/adminCamera", adminCamera);
+// 관리자 알림 관리 api
+app.use("/adminNotify", adminNotify);
 // 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
