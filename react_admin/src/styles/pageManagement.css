@@ -1,0 +1,33 @@
+.addition_container{
+    width: 90vw;
+    height: 92vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(208, 208, 208);
+}
+.addition_box{
+    width: 40vw;
+    height: 88vh;
+    background-color: white;
+}
+.addition_banner{
+    height: 8vh;
+    display: flex;
+    flex: row;
+    align-items: center;
+}
+.addition_title{
+    font-weight: bolder;
+    font-size: larger;
+    margin: 0 20px;
+}
+.blank{
+    width: 3vw;
+}
+.addition_chart{
+    width: 40vw;
+    height: 75vh;
+    background-color: rgb(214, 110, 110);
+}

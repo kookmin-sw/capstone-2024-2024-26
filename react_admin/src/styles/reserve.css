@@ -2,14 +2,14 @@
     display: flex;
     flex-direction: row;
     width: 90vw;
-    height: 93vh;
+    height: 92vh;
     background-color: rgb(208, 208, 208);
 }
 
 .calendar_box {
     margin-top: 15vh;
-    width: 50vw;
-    height: 60vh;
+    width: 45vw;
+    height: 50vh;
     display: flex;
     justify-content: center;
     align-items: center; /* 달력을 세로 중앙에 배치 */
@@ -17,7 +17,6 @@
 
 .calendar_show {
     width: 40vw;
-    overflow-y: auto;
     background-color: #f4f4f4;
     padding: 20px;
     border: 1px solid gray;
@@ -27,7 +26,7 @@
 .react-calendar {
     width: 100%;
     height: 100%; /* 부모 컨테이너에 맞춰서 크기 조정 */
-    max-width: none; /* 필요한 경우 최대 너비 제한 해제 */
+    /*max-width: none; /* 필요한 경우 최대 너비 제한 해제 */
 }
 .calendar_show table {
     width: 100%;
