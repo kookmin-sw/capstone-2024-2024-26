@@ -11,6 +11,7 @@ import 'reservation_details.dart';
 import 'myPage.dart';
 import 'congestion.dart';
 import 'document.dart';
+import 'notice.dart';
 
 class Select_reserve_cf extends StatefulWidget {
   final String roomName;
@@ -108,8 +109,14 @@ class _select_cf extends State<Select_reserve_cf> {
           centerTitle: true,
           actions: [
             IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset('assets/icons/notice_none.svg'))
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyNotice()),
+                );
+              },
+              icon: SvgPicture.asset('assets/icons/notice_none.svg'),
+            ),
           ],
           backgroundColor: Colors.transparent, // 상단바 배경색
           foregroundColor: Colors.black, //상단바 아이콘색

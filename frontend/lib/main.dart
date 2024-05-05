@@ -15,6 +15,7 @@ import 'dart:convert';
 import 'select_reserve.dart';
 import 'congestion.dart';
 import 'select_reserve_cf.dart';
+import 'notice.dart';
 
 void main() {
   runApp(const MyApp());
@@ -200,7 +201,12 @@ class _MainPageState extends State<MainPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyNotice()),
+              );
+            },
             icon: SvgPicture.asset('assets/icons/notice_none.svg'),
           ),
         ],

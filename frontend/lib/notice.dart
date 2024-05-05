@@ -13,16 +13,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'congestion.dart';
-import 'notice.dart';
 
-class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+class MyNotice extends StatefulWidget {
+  const MyNotice({super.key});
 
   @override
-  _MyPageState createState() => _MyPageState();
+  _MyNoticeState createState() => _MyNoticeState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _MyNoticeState extends State<MyNotice> {
   String name = '';
   String club = '';
   String? studentId;
@@ -33,27 +32,12 @@ class _MyPageState extends State<MyPage> {
     _checkUidStatus();
   }
 
-  File? _image;
-  final picker = ImagePicker();
-
-  Future getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '마이페이지',
+          '알림',
           style: TextStyle(
             color: Colors.black,
             fontSize: 15,
@@ -61,19 +45,14 @@ class _MyPageState extends State<MyPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: Container(),
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/back.svg', color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyNotice()),
-              );
-            },
-            icon: SvgPicture.asset('assets/icons/notice_none.svg'),
-          ),
-        ],
+
         backgroundColor: Colors.transparent, // 상단바 배경색
         foregroundColor: Colors.black, //상단바 아이콘색
 
@@ -105,186 +84,11 @@ class _MyPageState extends State<MyPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: GestureDetector(
-                      onTap: getImage,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Color(0XF5F5F5F5),
-                        backgroundImage:
-                            _image != null ? FileImage(_image!) : null,
-                        child: _image == null
-                            ? const Icon(
-                                Icons.camera_alt,
-                                size: 40,
-                                color: Color(0XC8C8C8C8),
-                              )
-                            : null,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 10, bottom: 10), // 이름 div의 top margin 추가
-                            child: Text(
-                              name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16, // 글씨 크기 조정
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ),
-                          Text(' 님',
-                              style: const TextStyle(
-                                  fontFamily: 'Inter', fontSize: 16)),
-                          SizedBox(
-                            width: 70,
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const SettingsPage()),
-                              );
-                            },
-                            icon: SvgPicture.asset(
-                              'assets/icons/settings.svg',
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              club,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16, // 글씨 크기 조정
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 10, bottom: 10),
-                            child: Text(
-                              '패널티 0회', // 동아리 이름과 패널티 표시
-                              style: TextStyle(
-                                color: Colors.grey[600], // 연한 회색으로 지정
-                                fontSize: 12, // 글씨 크기 조정
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 0),
-                            child: Text(
-                              '학번',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Inter',
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            ' $studentId',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                children: [],
               ),
             ),
 
             const SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextButton(
-                  onPressed: () => {
-                    //
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shadowColor: Colors.transparent, // Remove shadow color
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    '     이용안내',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                _buildDivider(),
-                TextButton(
-                  onPressed: () => {
-                    //
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shadowColor: Colors.transparent, // Remove shadow color
-                    backgroundColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    '     문의하기',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                _buildDivider(),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () => {
-                        _flutterDialog(context, "로그아웃 하시겠습니까?", "로그아웃"),
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shadowColor: Colors.transparent, // Remove shadow color
-                        backgroundColor: Colors.transparent,
-                      ),
-                      child: Text(
-                        '     로그아웃',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SvgPicture.asset('assets/icons/logout.svg'),
-                  ],
-                ),
-                _buildDivider(),
-              ],
-            )
           ],
         ),
       ),

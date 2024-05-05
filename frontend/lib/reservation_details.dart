@@ -5,6 +5,7 @@ import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'return.dart';
 import 'congestion.dart';
+import 'notice.dart';
 
 class Details extends StatefulWidget {
   const Details({super.key});
@@ -33,9 +34,14 @@ class _Details extends State<Details> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyNotice()),
+              );
+            },
             icon: SvgPicture.asset('assets/icons/notice_none.svg'),
-          )
+          ),
         ],
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
