@@ -100,8 +100,8 @@ def classification():
     
     #이미지 경로
     #첫번째 이미지는 내 폴더에서, 두번째는 사진찍은거 받아와서
-    before_image = './model/image/6.jpg'
-    after_image = './model/image/7.jpg'
+    before_image = './image/6.jpg'
+    after_image = './image/7.jpg'
 
 
     # 유사도 점수 계산 및 출력

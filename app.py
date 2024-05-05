@@ -8,7 +8,7 @@ from image_class import classification
 app = Flask(__name__)
 
 @app.route('/')
-def index():
+def gogo():
     return "서버실행 테스트"
 
 @app.route('/test')
