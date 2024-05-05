@@ -19,20 +19,26 @@ def index():
 # 요청들어오면 보내주기 
 @app.route('/api/count', methods=['POST'])
 def handle_request():
-    data = request.get_json()
-    if not data or 'image' not in data or 'info' not in data:
-        return jsonify({"error": "Invalid data"}), 400
+    # data = request.get_json()
+    # if not data or 'image' not in data or 'info' not in data:
+    #     return jsonify({"error": "Invalid data"}), 400
     
+    file_path = './test_image/1.jpg'  # 여기에 실제 이미지 파일 경로를 입력하세요.
 
+    # 이미지 파일 열기
+    image = Image.open(file_path).convert('RGB')
+
+    # 이미지와 관련된 추가 정보가 필요한 경우
+    info = "Optional info about the image"
 
     # 이미지 데이터와 추가 정보를 추출
-    base64_image = data['image']
-    info = data['info']
+    # base64_image = data['image']
+    # info = data['info']
 
     
     # 이 코드는 진짜 인코딩 된 값 불러 올때 사용
-    image_data = base64.b64decode(base64_image)
-    image = Image.open(io.BytesIO(image_data)).convert('RGB')
+    # image_data = base64.b64decode(base64_image)
+    # image = Image.open(io.BytesIO(image_data)).convert('RGB')
     result = count(image, info)
 
 
@@ -40,11 +46,11 @@ def handle_request():
     # 웹에도 정보 보내야 될 수도 이;ㅆ음...
     
     # 이건 진짜 사용할때
-    # return jsonify(result)
+    return jsonify(result)
 
 
     # 이건 테스트용
-    return render_template('display.html', result=result)
+    # return render_template('display.html', result=result)
 
 
 #이미지 청소상태 체크
@@ -57,10 +63,10 @@ def classi():
 
     # 여기서 데베 저장까지
     #이 코드는 ㄹㅇ 연동할때
-    # return jsonify(result)
+    return jsonify(result)
 
     #테스트용
-    return render_template('display.html', result=result["score"])
+    # return render_template('display.html', result=result["score"])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
