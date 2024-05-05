@@ -39,7 +39,7 @@ def make_layers(cfg, in_channels = 3, batch_norm=False, dilation = False):
 
 # 이걸 이제 입력받은 이미지, 강의실 정보 가지고
 #임계값 알아서 지정 후 return 하면됨
-def count(image, info="good"):
+def count(image, info):
 
     #info = 카메라 어디껀지(자줏, 무상실등)
     model = CSRNet()
@@ -66,4 +66,6 @@ def count(image, info="good"):
     predicted_density_map = output.squeeze(0).squeeze(0)  # 결과 텐서 차원 감소
     print(f"수치: {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
     x = predicted_density_map.sum().item()
-    return round(x, 3)
+    a = round(x, 3)
+    data = {"score" : a , "info" : info}
+    return data

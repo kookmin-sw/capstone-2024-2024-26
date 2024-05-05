@@ -10,7 +10,7 @@ import timm
 
 
 # 이미지 로드 및 전처리 함수
-def load_image(image_path):
+def load_image(first_path, second_image):
     # 이미지 전처리
     preprocess = transforms.Compose([
         transforms.Resize(256),
@@ -19,11 +19,13 @@ def load_image(image_path):
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
     
-    input_image = Image.open(image_path).convert('RGB')
+    input_image = Image.open(first_path).convert('RGB')
     processed_image = preprocess(input_image)
     processed_image = processed_image.unsqueeze(0)  # 차원 추가
+
+    image2 = preprocess(second_image).unsqueeze(0)
     
-    return processed_image
+    return processed_image, image2
 
 #임베딩 추출함수
 def get_vit_embeddings(tensor_image, vit):
@@ -44,8 +46,7 @@ def get_inception_embeddings(tensor_image, inception):
 
 # 두 이미지 간의 코사인 유사도 계산 함수
 def get_similarity_score(first_image_path, second_image_path, vit, resnet, inception):
-    first_image_tensor = load_image(first_image_path)
-    second_image_tensor = load_image(second_image_path)
+    first_image_tensor, second_image_tensor = load_image(first_image_path, second_image_path)
     
 
     first_vit_embedding = get_vit_embeddings(first_image_tensor, vit)
@@ -82,7 +83,7 @@ def get_similarity_score(first_image_path, second_image_path, vit, resnet, incep
     return score
 
 
-def classification():
+def classification(image, info):
     resnet = models.resnet34()
     resnet.load_state_dict(torch.load('./model/resnet34.pth'))
     resnet.eval()
@@ -100,12 +101,12 @@ def classification():
     
     #이미지 경로
     #첫번째 이미지는 내 폴더에서, 두번째는 사진찍은거 받아와서
-    before_image = './image/6.jpg'
-    after_image = './image/7.jpg'
+    default_image = './image/6.jpg'
+    new_image = image
 
 
     # 유사도 점수 계산 및 출력
-    score = get_similarity_score(before_image, after_image, vit, resnet, inception)
+    score = get_similarity_score(default_image, new_image, vit, resnet, inception)
 
     #각각의 임계값을 설정 후 셋중 두개 이상인걸로 ㄱㄱ
     # 동아리방 임계값 0.75, 0.8, 0.7로 설정
@@ -124,7 +125,7 @@ def classification():
     #마지막 출력
     if count >=2:
         # print("합격")
-        return {"score" : "청소완료"}
+        return {"score" : "청소완료", "info" : info}
     else:
         # print("청소해")
-        return {"score" : "청소다시하셈"}
+        return {"score" : "청소다시하셈", "info" : info}
