@@ -38,7 +38,7 @@ class _select extends State<Select_reserve> {
   final double intervalWidth = 50.0;
 
   final ExpansionTileController controller = ExpansionTileController();
-
+  bool timeSelected = false; // 시간 선택 상태를 추적하는 변수
   String startTime = ''; //server
   String endTime = '';
   String room_name = '';
@@ -56,6 +56,7 @@ class _select extends State<Select_reserve> {
   List<bool> isButtonPressedTable =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
 
+// tablelist는 서버에서 받아온 데이터로 대체
   List<dynamic> tableList = [
     {
       'available': '4',
@@ -65,6 +66,16 @@ class _select extends State<Select_reserve> {
     {
       'available': '6',
       'table_name': 'T2',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T3',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T4',
       'table_status': 'true',
     },
   ];
@@ -330,10 +341,9 @@ class _select extends State<Select_reserve> {
                                             setting += 1;
                                             if (setting == 1) {
                                               st = hour;
-                                              print(st);
                                             } else if (setting == 2) {
                                               ed = hour;
-                                              print(ed);
+
                                               if ((ed - st).abs() >= 2) {
                                                 setState(() {
                                                   isButtonPressedList[index] =
@@ -354,7 +364,10 @@ class _select extends State<Select_reserve> {
                                               FlutterDialog(
                                                   '예약은 최대 2시간까지 가능합니다.', '확인');
                                             }
+                                            timeSelected =
+                                                true; // 시간이 선택되었음을 나타냄
                                           } else {
+                                            timeSelected = false;
                                             setting -= 1;
                                             if (setting == 0) {
                                               st = 0;
@@ -439,26 +452,34 @@ class _select extends State<Select_reserve> {
                           ),
                         ],
                       ),
-
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: tableList.length,
-                        itemBuilder: (context, index) {
-                          return _CustomTableWidget(
-                            isButtonPressedTable: isButtonPressedTable,
-                            circlePositions: circlePositions,
-                            circlePositions_4: circlePositions_4,
-                            onTablePressed: (index) {
-                              setState(() {
-                                isButtonPressedTable[index] =
-                                    !isButtonPressedTable[index];
-                              });
-                            },
-                            tableIndex: index, // 인덱스 전달
-                            tableList: tableList,
-                          );
-                        },
+                      SingleChildScrollView(
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3, // 한 줄에 3개의 좌석을 표시
+                            childAspectRatio: 2 /
+                                1, // 아이템의 가로 세로 비율을 조정 (가로 길이를 세로 길이의 3배로 설정)
+                          ),
+                          itemCount: tableList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _CustomTableWidget(
+                              isButtonPressedTable: isButtonPressedTable,
+                              circlePositions: circlePositions,
+                              circlePositions_4: circlePositions_4,
+                              timeSelected: timeSelected,
+                              onTablePressed: (index) {
+                                setState(() {
+                                  isButtonPressedTable[index] =
+                                      !isButtonPressedTable[index];
+                                });
+                              },
+                              tableIndex: index,
+                              tableList: tableList,
+                            );
+                          },
+                        ),
                       ),
 
                       const SizedBox(height: 30),
@@ -496,7 +517,7 @@ class _select extends State<Select_reserve> {
 
                       ElevatedButton(
                         onPressed: () async {
-                          await Reservation(context);
+                          await Reservation(context, roomName);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF004F9E),
@@ -580,7 +601,7 @@ class _select extends State<Select_reserve> {
     }
   }
 
-  Future<void> Reservation(BuildContext context) async {
+  Future<void> Reservation(BuildContext context, String room_name) async {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
@@ -644,7 +665,7 @@ class _select extends State<Select_reserve> {
     const url = 'http://localhost:3000/reserveclub/';
     final Map<String, String> data = {
       'userId': uid!,
-      'roomId': room_name,
+      'roomName': room_name,
       'date': selectedDate.toString(),
       'startTime': startTime,
       'endTime': endTime,
@@ -664,9 +685,9 @@ class _select extends State<Select_reserve> {
 
     debugPrint('${response.statusCode}');
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      if (responseData['message'] == 'Reservation club created successfully') {
+      if (responseData['message'] == 'Creating reservation club successfully') {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const Complete()),
@@ -768,12 +789,14 @@ class _CustomTableWidget extends StatefulWidget {
   final List<bool> isButtonPressedTable;
   final List<Offset> circlePositions;
   final List<Offset> circlePositions_4;
+  final bool timeSelected;
   final int tableIndex; // 테이블의 인덱스
   final ValueSetter<int> onTablePressed;
   final List<dynamic> tableList;
   const _CustomTableWidget({
     Key? key,
     required this.isButtonPressedTable,
+    required this.timeSelected,
     required this.circlePositions,
     required this.circlePositions_4,
     required this.onTablePressed,
@@ -788,67 +811,41 @@ class _CustomTableWidget extends StatefulWidget {
 class _CustomTableWidgetState extends State<_CustomTableWidget> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        width: 100.655,
-        height: 50.61,
-        child: Stack(
-          children: [
-            for (var position
-                in widget.tableList[widget.tableIndex]['available'] == '4'
-                    ? widget.circlePositions_4
-                    : widget.circlePositions)
-              Positioned(
-                top: position.dy,
-                left: position.dx,
-                child: SvgPicture.asset(
-                  'assets/icons/circle.svg',
-                ),
-              ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.zero,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            widget.onTablePressed(widget.tableIndex);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                widget.isButtonPressedTable[widget.tableIndex]
-                                    ? const Color(0xFF004F9E)
-                                    : const Color(0xFFEAEAEA),
-                            minimumSize: Size(
-                                widget.tableList[widget.tableIndex]
-                                            ['available'] ==
-                                        '4'
-                                    ? 49.3275
-                                    : 98.655,
-                                37.61),
-                            elevation: 0.0,
-                          ),
-                          child: Text(
-                            'T ${widget.tableIndex + 1}', // 테이블 번호 표시
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+    // 컨테이너의 너비를 조정하여 버튼이 더 많이 보이도록 설정
+    double containerWidth = 300.0; // 이 값을 조정하여 전체 너비를 설정
+    double buttonWidth = 49.655; // 버튼 너비 설정
+
+    return Container(
+      width: containerWidth, // 컨테이너의 너비를 설정
+      height: 50.61,
+      child: Row(
+        children: [
+          // 버튼을 Row 내에 포함
+          ElevatedButton(
+            onPressed: widget.timeSelected
+                ? () {
+                    widget.onTablePressed(widget.tableIndex);
+                  }
+                : null, // timeSelected가 true일 때만 버튼 활성화
+            style: ElevatedButton.styleFrom(
+              backgroundColor: widget.isButtonPressedTable[widget.tableIndex]
+                  ? const Color(0xFF004F9E)
+                  : const Color(0xFFEAEAEA),
+              minimumSize: Size(buttonWidth, 37.61), // 버튼 크기 설정
+
+              elevation: 0.0,
+            ),
+            child: Text(
+              'T${widget.tableIndex + 1}', // 테이블 번호 표시
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontFamily: 'Inter',
               ),
             ),
-          ],
-        ),
+          ),
+          // 추가 버튼을 여기에 배치할 수 있습니다.
+        ],
       ),
     );
   }
