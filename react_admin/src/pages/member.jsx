@@ -10,15 +10,22 @@ const Member = () => {
 
   // 서버에서 회원 데이터를 가져오는 함수
   const fetchMembers = async () => {
-    try {
-      const response = await axios.get('http://localhost:4000/adminAuth/users');
-      console.log(response.data);  // 받아온 데이터 확인
+    const userEmail = localStorage.getItem('userEmail');  // 로컬 스토리지에서 이메일 가져오기
+  try {
+    const response = await axios.get('http://localhost:3000/adminAuth/profile', {
+      headers: { email: userEmail }  // 이메일을 요청 본문에 포함
+    });
+    if (response.status === 200) {
+      console.log('Profiles:', response.data);
       setMembers(response.data);
-    } catch (error) {
-      console.error('Error fetching members:', error);
-      console.log(error.response); // 에러 응답도 확인
+      return response.data;
+    } else {
+      throw new Error('Fetching profiles failed');
     }
-  };
+  } catch (error) {
+    console.error('Error fetching profiles:', error.response || error.message);
+  }
+};
 
   useEffect(() => {
     fetchMembers(); // 컴포넌트 마운트 시 회원 정보 가져오기

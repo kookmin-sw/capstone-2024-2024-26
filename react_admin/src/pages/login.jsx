@@ -5,40 +5,47 @@ import kookmin_logo from '../image/kookmin_logo.jpg';
 import '../styles/login.css';
 
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
-  
-    const handleLogin = async () => {
-        console.log("Attempting to log in with email:", email);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-      try {
-        const response = await axios.post("http://localhost:3000/adminAuth/signin", {
-          email,
-          password,
-        });
+  const handleLogin = async () => {
+      console.log("Attempting to log in with email:", email);
 
-        console.log("Server response:", response);
-  
-        if (response.data.message === "Signin successful") {
-          // 로그인 성공 시 리다이렉션
-          console.log("Login successful"); // 로그인 성공
-          navigate("/main");
+    try {
+      const response = await axios.post("http://localhost:3000/adminAuth/signin", {
+        email,
+        password,
+      });
+
+      console.log("Server response:", response);
+
+      if (response.data.message === "Signin successful") {
+        // 로그인 성공 시 이메일 저장
+        console.log("Login successful"); // 로그인 성공
+        localStorage.setItem("userEmail", email);  // 로컬 스토리지에 이메일 저장
+        const adminEmail = "react@kookmin.ac.kr"; // 관리자 이메일 설정
+        if (email === adminEmail) {
+            localStorage.setItem("isAdmin", "true"); // 관리자로 로그인된 상태 저장
         } else {
-          console.error("Login failed:", response.data.message); // 로그인 실패
-          setError("로그인 실패: " + response.data.message);
+            localStorage.removeItem("isAdmin"); // 관리자가 아니면 관리자 상태 제거
         }
-      } catch (error) {
-        console.error("Error logging in:", error); //예외 발생
-        setError("로그인 실패: 서버 오류가 발생했습니다.");
+        navigate("/main");
+      } else {
+        console.error("Login failed:", response.data.message); // 로그인 실패
+        setError("로그인 실패: " + response.data.message);
       }
-    };
+    } catch (error) {
+      console.error("Error logging in:", error); //예외 발생
+      setError("로그인 실패: 서버 오류가 발생했습니다.");
+    }
+  };
 
-    const onSubmit = (e) => {
-        e.preventDefault();  // 폼의 기본 제출 동작을 막습니다.
-        handleLogin();
-    };
+  const onSubmit = (e) => {
+      e.preventDefault();  // 폼의 기본 제출 동작을 막습니다.
+      handleLogin();
+  };
 
     const backgroundImageStyle = {
         backgroundImage: `url(${kookmin_logo})`,
