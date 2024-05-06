@@ -12,6 +12,7 @@ import 'congestion.dart';
 import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'dart:typed_data'; // 서명을 이미지 데이터로 변환하기 위해 필요
+import 'complete_cf.dart';
 
 class FormPage extends StatefulWidget {
   final DateTime selectedDate;
@@ -771,7 +772,12 @@ class _FormPageState extends State<FormPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Complete()),
+                                builder: (context) => Complete_cf(
+                                      roomName: roomName,
+                                      selectedDate: selectedDate,
+                                      startTime: startTime,
+                                      endTime: endTime,
+                                    )), // 서버 함수호출
                           );
                         },
                         style: ElevatedButton.styleFrom(

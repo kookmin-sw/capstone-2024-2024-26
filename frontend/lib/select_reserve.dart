@@ -449,18 +449,15 @@ class _select extends State<Select_reserve> {
                                                 setting += 1;
                                                 if (setting == 1) {
                                                   st = hour;
+                                                  ed = hour + 1;
                                                 } else if (setting == 2) {
-                                                  ed = hour;
-
-                                                  if ((ed - st).abs() >= 2) {
-                                                    setState(() {
-                                                      isButtonPressedList[
-                                                          index] = false;
-                                                      setting -= 1;
-                                                    });
-                                                    FlutterDialog(
-                                                        '예약은 연속 2시간 가능합니다.',
-                                                        '확인');
+                                                  if (hour == st + 1) {
+                                                    // 새로운 시간이 시작 시간 다음 시간과 일치하는지 확인
+                                                    ed = hour +
+                                                        1; // 조건을 만족하는 경우 종료 시간 업데이트
+                                                  } else {
+                                                    showErrorAndReset(index,
+                                                        '예약은 연속 2시간만 가능합니다.'); // 연속된 시간이 아니면 에러 표시
                                                   }
                                                 }
 
@@ -479,6 +476,7 @@ class _select extends State<Select_reserve> {
                                               } else {
                                                 timeSelected = false;
                                                 setting -= 1;
+                                                ed = 0;
                                                 if (setting == 0) {
                                                   st = 0;
                                                   ed = 0;
@@ -808,7 +806,14 @@ class _select extends State<Select_reserve> {
       if (responseData['message'] == 'Creating reservation club successfully') {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Complete()),
+          MaterialPageRoute(
+              builder: (context) => Complete(
+                    roomName: roomName,
+                    selectedDate: selectedDate,
+                    startTime: st,
+                    endTime: ed,
+                    table_number: table_number.toString(),
+                  )),
         );
       } else {
         setState(() {
@@ -820,6 +825,14 @@ class _select extends State<Select_reserve> {
         //errorMessage = '아이디와 비밀번호를 확인해주세요';
       });
     }
+  }
+
+  void showErrorAndReset(int index, String message) {
+    setState(() {
+      isButtonPressedList[index] = false; // 버튼 비활성화
+      setting -= 1; // 설정된 시간 감소
+    });
+    FlutterDialog(message, '확인'); // 에러 메시지 다이얼로그 표시
   }
 
   //alert dialog

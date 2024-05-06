@@ -9,33 +9,29 @@ import 'myPage.dart';
 import 'reservation_details.dart';
 import 'congestion.dart';
 
-class Complete extends StatefulWidget {
+class Complete_cf extends StatefulWidget {
   final DateTime selectedDate;
   final int startTime;
   final int endTime;
   final String roomName;
-  final String table_number;
 
-  const Complete(
-      {Key? key,
-      required this.selectedDate,
-      required this.startTime,
-      required this.endTime,
-      required this.roomName,
-      required this.table_number})
-      : super(key: key);
+  const Complete_cf({
+    Key? key,
+    required this.selectedDate,
+    required this.startTime,
+    required this.endTime,
+    required this.roomName,
+  }) : super(key: key);
 
   @override
-  _Complete createState() => _Complete(
-        selectedDate: selectedDate,
-        startTime: startTime,
-        endTime: endTime,
-        roomName: roomName,
-        table_number: table_number,
-      );
+  _Complete_cf createState() => _Complete_cf(
+      selectedDate: selectedDate,
+      startTime: startTime,
+      endTime: endTime,
+      roomName: roomName);
 }
 
-class _Complete extends State<Complete> {
+class _Complete_cf extends State<Complete_cf> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
   final int _currentIndex = 0;
@@ -43,17 +39,14 @@ class _Complete extends State<Complete> {
   final int startTime;
   final int endTime;
   final String roomName;
-  final String table_number;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
 
-  _Complete({
+  _Complete_cf({
     required this.selectedDate,
     required this.startTime,
     required this.endTime,
     required this.roomName,
-    required this.table_number,
   });
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -95,7 +88,7 @@ class _Complete extends State<Complete> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                '    예약이 완료되었습니다.',
+                '    예약신청이 완료되었습니다.',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 18,
@@ -116,7 +109,7 @@ class _Complete extends State<Complete> {
                     children: [
                       const SizedBox(height: 35),
                       Text(
-                        '[${roomName}]',
+                        '[${widget.roomName}]',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -128,7 +121,7 @@ class _Complete extends State<Complete> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        '${selectedDate.year}.${selectedDate.month}.${selectedDate.day}',
+                        '이용 날짜 :  ${selectedDate.year}.${selectedDate.month}.${selectedDate.day}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF004F9E),
@@ -140,7 +133,7 @@ class _Complete extends State<Complete> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        ' ${startTime}:00 ~ ${endTime}:00  | 좌석 ${table_number}',
+                        '이용 시간 :  ${widget.startTime}:00 ~ ${widget.endTime}:00',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
