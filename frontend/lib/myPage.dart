@@ -481,7 +481,7 @@ class _MyPageState extends State<MyPage> {
     debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['message'] == 'User checking success') {
         print(responseData['userData']);
         setState(() {

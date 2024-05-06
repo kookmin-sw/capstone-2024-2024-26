@@ -10,6 +10,8 @@ import 'reservation_details.dart';
 import 'myPage.dart';
 import 'congestion.dart';
 import 'package:intl/intl.dart';
+import 'package:signature/signature.dart';
+import 'dart:typed_data'; // 서명을 이미지 데이터로 변환하기 위해 필요
 
 class FormPage extends StatefulWidget {
   final DateTime selectedDate;
@@ -36,6 +38,17 @@ class _FormPageState extends State<FormPage> {
   int startTime = 0;
   int endTime = 0;
   String roomName = '';
+  String gubun = '';
+  String date = '';
+  String faculty = '';
+  String studentId = '';
+  String name = '';
+  String contact = '';
+  String email = '';
+  final SignatureController _controller = SignatureController(
+    penStrokeWidth: 2, // 펜 두께
+    penColor: Colors.black, // 펜 색상
+  );
   _FormPageState({
     required this.selectedDate,
     required this.startTime,
@@ -67,13 +80,14 @@ class _FormPageState extends State<FormPage> {
     debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
-      print(responseData);
+
       if (responseData['message'] == 'User checking success') {
-        print(responseData['userData']);
         setState(() {
           name = responseData['userData']['name'];
-          club = responseData['userData']['club'];
+          faculty = responseData['userData']['faculty'];
           studentId = responseData['userData']['studentId'];
+          contact = responseData['userData']['phone'];
+          email = responseData['userData']['email'];
         });
       } else {}
     } else {
@@ -98,15 +112,99 @@ class _FormPageState extends State<FormPage> {
     });
   }
 
+  void dipose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _showSignaturePad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          child: Container(
+            width: 359.39,
+            height: 200.41,
+            color: Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 359.39,
+                  height: 120.41,
+                  child: Signature(
+                    controller: _controller,
+                    backgroundColor: Color(0XFFFFFFFF),
+                  ),
+                ),
+                Container(
+                  height: 1,
+                  width: 350,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: const Text(
+                          '지우기',
+                          style: TextStyle(
+                            color: Color(0xFF8E8E8E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          _controller.clear();
+                        },
+                      ),
+                      SizedBox(width: 35),
+                      Container(
+                        height: 34.74,
+                        width: 1,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                      SizedBox(width: 35),
+                      TextButton(
+                        child: const Text(
+                          '저장',
+                          style: TextStyle(
+                            color: Color(0xFF004F9E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          _controller.toPngBytes().then((signature) {
+                            if (signature != null) {
+                              Navigator.of(context).pop(signature);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   final _formKey = GlobalKey<FormState>();
   List<Participant> participants = [];
-  String gubun = '';
-  String date = '';
-  String department = '';
-  String studentId = '';
-  String name = '';
-  String contact = '';
-  String email = '';
 
   final TextEditingController _purposeController = TextEditingController();
   @override
@@ -287,7 +385,7 @@ class _FormPageState extends State<FormPage> {
                         SizedBox(
                           width: 20,
                         ),
-                        buildInputField('', controller: _purposeController),
+                        buildInputField2('', controller: _purposeController),
                       ],
                     ),
                     SizedBox(
@@ -342,7 +440,7 @@ class _FormPageState extends State<FormPage> {
                             ),
                           ),
                           child: Text(
-                            '소프트웨어융합대학',
+                            faculty,
                             style: TextStyle(
                               color: Color(0XFF686868),
                               fontSize: 10,
@@ -382,7 +480,7 @@ class _FormPageState extends State<FormPage> {
                             ),
                           ),
                           child: Text(
-                            '20191621',
+                            studentId,
                             style: TextStyle(
                               color: Color(0XFF686868),
                               fontSize: 10,
@@ -422,7 +520,7 @@ class _FormPageState extends State<FormPage> {
                             ),
                           ),
                           child: Text(
-                            '안수현',
+                            name,
                             style: TextStyle(
                               color: Color(0XFF686868),
                               fontSize: 10,
@@ -462,7 +560,7 @@ class _FormPageState extends State<FormPage> {
                             ),
                           ),
                           child: Text(
-                            '01053829399',
+                            contact,
                             style: TextStyle(
                               color: Color(0XFF686868),
                               fontSize: 10,
@@ -502,7 +600,7 @@ class _FormPageState extends State<FormPage> {
                             ),
                           ),
                           child: Text(
-                            'saker123@kookmin.com',
+                            email,
                             style: TextStyle(
                               color: Color(0XFF686868),
                               fontSize: 10,
@@ -580,6 +678,114 @@ class _FormPageState extends State<FormPage> {
                               fontWeight: FontWeight.w700,
                               decoration: TextDecoration.underline,
                             ),
+                          ),
+                        ),
+                      ),
+                      const Divider(
+                        color: Colors.grey,
+                        thickness: 0.5,
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text('서약서',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
+                          )),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Center(
+                        child: Text(
+                          '* 신청자는 학생증(신분증)을 필히 지참하여 당직근무자가 확인을 위하여 학생증\n 제시를 요구할 시 이에 응하여야 하며, 당직근무자의 지시에 순응하여야 한다.\n* 화재 및 안전사고 예방에 주의해야 하며 전열기 및 위험물질의 사용을 금합니다.\n* 강의실 사용 목적 이외의 행위(취사 및 음주)를 금합니다.\n* 강의실 사용 중에 비품 및 기자재의 파손 및 망실에 대한 책임은 \n[교내 물품 관리 규정] 제14조에 의거합니다.\n* 강의실 내에 설치된 비품 및 기자재 보존과 청결을 유지할 것을 약속합니다.\n* 강의실 사용 시 음식물 반입을 금지합니다.\n* 대여 가능한 기간은 최장 5일입니다(주말 제외).',
+                          style: TextStyle(fontSize: 9, fontFamily: 'Inter'),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Center(
+                          child: Text('위와 같이 강의실/세미나실을 사용하고자 합니다.',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold))),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Center(
+                        child: Text(
+                            '${selectedDate.year}.${selectedDate.month}.${selectedDate.day}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontFamily: 'Inter',
+                            )),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment
+                            .center, // Aligns children to the right
+                        children: [
+                          Text('대표자',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold)),
+                          SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () => _showSignaturePad(context), // 함수 참조
+                            child: Container(
+                                width: 189.95,
+                                height: 55.13,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        width: 0.50, color: Color(0xFFEAEAEA)),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '서명',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFC6C6C6)),
+                                )),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Complete()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF004F9E),
+                          minimumSize: const Size(314.75, 41.46),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
+                        ),
+                        child: const Text(
+                          '사용 신청서 제출하기 ',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
@@ -680,6 +886,36 @@ class _FormPageState extends State<FormPage> {
   }
 }
 
+Widget buildInputField2(String labelText, {TextEditingController? controller}) {
+  return Container(
+    width: 243.44,
+    height: 50.97,
+    decoration: ShapeDecoration(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(width: 0.50, color: Color(0xFFEAEAEA)),
+        borderRadius: BorderRadius.circular(2),
+      ),
+    ),
+    child: TextField(
+      cursorWidth: 1.0, // 줄어든 커서의 두께
+      cursorHeight: 14,
+      controller: controller,
+      style: const TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.only(left: 5, bottom: 12),
+        hintText: labelText,
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFEAEAEA)),
+        ),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFEAEAEA)),
+        ),
+      ),
+    ),
+  );
+}
+
 class Participant {
   String name = '';
   String department = '';
@@ -706,6 +942,10 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
   final TextEditingController _studentIdController = TextEditingController();
+  final SignatureController _controller = SignatureController(
+    penStrokeWidth: 2, // 펜 두께
+    penColor: Colors.black, // 펜 색상
+  );
 
   @override
   void initState() {
@@ -717,7 +957,9 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
 
   @override
   void dispose() {
+    _controller.dispose();
     _nameController.dispose();
+
     _departmentController.dispose();
     _studentIdController.dispose();
     super.dispose();
@@ -785,6 +1027,37 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
               ),
             ],
           ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment:
+                MainAxisAlignment.end, // Aligns children to the right
+            children: [
+              Text('서명', style: TextStyle(fontSize: 11, fontFamily: 'Inter')),
+              SizedBox(width: 5),
+              GestureDetector(
+                onTap: () => _showSignaturePad(context), // 함수 참조
+                child: Container(
+                    width: 92.21,
+                    height: 37.87,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 0.50, color: Color(0xFFEAEAEA)),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '서명',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFC6C6C6)),
+                    )),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -818,6 +1091,92 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showSignaturePad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          child: Container(
+            width: 359.39,
+            height: 200.41,
+            color: Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 359.39,
+                  height: 120.41,
+                  child: Signature(
+                    controller: _controller,
+                    backgroundColor: Color(0XFFFFFFFF),
+                  ),
+                ),
+                Container(
+                  height: 1,
+                  width: 350,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: const Text(
+                          '지우기',
+                          style: TextStyle(
+                            color: Color(0xFF8E8E8E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          _controller.clear();
+                        },
+                      ),
+                      SizedBox(width: 35),
+                      Container(
+                        height: 34.74,
+                        width: 1,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                      SizedBox(width: 35),
+                      TextButton(
+                        child: const Text(
+                          '저장',
+                          style: TextStyle(
+                            color: Color(0xFF004F9E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          _controller.toPngBytes().then((signature) {
+                            if (signature != null) {
+                              Navigator.of(context).pop(signature);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
