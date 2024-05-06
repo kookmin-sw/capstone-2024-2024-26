@@ -356,6 +356,7 @@ class _MyPageState extends State<MyPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0)),
             //Dialog Main Title
+            backgroundColor: Colors.white, // Dialog의 배경색을 흰색으로 설정
 
             //
             content: SizedBox(
@@ -480,6 +481,7 @@ class _MyPageState extends State<MyPage> {
     debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      print(responseData);
       if (responseData['message'] == 'User checking success') {
         print(responseData['userData']);
         setState(() {

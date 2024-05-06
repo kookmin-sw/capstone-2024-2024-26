@@ -405,6 +405,7 @@ class _Details extends State<Details> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(3.0),
           ),
+          backgroundColor: Colors.white,
           content: SizedBox(
             width: 359.39,
             height: 45.41,

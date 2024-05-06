@@ -16,6 +16,10 @@ import 'select_reserve.dart';
 import 'congestion.dart';
 import 'select_reserve_cf.dart';
 import 'notice.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   runApp(const MyApp());
@@ -54,6 +58,49 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _permissionWithNotification();
+    _initialization();
+  }
+
+  void _permissionWithNotification() async {
+    if (await Permission.notification.isDenied &&
+        !await Permission.notification.isPermanentlyDenied) {
+      await [Permission.notification].request();
+    }
+  }
+
+  void _initialization() async {
+    final FlutterLocalNotificationsPlugin _local =
+        FlutterLocalNotificationsPlugin();
+
+    AndroidInitializationSettings android =
+        const AndroidInitializationSettings("@mipmap/ic_launcher");
+
+    DarwinInitializationSettings ios = const DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
+
+    InitializationSettings settings =
+        InitializationSettings(android: android, iOS: ios);
+    await _local.initialize(settings);
+
+    NotificationDetails details = const NotificationDetails(
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      android: AndroidNotificationDetails(
+        "1",
+        "test",
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+    );
+
+    await _local.show(1, "title", "body", details);
   }
 
   _checkLoginStatus() async {
@@ -104,6 +151,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final ExpansionTileController controller = ExpansionTileController();
   bool is_tap = false;
+
   String time = '';
   String people = '';
   String roomName = '';

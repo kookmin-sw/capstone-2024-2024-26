@@ -30,6 +30,7 @@ class _select_cf extends State<Select_reserve_cf> {
     width: 50,
     // Customize your empty data representation
   );
+  bool isTimeSelected = false; // 시간 선택 여부를 추적하는 변수
 
   @override
   void initState() {
@@ -281,6 +282,14 @@ class _select_cf extends State<Select_reserve_cf> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          SizedBox(width: 20),
+                          Text(
+                            '** 연속적인 필요 시간만 선택하세요. \n   무분별한 사용한 반려될 수 있습니다.',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFFA3A3A3),
+                            ),
+                          ),
                         ],
                       ),
 
@@ -305,42 +314,67 @@ class _select_cf extends State<Select_reserve_cf> {
                                         fontFamily: 'Inter',
                                       ),
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isButtonPressedList[index] =
-                                              !isButtonPressedList[index];
-                                          if (isButtonPressedList[index] ==
-                                              true) {
-                                            setting += 1;
-                                            if (setting == 1) {
-                                              st = hour;
-                                            } else if (setting == 2) {
-                                              ed = hour;
-                                            }
-                                          } else {
-                                            setting -= 1;
-                                            if (setting == 0) {
-                                              st = 0;
-                                              ed = 0;
-                                            } else if (setting == 1) {
-                                              st = ed;
-                                              ed = st;
-                                            }
-                                          }
-                                        });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: isButtonPressedList[
-                                                index]
-                                            ? const Color(0XFF004F9E)
-                                            : const Color(
-                                                0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
-                                        minimumSize: const Size(50, 30),
-                                        shape: const RoundedRectangleBorder(),
-                                        elevation: 0.2, // 그림자 제거
-                                      ),
-                                      child: const Text('  '),
+                                    Row(
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isButtonPressedList[index] =
+                                                  !isButtonPressedList[index];
+                                              isTimeSelected =
+                                                  isButtonPressedList.any(
+                                                      (element) => element);
+                                              if (isButtonPressedList[index] ==
+                                                  true) {
+                                                setting += 1;
+                                                if (setting == 1) {
+                                                  st = hour;
+                                                  ed = hour + 1;
+                                                } else if (setting > 1) {
+                                                  ed = ed + 1;
+                                                }
+                                              } else {
+                                                setting -= 1;
+                                                if (setting == 0) {
+                                                  st = 0;
+                                                  ed = 0;
+                                                } else if (setting <= 1) {
+                                                  st = ed;
+                                                  ed = st;
+                                                }
+                                              }
+
+                                              if (!validateContinuousSelection(
+                                                  isButtonPressedList)) {
+                                                FlutterDialog(
+                                                    '연속적인 시간을 선택해주세요', '확인');
+                                                isButtonPressedList[index] =
+                                                    false;
+                                                isTimeSelected =
+                                                    isButtonPressedList.any(
+                                                        (element) => element);
+                                                setting -= 1;
+                                              }
+                                            });
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                isButtonPressedList[index]
+                                                    ? const Color(0XFF004F9E)
+                                                    : const Color(0xFFF8F8F8),
+                                            minimumSize: const Size(50, 30),
+                                            shape:
+                                                const RoundedRectangleBorder(),
+                                            elevation: 0.2,
+                                          ),
+                                          child: const Text('  '),
+                                        ),
+                                        Container(
+                                          height: 25.74,
+                                          width: 1,
+                                          color: Colors.grey.withOpacity(0.2),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -391,16 +425,25 @@ class _select_cf extends State<Select_reserve_cf> {
                       ),
 
                       ElevatedButton(
-                        onPressed: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FormPage(),
-                            ),
-                          );
-                        },
+                        onPressed: isTimeSelected
+                            ? () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FormPage(
+                                      roomName: roomName,
+                                      selectedDate: selectedDate,
+                                      startTime: st,
+                                      endTime: ed,
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF004F9E),
+                          backgroundColor: isTimeSelected
+                              ? Color(0xFF004F9E)
+                              : Color(0xFFD9D9D9),
                           minimumSize: const Size(314.87, 41.97),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(3)),
@@ -481,109 +524,6 @@ class _select_cf extends State<Select_reserve_cf> {
     }
   }
 
-  Future<void> Reservation(BuildContext context) async {
-    setState(() {
-      isLoading = true; // 요청 시작 시 로딩 시작
-    });
-    // Initialize start and end time
-    int startHour = 0;
-    int endHour = 0;
-
-    // Find selected time range
-    for (int i = 0; i < isButtonPressedList.length; i++) {
-      if (isButtonPressedList[i]) {
-        startHour = i + 9; // Assuming index 0 corresponds to 9 AM
-        break;
-      }
-    }
-
-    for (int i = isButtonPressedList.length - 1; i >= 0; i--) {
-      if (isButtonPressedList[i]) {
-        endHour = i + 10; // Assuming index 0 corresponds to 9 AM
-        break;
-      }
-    }
-
-    // Check if both start and end time are selected
-    if (startHour == 0 || endHour == 0) {
-      FlutterDialog('시간을 선택해주세요', '확인');
-      setState(() {
-        isLoading = false; // 요청 완료 시 로딩 숨김
-      });
-      return;
-    }
-
-    // Validate time range
-    if (endHour - startHour > 2) {
-      FlutterDialog('예약은 최대 2시간까지 가능합니다.', '확인');
-      setState(() {
-        isLoading = false; // 요청 완료 시 로딩 숨김
-      });
-      return;
-    }
-
-    // Set start and end time strings
-    startTime = '$startHour:00';
-    endTime = '$endHour:00';
-
-    // Find selected table number
-    for (int i = 0; i < isButtonPressedTable.length; i++) {
-      if (isButtonPressedTable[i]) {
-        table_number = i + 1;
-        break;
-      }
-    }
-
-    if (table_number == 0) {
-      FlutterDialog('좌석을 선택해주세요', '확인');
-      setState(() {
-        isLoading = false; // 요청 완료 시 로딩 숨김
-      });
-      return;
-    }
-
-    const url = 'http://localhost:3000/reserveclub/';
-    final Map<String, String> data = {
-      'userId': uid!,
-      'roomId': room_name,
-      'date': selectedDate.toString(),
-      'startTime': startTime,
-      'endTime': endTime,
-      'tableNumber': table_number.toString(),
-    };
-
-    debugPrint('$data');
-    final response = await http.post(
-      Uri.parse(url),
-      body: json.encode(data),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    setState(() {
-      isLoading = false; // 요청 완료 시 로딩 숨김
-    });
-
-    debugPrint('${response.statusCode}');
-
-    if (response.statusCode == 201) {
-      final responseData = json.decode(response.body);
-      if (responseData['message'] == 'Reservation club created successfully') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Complete()),
-        );
-      } else {
-        setState(() {
-          //errorMessage = '아이디와 비밀번호를 확인해주세요';
-        });
-      }
-    } else {
-      setState(() {
-        //errorMessage = '아이디와 비밀번호를 확인해주세요';
-      });
-    }
-  }
-
   //alert dialog
   void FlutterDialog(String text, String text2) {
     showDialog(
@@ -596,6 +536,7 @@ class _select_cf extends State<Select_reserve_cf> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0)),
             //Dialog Main Title
+            backgroundColor: Colors.white,
 
             //
             content: SizedBox(
@@ -653,9 +594,32 @@ class _select_cf extends State<Select_reserve_cf> {
 
   // onDaySelected 함수 추가
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    setState(() {
-      selectedDate = selectedDay;
-    });
+    if (!isSameDay(selectedDate, selectedDay)) {
+      // 현재 선택된 날짜와 새로 선택된 날짜가 다를 경우
+      setState(() {
+        selectedDate = selectedDay;
+        // 시간 선택 배열 초기화
+        isButtonPressedList = List.generate(16, (index) => false);
+        isTimeSelected = false; // 시간 선택 여부 업데이트
+        setting = 0; // 선택된 시간의 개수 초기화
+        st = 0; // 시작 시간 초기화
+        ed = 0; // 종료 시간 초기화
+      });
+    }
+  }
+
+  // 선택된 시간의 연속성 검사 함수
+  bool validateContinuousSelection(List<bool> selections) {
+    int lastSelectedIndex = -1;
+    for (int i = 0; i < selections.length; i++) {
+      if (selections[i]) {
+        if (lastSelectedIndex != -1 && (i - lastSelectedIndex > 1)) {
+          return false; // 비연속적인 인덱스 찾기
+        }
+        lastSelectedIndex = i;
+      }
+    }
+    return true;
   }
 
 // Function to check if a date is before today

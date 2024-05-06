@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'congestion.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MyNotice extends StatefulWidget {
   const MyNotice({super.key});
@@ -22,6 +23,11 @@ class MyNotice extends StatefulWidget {
 }
 
 class _MyNoticeState extends State<MyNotice> {
+  List<dynamic> notifications = [
+    {'title': '1', 'body': '금일 12시에 이용이 예정되어있습니다.', 'date': '5월 5일 11:50'},
+    {'title': '1', 'body': '버전 1.12 업데이트', 'date': '5월 5일 11:00'}
+  ]; // 서버에서 받아온 알림 데이터를 저장할 리스트
+
   String name = '';
   String club = '';
   String? studentId;
@@ -30,7 +36,23 @@ class _MyNoticeState extends State<MyNotice> {
   void initState() {
     super.initState();
     _checkUidStatus();
+    // fetchNotifications(); // 화면 로딩 시 알림 데이터를 가져옵니다.
   }
+
+  // // 서버로부터 알림 데이터를 받아오는 함수
+  // Future<void> fetchNotifications() async {
+  //   var url = 'http://localhost:3000/notifications'; // 서버 URL
+  //   var response = await http.get(Uri.parse(url));
+  //   var data = jsonDecode(response.body);
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       notifications = data; // 받아온 데이터를 notifications 리스트에 저장
+  //     });
+  //   } else {
+  //     // 오류 처리
+  //     print('Failed to fetch notifications');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -70,27 +92,15 @@ class _MyNoticeState extends State<MyNotice> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              width: 337,
-              height: 132.76,
-              decoration: BoxDecoration(
-                color: const Color(0x079A9A9A),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [],
-              ),
-            ),
-
-            const SizedBox(height: 20), // '이용안내, 문의하기, 로그아웃' 버튼과 회색원 간격 추가
-          ],
-        ),
+      body: ListView.builder(
+        itemCount: notifications.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(notifications[index]['title']),
+            subtitle: Text(notifications[index]['body']),
+            trailing: Text(notifications[index]['date']),
+          );
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

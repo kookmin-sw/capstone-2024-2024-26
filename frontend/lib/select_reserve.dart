@@ -21,6 +21,10 @@ class Select_reserve extends StatefulWidget {
 }
 
 class _select extends State<Select_reserve> {
+  bool isFirstVisit = true; // 사용자가 첫 방문인지 여부
+  bool isAgreed = false; // 사용자가 안내사항에 동의했는지 여부
+  final ScrollController _scrollController = ScrollController();
+
   final Widget emptyDataWidget = Container(
     width: 50,
     // Customize your empty data representation
@@ -29,6 +33,101 @@ class _select extends State<Select_reserve> {
   void initState() {
     super.initState();
     _checkUidStatus();
+    _checkFirstVisit();
+  }
+
+  // 사용자의 첫 방문 여부를 확인
+  _checkFirstVisit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isFirstVisit = prefs.getBool('isFirstVisit') ?? true;
+    if (isFirstVisit == false) {
+      // 첫 방문인 경우 안내사항을 보여줍니다.
+      _showGuidanceDialog();
+      await prefs.setBool('isFirstVisit', false); // 첫 방문 상태 업데이트
+    }
+  }
+
+  void _showGuidanceDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        bool isChecked = false; // 체크박스 상태 관리용 변수
+        return Dialog(
+          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
+          child: Container(
+            width: 1500, // 다이얼로그의 너비 설정
+            height: 1500, // 다이얼로그의 높이 설정
+            decoration: BoxDecoration(
+                color: Colors.white, // 다이얼로그의 배경색 지정
+                borderRadius: BorderRadius.circular(4) // 모서리를 직각으로 설정
+                ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    "안내사항",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      "\n이 공유공간은 학생들이 그룹 스터디, 토론,\n 조별과제 등의 팀 단위 학업 수행을 위해 마련된 \n공간으로 팀 단위 당 하루 최대 4시간을 예약하여 \n이용하실 수 있습니다. \n\nThis shared space is designed for students to \nconduct teamwork such as group studies, \ndiscussions, and group assignments. \nEach team can reserve up to 4 hours per day.\n\n주의사항\n\n1.예약 신청 후 사전 취소 없이 2회 공간 미이용 시 \n시설 이용 페널티가 발생합니다.\n2.페널티 2회 이상 부여 받을 시에는 60일의 \n시설 이용이 정지됩니다. \n3.예약 신청 시간 이후 10분 내에 입실하지 않을 시에 \n예약 취소되며 다음 대기자에게 자동 예약됩니다.\n 4.음식물 취식 가능 여부 등은 해당 공간의 \n규칙에 따라 상이합니다.\n 5.사용 후 정리 정돈 및 사진 촬영은 필수이며 이행하지 \n않을 시에는 페널티가 부여됩니다. \n6.정리 정돈 사진은 AI에 의해 통과 여부가 판단됩니다. \n\n\n1. If the space is not used twice without prior \ncancellation after requesting a reservation, \na facility use penalty will be incurred.\n2. If you receive a penalty more than twice,\n your use of the facility will be\n suspended for 60 days.\n3. If you do not check in within 10 minutes \nafter the reservation application time,\nyour reservation will be canceled and \nthe reservation will automatically \nbe made to the next person on the waiting list.\n4. Whether food can be eaten or not depends \non the rules of the space.\n5. Cleaning up after use and taking photos \nare required, and penalties may apply \nif you do not do so.\n6. Organized photos are judged \nby AI to pass or fail.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      activeColor: const Color(0xFF004F9E),
+                      value: isChecked,
+                      onChanged: (bool? value) {
+                        // 체크박스 상태를 업데이트하고 다이얼로그를 닫음
+                        setState(() {
+                          isChecked = value!;
+                        });
+                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                      },
+                    ),
+                    Text(
+                      "이해했습니다.",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0XFF004F9E),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
+                if (isAgreed) // 체크박스가 체크되면 버튼 표시
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    },
+                    child: Text("확인"),
+                  )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   String roomName;
@@ -338,65 +437,77 @@ class _select extends State<Select_reserve> {
                                         fontFamily: 'Inter',
                                       ),
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isButtonPressedList[index] =
-                                              !isButtonPressedList[index];
-                                          if (isButtonPressedList[index] ==
-                                              true) {
-                                            setting += 1;
-                                            if (setting == 1) {
-                                              st = hour;
-                                            } else if (setting == 2) {
-                                              ed = hour;
+                                    Row(
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isButtonPressedList[index] =
+                                                  !isButtonPressedList[index];
+                                              if (isButtonPressedList[index] ==
+                                                  true) {
+                                                setting += 1;
+                                                if (setting == 1) {
+                                                  st = hour;
+                                                } else if (setting == 2) {
+                                                  ed = hour;
 
-                                              if ((ed - st).abs() >= 2) {
-                                                setState(() {
-                                                  isButtonPressedList[index] =
-                                                      false;
-                                                  setting -= 1;
-                                                });
-                                                FlutterDialog(
-                                                    '예약은 연속 2시간 가능합니다.', '확인');
-                                              }
-                                            }
+                                                  if ((ed - st).abs() >= 2) {
+                                                    setState(() {
+                                                      isButtonPressedList[
+                                                          index] = false;
+                                                      setting -= 1;
+                                                    });
+                                                    FlutterDialog(
+                                                        '예약은 연속 2시간 가능합니다.',
+                                                        '확인');
+                                                  }
+                                                }
 
-                                            if (setting > 2) {
-                                              setState(() {
-                                                isButtonPressedList[index] =
-                                                    false;
+                                                if (setting > 2) {
+                                                  setState(() {
+                                                    isButtonPressedList[index] =
+                                                        false;
+                                                    setting -= 1;
+                                                  });
+                                                  FlutterDialog(
+                                                      '예약은 최대 2시간까지 가능합니다.',
+                                                      '확인');
+                                                }
+                                                timeSelected =
+                                                    true; // 시간이 선택되었음을 나타냄
+                                              } else {
+                                                timeSelected = false;
                                                 setting -= 1;
-                                              });
-                                              FlutterDialog(
-                                                  '예약은 최대 2시간까지 가능합니다.', '확인');
-                                            }
-                                            timeSelected =
-                                                true; // 시간이 선택되었음을 나타냄
-                                          } else {
-                                            timeSelected = false;
-                                            setting -= 1;
-                                            if (setting == 0) {
-                                              st = 0;
-                                              ed = 0;
-                                            } else if (setting == 1) {
-                                              st = ed;
-                                              ed = st;
-                                            }
-                                          }
-                                        });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: isButtonPressedList[
-                                                index]
-                                            ? const Color(0XFF004F9E)
-                                            : const Color(
-                                                0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
-                                        minimumSize: const Size(50, 30),
-                                        shape: const RoundedRectangleBorder(),
-                                        elevation: 0.2, // 그림자 제거
-                                      ),
-                                      child: const Text('  '),
+                                                if (setting == 0) {
+                                                  st = 0;
+                                                  ed = 0;
+                                                } else if (setting == 1) {
+                                                  st = ed;
+                                                  ed = st;
+                                                }
+                                              }
+                                            });
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: isButtonPressedList[
+                                                    index]
+                                                ? const Color(0XFF004F9E)
+                                                : const Color(
+                                                    0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
+                                            minimumSize: const Size(50, 30),
+                                            shape:
+                                                const RoundedRectangleBorder(),
+                                            elevation: 0.2, // 그림자 제거
+                                          ),
+                                          child: const Text('  '),
+                                        ),
+                                        Container(
+                                          height: 25.74,
+                                          width: 1,
+                                          color: Colors.grey.withOpacity(0.2),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -722,7 +833,7 @@ class _select extends State<Select_reserve> {
             // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0)),
-            //Dialog Main Title
+            backgroundColor: Colors.white,
 
             //
             content: SizedBox(
