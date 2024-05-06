@@ -39,7 +39,7 @@ function isAdmin(req, res, next) {
 }
 
 // 로그인
-adminAuth.post("/signin", isAdmin, async (req, res) => {
+adminAuth.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
   try {

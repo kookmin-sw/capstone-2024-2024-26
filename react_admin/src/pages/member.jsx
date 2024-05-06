@@ -17,8 +17,8 @@ const Member = () => {
     });
     if (response.status === 200) {
       console.log('Profiles:', response.data);
-      setMembers(response.data);
-      return response.data;
+      setMembers(response.data.allUserData);  // 서버에서 보내준 데이터 구조에 맞춰 사용
+      return response.data.allUserData;
     } else {
       throw new Error('Fetching profiles failed');
     }
@@ -84,7 +84,7 @@ const Member = () => {
                  value={searchTerm}
                  onChange={e => setSearchTerm(e.target.value)}
                  />
-                 <button className='search_button'>검색</button>
+                 <div className='search_button'>검색하기</div>
               </div>
               <hr></hr>
               <MemberTable members={filteredMembers} />

@@ -69,12 +69,20 @@ td {
     border-radius: 5px;
     border: solid 0.2px black;
     position: absolute;
-    right: 10vw;
+    right: 4vw;
     height: 4vh;
 }
 .search_button{
     position: absolute;
-    right: 4vw;
+    right: 16vw;
     height: 4vh;
     width: 5vw;
+    border: solid 1px black;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #004F9E;
+    color: white;
+    font-weight: bold;
 }
