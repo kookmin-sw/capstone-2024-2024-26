@@ -1,0 +1,29 @@
+.cameraTable_num{
+    width: 8vw;
+}
+.cameraTable_building{
+    width: 20vw;
+}
+.cameraTable_location{
+    width: 20vw;
+}
+.cameraTable_status{
+    width: 8vw;
+}
+.cameraTable_manage{
+    width: 20vw;
+}
+.popup_camera{
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(218, 218, 218);
+    width: 20vw;
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: solid 1px black;
+    padding: 10px;
+}

@@ -9,26 +9,25 @@ const Traffic = () => {
   const [cameras, setCameras] = useState([]);
   const [newCamera, setNewCamera] = useState({ building: '', location: '' });
 
-  useEffect(() => {
-    // 서버로부터 카메라 데이터를 가져옴
-    const fetchCameras = async () => {
-      const userEmail = localStorage.getItem('userEmail');
-      try {
-        const response = await axios.get('http://localhost:3000/adminCamera/get', {
-          headers: { email: userEmail }  // 이메일을 요청 본문에 포함
-        });
-        if (response.data.cameras) {
-          setCameras(response.data.cameras.map((camera, index) => ({
-            id: index + 1,
-            location: camera.location,
-            status: null  // 작동 여부는 null로 초기화
-          })));
-        }
-      } catch (error) {
-        console.error('Failed to fetch cameras:', error);
+  const fetchCameras = async () => {
+    console.log("Fetching cameras from server..."); // 로깅 추가
+    try {
+      const response = await axios.get('http://localhost:3000/adminCamera/get');
+      console.log("Response received:", response.data); // 응답 로깅
+      if (response.data.cameras) {
+        setCameras(response.data.cameras.map((camera, index) => ({
+          id: index + 1,
+          location: camera.location,
+          status: null
+        })));
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch cameras:', error);
+      console.log("Error details:", error.response || error.message); // 오류 상세 로깅
+    }
+  };
 
+  useEffect(() => {
     fetchCameras();
   }, []);
 
@@ -85,11 +84,11 @@ const handleButtonClick = () => {
     <table>
       <thead>
         <tr>
-          <th>카메라 번호</th>
-          <th>건물 이름</th>
-          <th>카메라 위치</th>
-          <th>작동 여부</th>
-          <th>관리</th>
+          <th className='cameraTable_num'>카메라 번호</th>
+          <th className='cameraTable_building'>건물 이름</th>
+          <th className='cameraTable_location'>카메라 위치</th>
+          <th className='cameraTable_status'>작동 여부</th>
+          <th className='cameraTable_manage'>관리</th>
         </tr>
       </thead>
       <tbody>
@@ -127,7 +126,6 @@ const handleButtonClick = () => {
                                 <button className='popup_inner_banner_back' onClick={handleClosePopup}>✖️</button>
                               </div>
                               <hr></hr>
-
                               <div className='popup_inner_input'>
                                 <p className='popup_input_title'>건물이름</p>
                                 <input
@@ -138,7 +136,6 @@ const handleButtonClick = () => {
                                   onChange={handleInputChange}
                                 />
                               </div>
-
                               <div className='popup_inner_input'>
                                 <p className='popup_input_title'>카메라 위치</p>
                                 <input

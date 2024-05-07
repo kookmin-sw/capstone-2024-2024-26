@@ -1,10 +1,3 @@
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    deleteUser,
-    fetchSignInMethodsForEmail,
-    signInWithEmailAndPassword,
-  } from "firebase/auth";
   import {
     setDoc,
     getFirestore,
@@ -32,26 +25,14 @@ import {
   const db = getFirestore(app);
   
   const adminCamera = express.Router();
-  
-  adminCamera.post("/set", async (req, res) => {
-    const { location } = req.body;
-    try {
-      // 카메라 위치정보 등록
-      await setDoc(doc(db, "Camera", `${location}`), {
-        location: location,
-        message: `Camera setting at ${location}`,
-      });
-  
-      res.status(200).json({ message: "Setting camera successfully" });
-    } catch (error) {
-      res.status(400).json({ error: "Failed to setting camera location" });
-    }
-  });
-  
+
   adminCamera.get("/get", async (req, res) => {
+    console.log("Received get request for cameras."); // 서버에서 요청 받음 확인 로그
     try {
       const cameraDocs = await getDocs(query(collection(db, "Camera")));
+      console.log("Query executed, documents count:", cameraDocs.size); // 문서 수 로깅
       if (cameraDocs.empty) {
+        console.log("No camera locations found."); // 데이터가 없는 경우 로그
         return res.status(400).json({ message: "No location for camera" });
       }
   
@@ -69,5 +50,21 @@ import {
       res.status(500).json({ message: "Failed to retrieve camera locations" });
     }
   });
+
+  adminCamera.post("/set", async (req, res) => {
+    const { location } = req.body;
+    try {
+      // 카메라 위치정보 등록
+      await setDoc(doc(db, "Camera", `${location}`), {
+        location: location,
+        message: `Camera setting at ${location}`,
+      });
+  
+      res.status(200).json({ message: "Setting camera successfully" });
+    } catch (error) {
+      res.status(400).json({ error: "Failed to setting camera location" });
+    }
+  });
+  
   
   export default adminCamera;
