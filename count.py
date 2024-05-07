@@ -64,7 +64,7 @@ def count(image, info):
 
     # 결과 출력
     predicted_density_map = output.squeeze(0).squeeze(0)  # 결과 텐서 차원 감소
-    print(f"수치: {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
+    # print(f"수치: {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
     x = predicted_density_map.sum().item()
     a = round(x, 3)
     data = {"score" : a , "info" : info}
