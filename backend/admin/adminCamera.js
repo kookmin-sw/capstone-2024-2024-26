@@ -21,6 +21,7 @@
     appId: process.env.FLUTTER_APP_appId,
     measurementId: process.env.FLUTTER_APP_measurementId,
   };
+
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   
@@ -65,6 +66,34 @@
       res.status(400).json({ error: "Failed to setting camera location" });
     }
   });
+
+
+  adminCamera.delete("/delete/:location", async (req, res) => {
+    const location = req.params.location;
+    try {
+      await deleteDoc(doc(db, "Camera", location));
+      console.log(`Deleted camera at location: ${location}`); // Log the deletion
+      res.status(200).json({ message: `Camera deleted at ${location}` });
+    } catch (error) {
+      console.error(`Error deleting camera at ${location}:`, error);
+      res.status(500).json({ message: "Failed to delete camera location" });
+    }
+  });
   
+
+  adminCamera.patch("/update/:location", async (req, res) => {
+    const location = req.params.location;
+    const updateData = req.body; // Data to update
+    try {
+      await setDoc(doc(db, "Camera", location), updateData, { merge: true }); // Set with merge to update fields
+      console.log(`Updated camera at location: ${location}`); // Log the update
+      res.status(200).json({ message: `Camera updated at ${location}` });
+    } catch (error) {
+      console.error(`Error updating camera at ${location}:`, error);
+      res.status(500).json({ message: "Failed to update camera location" });
+    }
+  });
   
+
+
   export default adminCamera;
