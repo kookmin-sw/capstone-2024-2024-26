@@ -21,6 +21,12 @@ app = Flask(__name__)
 def index():
     return "서버실행 테스트"
 
+@app.route('/test')
+def index():
+    return "동작완료"
+
+# 공유공간 정보는 계속 받아와서 따로 계속 혼잡도 리스트로 만들어뒀다가 
+# 요청들어오면 보내주기 
 @app.route('/api/count', methods=['POST'])
 def handle_request():
     data = request.get_json()
@@ -45,10 +51,12 @@ def handle_request():
     return jsonify(result)
 
 
+
+#이미지 청소상태 체크
 @app.route('/api/class', methods=['POST'])
 def classi():
     result = classification()
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

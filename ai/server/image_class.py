@@ -127,28 +127,30 @@ def classification():
     
     #이미지 경로
     #첫번째 이미지는 내 폴더에서, 두번째는 사진찍은거 받아와서
-    before_image = './ai/classification/image/6.jpg'
-    after_image = './ai/classification/image/7.jpg'
+    before_image = './ai/classification/image/1.jpg'
+    after_image = './ai/classification/image/3.jpg'
 
 
     # 유사도 점수 계산 및 출력
     score = get_similarity_score(before_image, after_image, vit, resnet, inception)
 
     #각각의 임계값을 설정 후 셋중 두개 이상인걸로 ㄱㄱ
+    # 동아리방 임계값 0.75, 0.8, 0.7로 설정
+    #강의실 임계값도 사진 가져와서 테스트 후 정해야됨
     count = 0
-    if score["vit_score"] > 0.7:
+    if score["vit_score"] > 0.75:
         print("vit 통과, score : {}".format(score["vit_score"]))
         count+=1
     else:
         print("vit 탈락, score : {}".format(score["vit_score"]))
 
-    if score["resnet_score"] > 0.85:
+    if score["resnet_score"] > 0.8:
         print("resnet 통과, score : {}".format(score["resnet_score"]))
         count+=1
     else:
         print("resnet 탈락, score : {}".format(score["resnet_score"]))
 
-    if score["inception_score"] > 0.6:
+    if score["inception_score"] > 0.7:
         print("inception 통과, score : {}".format(score["inception_score"]))
         count+=1
     else:
@@ -158,11 +160,13 @@ def classification():
     #마지막 출력
     if count >=2:
         print("합격")
-        return {"score" : 1}
+        # return {"score" : 1}
     else:
         print("청소해")
-        return {"score" : 0}
+        # return {"score" : 0}
 
     # show_images(before_image, after_image)
 
-    
+# if __name__ == '__main__':
+#     print(os.getcwd())
+#     classification()
