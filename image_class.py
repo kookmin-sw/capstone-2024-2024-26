@@ -10,7 +10,7 @@ import timm
 
 
 # 이미지 로드 및 전처리 함수
-def load_image(first_path, second_image):
+def load_image(first_path, second_image, device):
     # 이미지 전처리
     preprocess = transforms.Compose([
         transforms.Resize(256),
@@ -21,9 +21,9 @@ def load_image(first_path, second_image):
     
     input_image = Image.open(first_path).convert('RGB')
     processed_image = preprocess(input_image)
-    processed_image = processed_image.unsqueeze(0)  # 차원 추가
+    processed_image = processed_image.unsqueeze(0).to(device)  # 차원 추가
 
-    image2 = preprocess(second_image).unsqueeze(0)
+    image2 = preprocess(second_image).unsqueeze(0).to(device)
     
     return processed_image, image2
 
@@ -45,8 +45,8 @@ def get_inception_embeddings(tensor_image, inception):
 
 
 # 두 이미지 간의 코사인 유사도 계산 함수
-def get_similarity_score(first_image_path, second_image_path, vit, resnet, inception):
-    first_image_tensor, second_image_tensor = load_image(first_image_path, second_image_path)
+def get_similarity_score(first_image_path, second_image_path, vit, resnet, inception, device):
+    first_image_tensor, second_image_tensor = load_image(first_image_path, second_image_path, device)
     
 
     first_vit_embedding = get_vit_embeddings(first_image_tensor, vit)
@@ -84,16 +84,17 @@ def get_similarity_score(first_image_path, second_image_path, vit, resnet, incep
 
 
 def classification(image, info):
-    resnet = models.resnet34()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    resnet = models.resnet34().to(device)
     resnet.load_state_dict(torch.load('./model/resnet34.pth'))
     resnet.eval()
 
-    inception = models.googlenet()
+    inception = models.googlenet().to(device)
     inception.load_state_dict(torch.load('./model/googlenet.pth'))
     inception.eval()
 
 
-    vit = timm.create_model('deit_tiny_patch16_224', pretrained=True)
+    vit = timm.create_model('deit_tiny_patch16_224', pretrained=True).to(device)
     vit.load_state_dict(torch.load('./model/deit_tiny.pth'))
     vit.eval()
 
@@ -106,7 +107,7 @@ def classification(image, info):
 
 
     # 유사도 점수 계산 및 출력
-    score = get_similarity_score(default_image, new_image, vit, resnet, inception)
+    score = get_similarity_score(default_image, new_image, vit, resnet, inception, device)
 
     #각각의 임계값을 설정 후 셋중 두개 이상인걸로 ㄱㄱ
     # 동아리방 임계값 0.75, 0.8, 0.7로 설정

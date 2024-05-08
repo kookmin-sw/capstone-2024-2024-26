@@ -17,55 +17,70 @@ def index():
     return "동작완료"
 
 
-#진짜 라즈베리파이랑 쓸놈
-@app.route('/upload', methods=['POST'])
-def upload():
-    data = request.get_json()
-    if data and 'image' in data:
-        # Base64 문자열을 바이트로 디코딩
-        image_data = base64.b64decode(data['image'])
-        # BytesIO를 통해 이미지로 변환
-        image = Image.open(io.BytesIO(image_data))
+@app.route('/image', methods=['POST'])
+def receive_image():
+    if 'frame' in request.files and 'info' in request.files:
+        image_file = request.files['frame']
+        image = Image.open(image_file.stream)  # 파일 스트림에서 이미지 로드
+        
+        info = request.files['info'].read()
+        result = count(image, info)
+        #파베에 혼잡도만 변경하면댐
+        return result, 200
     else:
-        #파베에 카메라 작동안한다고 설정
-        #이러면 flutter도 알아서 작동안함
-        return None
+        #파베에 상태 flase로 변경
+        return "No image provided", 400
 
-    info = "자주스"
-    result = count(image, info)
 
-    #파베에 result값 저장
+#진짜 라즈베리파이랑 쓸놈
+# @app.route('/upload', methods=['POST'])
+# def upload():
+#     data = request.get_json()
+#     if data and 'image' in data:
+#         # Base64 문자열을 바이트로 디코딩
+#         image_data = base64.b64decode(data['image'])
+#         # BytesIO를 통해 이미지로 변환
+#         image = Image.open(io.BytesIO(image_data))
+#     else:
+#         #파베에 카메라 작동안한다고 설정
+#         #이러면 flutter도 알아서 작동안함
+#         return None
 
-    # 얘는 테스트요용
-    return jsonify(result)
+#     info = "자주스"
+#     result = count(image, info)
+
+#     #파베에 result값 저장
+
+#     # 얘는 테스트요용
+#     return jsonify(result)
 
 
 
 # 공유공간 정보는 계속 받아와서 따로 계속 혼잡도 리스트로 만들어뒀다가 
 # 요청들어오면 보내주기 
-@app.route('/api/count' , methods=['POST'])  #, methods=['POST']
-def handle_request():
-    data = request.get_json()
-    if not data or 'image' not in data or 'info' not in data:
-        return jsonify({"error": "Invalid data"}), 400
+# @app.route('/api/count' , methods=['POST'])  #, methods=['POST']
+# def handle_request():
+#     data = request.get_json()
+#     if not data or 'image' not in data or 'info' not in data:
+#         return jsonify({"error": "Invalid data"}), 400
     
 
-    # 이미지 데이터와 추가 정보를 추출
-    base64_image = data['image']
-    info = data['info']
+#     # 이미지 데이터와 추가 정보를 추출
+#     base64_image = data['image']
+#     info = data['info']
 
     
-    # 이 코드는 진짜 인코딩 된 값 불러 올때 사용
-    image_data = base64.b64decode(base64_image)
-    image = Image.open(io.BytesIO(image_data)).convert('RGB')
-    result = count(image, info)
+#     # 이 코드는 진짜 인코딩 된 값 불러 올때 사용
+#     image_data = base64.b64decode(base64_image)
+#     image = Image.open(io.BytesIO(image_data)).convert('RGB')
+#     result = count(image, info)
 
 
-    # 결과에 따라 firebase에 저장 or flutter에 재요청
-    # 웹에도 정보 보내야 될 수도 이;ㅆ음...
+#     # 결과에 따라 firebase에 저장 or flutter에 재요청
+#     # 웹에도 정보 보내야 될 수도 이;ㅆ음...
     
-    # 이건 진짜 사용할때
-    return jsonify(result)
+#     # 이건 진짜 사용할때
+#     return jsonify(result)
 
 
     # 이건 테스트용
