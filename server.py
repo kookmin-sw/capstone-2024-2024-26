@@ -4,12 +4,14 @@ app = Flask(__name__)
 
 @app.route('/video_feed', methods=['POST'])
 def video_feed():
-    def generate():
+    frame_data = request.files['frame'].read()  # 요청 컨텍스트 내에서 데이터 읽기
+
+    def generate(frame_data):
         while True:
-            frame = request.files['frame'].read()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n')
+    
+    return Response(generate(frame_data), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/')
 def index():
