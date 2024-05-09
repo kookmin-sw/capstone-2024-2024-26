@@ -1,15 +1,24 @@
 .inq-numb-header{
-    width: 5vw;
+    width: 4vw;
 }
 .inq-date-header{
-    width: 14vw;
+    width: 15vw;
+}
+.inq-name-header{
+    width: 12vw;
+}
+.inq-inquiryId-header{
+    width: 12vw;
 }
 .inq-mail-header{
-    width: 20vw;
+    width: 15vw;
 }
 .inq-contact-header{
     width: 15vw;
 }
+.inq-status-header{
+    width: 5vw;
+}
 .inq-response-header{
-    width: 22vw;
+    width: 10vw;
 }
