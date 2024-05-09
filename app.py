@@ -67,7 +67,7 @@ def receive_image():
         return result, 200
     else:
         #파베에 상태 flase로 변경
-        doc_ref = db.collection("camera").document('미래관 자율주행 스튜디오')
+        doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
         doc = doc_ref.get()
         if doc.exists:
             doc_ref.update({'state': 0})
