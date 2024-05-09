@@ -10,6 +10,7 @@ import adminRoom from "./admin/adminRoom.js";
 import adminCamera from "./admin/adminCamera.js";
 // import adminNotify from "./admin/adminNotify.js";
 import inquiry from "./routes/inquiry.js";
+import adminInquiry from "./admin/adminInquiry.js";
 
 const port = 3000;
 
@@ -33,6 +34,8 @@ app.use("/adminRoom", adminRoom);
 app.use("/adminCamera", adminCamera);
 // 문의 관리 api
 app.use("/inquiry", inquiry);
+// 관리자 문의 관리 api
+app.use("/adminInquiry", adminInquiry);
 // 관리자 알림 관리 api
 // app.use("/adminNotify", adminNotify);
 // 서버 시작
