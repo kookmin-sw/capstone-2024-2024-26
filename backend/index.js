@@ -8,7 +8,8 @@ import adminAuth from "./admin/adminAuth.js";
 import adminClub from "./admin/adminClub.js";
 import adminRoom from "./admin/adminRoom.js";
 import adminCamera from "./admin/adminCamera.js";
-import adminNotify from "./admin/adminNotify.js";
+// import adminNotify from "./admin/adminNotify.js";
+import inquiry from "./routes/inquiry.js";
 
 const port = 3000;
 
@@ -30,8 +31,10 @@ app.use("/adminClub", adminClub);
 app.use("/adminRoom", adminRoom);
 // 카메라 관리 api
 app.use("/adminCamera", adminCamera);
+// 문의 관리 api
+app.use("/inquiry", inquiry);
 // 관리자 알림 관리 api
-app.use("/adminNotify", adminNotify);
+// app.use("/adminNotify", adminNotify);
 // 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
