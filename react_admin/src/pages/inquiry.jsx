@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/inquiry.css';
@@ -10,42 +8,42 @@ const Inquiry = () => {
   const [searchDate, setSearchDate] = useState('');
   const [inquiries, setInquiries] = useState([]);
 
-  const fetchData = async () => {
-    const db = firebase.firestore();
-    const inquiryCollection = await db.collection('inquiries').get();
-    return inquiryCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  };
-
   useEffect(() => {
     const fetchInquiries = async () => {
-      const fetchedInquiries = await fetchData();
-      setInquiries(fetchedInquiries);
+      try {
+        const response = await axios.get('http://localhost:3000/adminInquiry/get');
+        setInquiries(response.data);
+      } catch (error) {
+        console.error('Error fetching inquiries:', error);
+      }
     };
     fetchInquiries();
   }, []);
 
-  const filteredInquiries = inquiries.filter(inquiry =>
-    inquiry.date >= searchDate // 간단한 예시, 날짜 검색 로직 추가 필요
-  );
+  const filteredInquiries = inquiries.filter(inquiry => inquiry.date >= searchDate);
 
   const InquiryTable = ({ inquiries }) => (
     <table>
       <thead>
         <tr>
-          <th className='inq-numb-header'>문의 번호</th>
-          <th className='inq-date-header'>신청 날짜</th>
+          <th className='inq-numb-header'>번호</th>
+          <th className='inq-date-header'>문의 날짜</th>
+          <th className='inq-name-header'>이름</th>
+          <th className='inq-inquiryId-header'>학번</th>
           <th className='inq-mail-header'>메일</th>
-          <th className='inq-contact-header'>연락처</th>
-          <th className='inq-response-header'>답변 작성</th>
+          <th className='inq-status-header'>답변 여부</th>
+          <th className='inq-response-header'>답변하기</th>
         </tr>
       </thead>
       <tbody>
         {inquiries.map((inquiry, index) => (
           <tr key={index}>
-            <td>{inquiry.inquiryId}</td>
+            <td>{inquiry.number}</td>
             <td>{inquiry.date}</td>
+            <td>{inquiry.name}</td>
+            <td>{inquiry.inquiryId}</td>
             <td>{inquiry.email}</td>
-            <td>{inquiry.phone}</td>
+            <td>{inquiry.status}</td>
             <td><button onClick={() => handleResponse(inquiry)}>답변 작성하기</button></td>
           </tr>
         ))}
@@ -76,7 +74,7 @@ const Inquiry = () => {
                 <button className='search_button'>검색</button>
               </div>
               <hr></hr>
-              <InquiryTable inquiries={filteredInquiries} />
+              
             </div>
           </div>
         </div>
