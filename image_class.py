@@ -83,7 +83,7 @@ def get_similarity_score(first_image_path, second_image_path, vit, resnet, incep
     return score
 
 
-def classification(image, info):
+def classification(image):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     resnet = models.resnet34().to(device)
     resnet.load_state_dict(torch.load('./model/resnet34.pth'))
@@ -126,7 +126,7 @@ def classification(image, info):
     #마지막 출력
     if count >=2:
         # print("합격")
-        return {"score" : "청소완료", "info" : info}
+        return {"score" : 1}
     else:
         # print("청소해")
-        return {"score" : "청소다시하셈", "info" : info}
+        return {"score" : 0}
