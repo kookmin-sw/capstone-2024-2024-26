@@ -51,7 +51,7 @@ function isAdmin(req, res, next) {
 }
 
 // 강의실 생성 설정
-adminRoom.post("/create/room", isAdmin, async (req, res) => {
+adminRoom.post("/create/room", async (req, res) => {
   const { faculty, roomName, available_People, available_Time, conferenceImage } = req.body;
 
   try {

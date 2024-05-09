@@ -7,10 +7,10 @@ import '../styles/pageManagement.css';
 const PageManagement = () => {
   const initialRoomData = {
       roomName: '',
-      time: '',
-      people: '',
+      available_Time: '',
+      available_People: '',
       faculty: '',
-      photo: null,
+      conferenceImage: null,
       preview: null,
   };
 
@@ -23,33 +23,39 @@ const PageManagement = () => {
   };
 
   const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      setRoomData((prevData) => ({ ...prevData, photo: file }));
+    const file = e.target.files[0];
+    setRoomData((prevData) => ({ ...prevData, conferenceImage: file }));
 
-      if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              setRoomData((prevData) => ({ ...prevData, preview: reader.result }));
-          };
-          reader.readAsDataURL(file);
-      }
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setRoomData((prevData) => ({ ...prevData, preview: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleCreateRoom = async () => {
-    if (roomData.photo) {
+    if (roomData.conferenceImage) {
       const reader = new FileReader();
-      reader.readAsDataURL(roomData.photo);
+      reader.readAsDataURL(roomData.conferenceImage);
       reader.onload = async () => {
         try {
           const base64EncodedImage = reader.result.split(',')[1]; // 이미지 데이터만 추출
           const formData = new FormData();
           formData.append('faculty', roomData.faculty);
           formData.append('roomName', roomData.roomName);
-          formData.append('time', roomData.time);
-          formData.append('people', roomData.people);
-          formData.append('email', 'react@kookmin.ac.kr'); // 관리자 이메일 확인
-          formData.append('photo', base64EncodedImage); // Base64 인코딩된 이미지 데이터
+          formData.append('available_Time', roomData.available_Time);
+          formData.append('available_People', roomData.available_People);
+          formData.append('conferenceImage', base64EncodedImage); // Base64 인코딩된 이미지 데이터
   
+          console.log('Sending the following data to the server:');
+        console.log('Faculty:', roomData.faculty);
+        console.log('Room Name:', roomData.roomName);
+        console.log('Available Time:', roomData.available_Time);
+        console.log('Available People:', roomData.available_People);
+        console.log('Conference Image (Base64 Encoded):', base64EncodedImage.substring(0, 30) + '...'); // Show only first 30 characters
+
           const response = await axios.post('http://localhost:3000/adminRoom/create/room', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -126,9 +132,9 @@ const PageManagement = () => {
                           <p className='popup_input_title'>사용가능 시간</p>
                           <input
                             type='text'
-                            name='time'
+                            name='available_Time'
                             placeholder=" '00:00-00:00' "
-                            value={roomData.time}
+                            value={roomData.available_Time}
                             onChange={handleInputChange}
                           />
                           </div>
@@ -136,9 +142,9 @@ const PageManagement = () => {
                           <p className='popup_input_title'>수용 인원</p>
                           <input
                             type='text'
-                            name='people'
+                            name='available_People'
                             placeholder='"00"'
-                            value={roomData.people}
+                            value={roomData.available_People}
                             onChange={handleInputChange}
                           />
                           </div>

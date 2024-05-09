@@ -8,7 +8,7 @@ import adminAuth from "./admin/adminAuth.js";
 import adminClub from "./admin/adminClub.js";
 import adminRoom from "./admin/adminRoom.js";
 import adminCamera from "./admin/adminCamera.js";
-//import adminInquiry from "./admin/adminInquiry.js";
+import adminInquiry from "./admin/adminInquiry.js";
 
 
 const port = 3000;
@@ -34,7 +34,7 @@ app.use("/adminClub", adminClub);
 app.use("/adminRoom", adminRoom);
 //혼잡도 관리 api
 app.use('/adminCamera', adminCamera);
-//app.use('/adminInquiry', adminInquiry);
+app.use('/adminInquiry', adminInquiry);
 // 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
