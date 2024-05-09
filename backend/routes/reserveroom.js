@@ -64,7 +64,7 @@ reserveroom.post("/", async (req, res) => {
     const conferenceRoomDoc = doc(facultyConferenceCollection, roomName);
     const conferenceRoomDocSnap = await getDoc(conferenceRoomDoc);
 
-    // 해당 동아리방이 있는지 확인
+    // 해당 강의실이 있는지 확인
     if (!conferenceRoomDocSnap.exists()) {
       return res.status(404).json({
         error: `${roomName} does not exist in ${collectionName} collection`,
@@ -97,7 +97,6 @@ reserveroom.post("/", async (req, res) => {
       }
     }
 
-    // 여기서부터 수정해야함
     for (let i = startTimeHour; i < endTimeHour; i++) {
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
       const reservationDocSnap = await getDoc(reservationDocRef);
@@ -112,7 +111,10 @@ reserveroom.post("/", async (req, res) => {
           const studentDepartments = [];
           for (const studentId of studentIds) {
             const collectionRef = collection(db, "users");
-            const userDoc = query(collectionRef, where("studentId", "==", studentId));
+            const userDoc = query(
+              collectionRef,
+              where("studentId", "==", studentId)
+            );
 
             const userDocSnapshot = await getDocs(userDoc);
             if (!userDocSnapshot.empty) {
@@ -140,11 +142,13 @@ reserveroom.post("/", async (req, res) => {
     }
 
     // 예약 성공 시 응답
-    res.status(201).json({ message: "Reservation room created successfully" });
+    res
+      .status(201)
+      .json({ message: "Reservation Conference created successfully" });
   } catch (error) {
     // 오류 발생 시 오류 응답
-    console.error("Error creating reservation room", error);
-    res.status(500).json({ error: "Failed reservation room" });
+    console.error("Error reserve conference room", error);
+    res.status(500).json({ error: "Failed to reserve conference room" });
   }
 });
 
@@ -212,8 +216,8 @@ reserveroom.get(
   "/reservationrooms/:userId/:startDate/:endDate",
   async (req, res) => {
     const userId = req.params.userId;
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
 
     try {
       // 사용자 정보 가져오기
@@ -225,91 +229,60 @@ reserveroom.get(
       const userData = userDoc.data();
 
       // 컬렉션 이름 설정
-      const collectionName = `${userData.faculty}_Classroom`;
+      const collectionName = `${userData.faculty}_Classroom_queue`;
 
-      // 모든 예약 내역 가져오기
-      const reservationsSnapshot = await getDocs(
-        collection(db, `${collectionName}`)
-      );
-
-      // 예약이 없는 경우
-      if (reservationsSnapshot.empty) {
-        return res.status(404).json({ message: "No reservations found" });
-      }
-
-      // 예약 내역 반환
+      // 사용자 예약 내역
       const userReservations = [];
+
+      // 강의실 컬렉션 참조
+      const facultyConferenceCollectionRef = collection(db, collectionName);
+
+      const querySnapshot = await getDocs(facultyConferenceCollectionRef);
+
+      // 비동기 처리를 위해 Promise.all 사용
       await Promise.all(
-        reservationsSnapshot.docs.map(async (doc) => {
-          // 문서 ID에 특정 문자열이 포함되어있는 경우에만 추가
-          if (doc.id.includes(userData.studentId)) {
-            const reservation = doc.data();
-            const reservationDate = new Date(reservation.date);
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
 
-            // 특정 시작 날짜부터 특정 끝 날짜까지의 범위 내에 있는 예약인지 확인
-            if (
-              reservationDate >= new Date(startDate) &&
-              reservationDate <= new Date(endDate)
-            ) {
-              // 학생들의 학번을 공백을 기준으로 분할하여 리스트를 만듦
-              const studentIdList = reservation.studentIds;
-              if (studentIdList.length != reservation.numberOfPeople) {
-                return res.status(400).json({
-                  error:
-                    "The numberOfPeople does not match the number of given studentIds",
-                });
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                // 예약된 문서 정보 조회
+                  userReservations.push({
+                    roomName: roomName,
+                    mainName: userData.name,
+                    date: dateString,
+                    startTime: startTime,
+                    endTime: endTime,
+                    studentName: reservationData.studentNames,
+                    studentDepartment: reservationData.studentDepartments,
+                    studentId: reservationData.studentIds,
+                    usingPurpose: reservationData.usingPurpose,
+                    boolAgree: reservationData.boolAgree
+                  });
               }
-
-              // 각 학생의 정보를 가져오는 비동기 함수
-              const getUserInfoPromises = studentIdList.map(
-                async (studentId) => {
-                  const userQuerySnapshot = await getDocs(
-                    query(
-                      collection(db, "users"),
-                      where("studentId", "==", studentId)
-                    )
-                  );
-                  if (!userQuerySnapshot.empty) {
-                    const userData = userQuerySnapshot.docs[0].data();
-                    return {
-                      studentId: studentId,
-                      name: userData.name,
-                      faculty: userData.faculty,
-                    };
-                  } else {
-                    throw new Error(`User with ID ${studentId} not found`);
-                  }
-                }
-              );
-
-              // 비동기 함수들을 병렬로 실행하여 학생 정보를 가져옵니다.
-              const studentInfoList = await Promise.all(getUserInfoPromises);
-
-              userReservations.push({
-                id: doc.id, // 예약 문서 ID
-                userId: reservation.userId,
-                userName: reservation.userName,
-                roomId: reservation.roomId,
-                date: reservation.date,
-                startTime: reservation.startTime,
-                endTime: reservation.endTime,
-                numberOfPeople: reservation.numberOfPeople,
-                studentIds: studentIdList,
-                studentNames: studentInfoList.map((student) => student.name),
-                studentFaculty: studentInfoList.map(
-                  (student) => student.faculty
-                ),
-              });
-            }
-          } else {
-            res
-              .status(401)
-              .json({ message: "No reservations found for this user" });
+            });
           }
         })
       );
 
-      // 해당 날짜의 모든 예약 내역 반환
+      // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
         reservations: userReservations,
@@ -322,160 +295,5 @@ reserveroom.get(
   }
 );
 
-// 강의실 예약 수정
-reserveroom.post("/update/:userId/:reservationUID", async (req, res) => {
-  const userId = req.params.userId;
-  const reservationUID = req.params.reservationUID;
-  const {
-    roomId,
-    date,
-    startTime,
-    endTime,
-    usingPurpose,
-    studentIds,
-    numberOfPeople,
-  } = req.body;
-
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
-
-    // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_Classroom_queue`;
-
-    // Firestore에서 해당 예약 문서를 가져옴
-    const reserveRoomDoc = await getDoc(
-      doc(db, `${collectionName}`, reservationUID)
-    );
-    if (!reserveRoomDoc.exists()) {
-      // 예약 문서가 존재하지 않는 경우 오류 응답
-      return res.status(404).json({ error: "Reservation not found" });
-    }
-
-    // 변경된 필드만 업데이트
-    const updateFields = {};
-    if (roomId) updateFields.roomId = roomId;
-    if (date) updateFields.date = date;
-    if (startTime) updateFields.startTime = startTime;
-    if (endTime) updateFields.endTime = endTime;
-    if (usingPurpose) updateFields.usingPurpose = usingPurpose;
-    if (studentIds) updateFields.studentIds = studentIds;
-    if (numberOfPeople) updateFields.numberOfPeople = numberOfPeople;
-    // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
-    const existingReservationSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("roomId", "==", roomId)
-    );
-
-    const existingReservation = existingReservationSnapshot.docs.find((doc) =>
-      doc.id.includes(roomId)
-    );
-
-    // roomId와 같은 문자열이 포함되어 있는 경우 예약 진행
-    if (existingReservation) {
-      // 예약된 시간대와 좌석 확인
-      const existingReservationsSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("date", "==", date),
-        where("roomId", "==", roomId)
-      );
-
-      // 겹치는 예약이 있는지 확인
-      const overlappingReservation = existingReservationsSnapshot.docs.find(
-        (doc) => {
-          const reservation = doc.data();
-          // 기존 예약의 시작 시간과 끝 시간
-          const existingStartTime = reservation.startTime;
-          const existingEndTime = reservation.endTime;
-          const existingDate = reservation.date;
-          const existingRoomId = reservation.roomId;
-          const startTimeClub = startTime;
-          const endTimeClub = endTime;
-
-          // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-          if (
-            (existingDate == date &&
-              startTimeClub == existingStartTime &&
-              endTimeClub == existingEndTime &&
-              roomId == existingRoomId) ||
-            (existingDate == date &&
-              roomId == existingRoomId &&
-              startTimeClub < existingEndTime &&
-              endTimeClub > existingStartTime)
-          ) {
-            return true;
-          }
-          return false;
-        }
-      );
-
-      // 겹치는 예약이 있는 경우 에러 반환
-      if (overlappingReservation) {
-        return res
-          .status(401)
-          .json({ error: "The room is already reserved for this time" });
-      }
-
-      // 학생들의 학번을 공백을 기준으로 분할하여 리스트를 만듦
-      const studentIdList = studentIds.split(" ");
-      if (studentIdList.length != numberOfPeople) {
-        return res.status(400).json({
-          error:
-            "The numberOfPeople does not match the number of given studentIds",
-        });
-      }
-
-      // 각 학생의 정보를 가져오는 비동기 함수
-      const getUserInfoPromises = studentIdList.map(async (studentId) => {
-        const userQuerySnapshot = await getDocs(
-          query(collection(db, "users"), where("studentId", "==", studentId))
-        );
-        if (!userQuerySnapshot.empty) {
-          const userData = userQuerySnapshot.docs[0].data();
-          return {
-            studentId: studentId,
-            name: userData.name,
-            faculty: userData.faculty,
-          };
-        } else {
-          throw new Error(`User with ID ${studentId} not found`);
-        }
-      });
-
-      // 비동기 함수들을 병렬로 실행하여 학생 정보를 가져옵니다.
-      const studentInfoList = await Promise.all(getUserInfoPromises);
-
-      // 업데이트 필드에 학생 정보 추가
-      updateFields.studentNames = studentInfoList.map(
-        (student) => student.name
-      );
-      updateFields.studentFaculty = studentInfoList.map(
-        (student) => student.faculty
-      );
-
-      // 승인 정보 False 업데이트 필드에 추가
-      updateFields.boolAgree = false;
-
-      // 겹치는 예약이 없으면 예약 업데이트
-      await updateDoc(
-        doc(db, `${collectionName}`, reservationUID),
-        updateFields
-      );
-
-      // 업데이트 된 강의실 예약 정보 반환
-      res.status(200).json({ message: "Reservation updated successfully" });
-    } else {
-      return res.status(402).json({ error: "Does not have a roomId." });
-    }
-  } catch (error) {
-    console.error("Error updating reservation");
-    res.status(500).json({ error: "Failed to update reservation" });
-  }
-});
 
 export default reserveroom;
