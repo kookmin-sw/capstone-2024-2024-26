@@ -52,27 +52,9 @@ function isAdmin(req, res, next) {
 
 // 강의실 생성 설정
 adminRoom.post("/create/room", isAdmin, async (req, res) => {
-  const { faculty, roomName, available_People, base64Image } = req.body;
+  const { faculty, roomName, available_People, available_Time, conferenceImage } = req.body;
 
   try {
-    // base64 데이터 디코딩
-    const base64ImageInfo = base64Image.split(";base64,").pop();
-    const buffer = Buffer.from(base64ImageInfo, "base64");
-
-    // 파일 확장자 추출
-    const mimeType = mime.lookup(roomName);
-    const ext = mime.extension(mimeType);
-
-    // 이미지를 Firebase Storage에 업로드
-    const storageRef = ref(
-      storage,
-      `roomLayouts/${faculty}/${roomName}.${ext}`
-    );
-    await uploadBytes(storageRef, buffer); // 이미지 업로드
-
-    // Firebase Storage에서 이미지 URL 가져오기
-    const imageUrl = await getDownloadURL(storageRef);
-
     // 단과대학 동아리 컬렉션 생성
     const facultyClubCollectionRef = collection(
       db,
@@ -84,10 +66,11 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
 
     // 정보 생성
     const data = {
-      roomName: `${roomName}`,
-      available_People: `${available_People}`,
-      available_Time: "09:00 - 22:00",
-      roomLayoutImageUrl: `${imageUrl}`, // 이미지 URL 저장
+      faculty: faculty,
+      roomName: roomName,
+      available_People: available_People,
+      available_Time: available_Time,
+      conferenceImage: conferenceImage
     };
 
     // 강의실 정보 및 이미지 URL 저장
@@ -122,10 +105,16 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
       return res.status(404).json({ error: "This Classroom does not exists" });
     }
     const facultyConferenceCollectionQueue = collection(db, collectionName);
-    const facultyConferenceCollcetion = collection(db,collectionNameConference);
+    const facultyConferenceCollcetion = collection(
+      db,
+      collectionNameConference
+    );
 
     const conferenceRoomDoc = doc(facultyConferenceCollcetion, roomName);
-    const conferenceRoomDocQueue = doc(facultyConferenceCollectionQueue, roomName);
+    const conferenceRoomDocQueue = doc(
+      facultyConferenceCollectionQueue,
+      roomName
+    );
 
     const conferenceRoomDocSnapQueue = await getDoc(conferenceRoomDocQueue);
 
@@ -163,7 +152,7 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
           await updateDoc(reservationDocRefQueue, { boolAgree: true });
 
           const reservationDocDataSnap = await getDoc(reservationDocRefQueue);
-          const reservationData = reservationDocDataSnap.data(); 
+          const reservationData = reservationDocDataSnap.data();
 
           await setDoc(reservationDocRef, reservationData);
 
@@ -172,7 +161,9 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
       }
     }
 
-    res.status(200).json({ message: "Agree Conference reservation successfully" });
+    res
+      .status(200)
+      .json({ message: "Agree Conference reservation successfully" });
   } catch (error) {
     console.error("Error Agreeing Conference:", error);
     res.status(500).json({ error: "Failed to agree Conference" });
