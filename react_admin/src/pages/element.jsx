@@ -1,14 +1,12 @@
 import React from 'react';
 import '../styles/item.css';
 
+function SidebarItem({ menu, isActive, isSubMenu = false }) {
+    // isSubMenu prop에 따라 클래스를 조건부로 추가
+    const itemClass = `sidebar-item ${isSubMenu ? 'sub-menu' : ''}`;
 
-function SidebarItem({ menu, isActive }) {
-    return isActive === true ? (
-        <div className="sidebar-item">
-            <p className="sidebar_menu">{menu.name}</p>
-        </div>
-    ) : (
-        <div className="sidebar-item">
+    return (
+        <div className={itemClass}>
             <p className="sidebar_menu">{menu.name}</p>
         </div>
     );
