@@ -15,7 +15,7 @@ const port = 3000;
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001']
+  origin: ['http://localhost:3000', 'http://localhost:8000']
 }));
 //서로다른 포트의 요청을 허용하게 해줌
 app.use(express.json());
