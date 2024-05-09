@@ -30,38 +30,6 @@ const db = getFirestore(app);
 
 const reserveroom = express.Router();
 
-function encodeImageToBase64(filePath) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (error, data) => {
-      if (error) {
-        reject(error);
-      } else {
-        const base64String = Buffer.from(data).toString("base64");
-        resolve(base64String);
-      }
-    });
-  });
-}
-
-// 인코딩된 base64 이미지를 담을 리스트
-const encodedImages = [];
-
-// 파일 경로들
-const filePaths = [
-  "C:/Users/luki2/capstone-2024-26/backend/강의실 ex.jpg",
-  // 다른 이미지 파일 경로들 추가 가능
-];
-
-// 각 파일을 base64로 인코딩하여 리스트에 추가
-Promise.all(filePaths.map((filePath) => encodeImageToBase64(filePath)))
-  .then((base64Strings) => {
-    encodedImages.push(...base64Strings);
-    // console.log("Encoded images:", encodedImages); // 인코딩된 이미지 리스트 출력
-  })
-  .catch((error) => {
-    console.error("Error encoding images to base64:", error);
-  });
-
 // 강의실 예약
 reserveroom.post("/", async (req, res) => {
   const {
@@ -158,7 +126,6 @@ reserveroom.post("/", async (req, res) => {
             }
           }
 
-          const signImagesEncode = encodedImages;
           await setDoc(reservationDocRef, {
             mainName: userData.name, // 누가 대표로 예약을 했는지(책임 문제)
             studentName: studentNames,
