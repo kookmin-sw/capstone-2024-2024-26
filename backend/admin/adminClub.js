@@ -54,12 +54,6 @@ adminClub.delete(
   async (req, res) => {}
 );
 
-// 동아리방 예약 수정
-adminClub.post(
-  "/update/:userId/:reserveclubUID",
-  isAdmin,
-  async (req, res) => {}
-);
 
 // 관리자 동아리방 설정 생성
 adminClub.post("/create/room", isAdmin, async (req, res) => {
@@ -102,5 +96,85 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
     res.status(500).json({ error: "Failed to register Club Room" });
   }
 });
+
+adminClub.get(
+  "/reservations/:startDate/:endDate",
+  isAdmin,
+  async (req, res) => {
+    const {faculty} = req.body;
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
+
+    try {
+      const collectionName = `${faculty}_Classroom`;
+
+      // 각 단과대별 강의실 컬렉션
+      const facultyConferenceCollcetion = collection(db, collectionName);
+
+      // 해당 컬렉션의 모든 문서 가져오기
+      const querySnapshot = await getDocs(facultyConferenceCollcetion);
+
+      // 모든 문서 데이터를 저장할 배열
+      const allDocData = [];
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                // 예약된 문서 정보 조회
+                allDocData.push({
+                  roomName: roomName,
+                  mainName: reservationData.mainName,
+                  date: dateString,
+                  startTime: startTime,
+                  endTime: endTime,
+                  studentName: reservationData.studentNames,
+                  studentDepartment: reservationData.studentDepartments,
+                  studentId: reservationData.studentIds,
+                  usingPurpose: reservationData.usingPurpose,
+                  boolAgree: reservationData.boolAgree,
+                });
+              }
+            });
+          }
+        })
+      );
+
+      // 사용자 예약 내역 반환
+      res.status(200).json({
+        message: "Administrator reservations fetched successfully",
+        reservations: allDocData,
+      });
+    } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching Administrator reservations", error);
+      res
+        .status(500)
+        .json({ error: "Failed to fetch administrator reservations" });
+    }
+  }
+);
+
+
 
 export default adminClub;

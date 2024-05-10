@@ -38,7 +38,7 @@ reserveroom.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    usingPurpose,
+    usingPurpose, // 소속, 학번, 성명, 연락처, 이메일
     studentIds, // studentIds 리스트 형태로!
     signImagesEncode, // 서명이미지 인코딩된 값 리스트 형태로!
     numberOfPeople,
