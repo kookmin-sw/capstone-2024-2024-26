@@ -60,13 +60,13 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
   } = req.body;
 
   try {
-    // 단과대학 동아리 컬렉션 생성
+    // 단과대학 강의실 컬렉션 생성
     const facultyClubCollectionRef = collection(
       db,
       `${faculty}_Classroom_queue`
     );
 
-    // 동아리방 위치 문서 생성
+    // 강의실 위치 문서 생성
     const classRoomDocRef = doc(facultyClubCollectionRef, `${roomName}`);
 
     // 정보 생성
@@ -291,16 +291,40 @@ adminRoom.get("/conferenceInfo/:userId", isAdmin, async (req, res) => {
       });
     });
 
-    res
-      .status(200)
-      .json({
-        message: "fetch all conference info successfully",
-        allConferenceInfo,
-      });
+    res.status(200).json({
+      message: "fetch all conference info successfully",
+      allConferenceInfo,
+    });
   } catch (error) {
     //오류 발생 시 오류 응답
     console.error("Error fetching conference info", error);
     res.status(500).json({ error: "Failed to fetch conference info" });
+  }
+});
+
+// 강의실 정보 삭제
+adminRoom.delete("/delete/conferenceInfo", isAdmin, async (req, res) => {
+  const { faculty, roomName } = req.body;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Classroom_queue`;
+
+    const facultyConferenceCollcetion = collection(db, collectionName);
+
+    const roomDocRef = doc(facultyConferenceCollcetion, roomName);
+
+    const roomDocSnapshot = await getDoc(roomDocRef);
+    if (!roomDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    await deleteDoc(roomDocRef);
+
+    res.status(200).json({ message: "Room deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting room", error);
+    res.status(500).json({ error: "Failed to delete room" });
   }
 });
 
