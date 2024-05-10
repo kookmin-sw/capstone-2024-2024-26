@@ -180,7 +180,7 @@ adminRoom.get(
   "/reservations/:startDate/:endDate",
   isAdmin,
   async (req, res) => {
-    const {faculty} = req.body;
+    const { faculty } = req.body;
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
 
@@ -253,5 +253,55 @@ adminRoom.get(
     }
   }
 );
+
+// 강의실 정보 불러오기
+adminRoom.get("/conferenceInfo/:userId", isAdmin, async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_Classroom_queue`;
+
+    const facultyConferenceCollcetion = collection(db, collectionName);
+
+    const querySnapshot = await getDocs(facultyConferenceCollcetion);
+
+    if (querySnapshot.empty) {
+      return res.status(401).json({ error: "Conference Info does not exist" });
+    }
+
+    const allConferenceInfo = [];
+
+    querySnapshot.forEach((doc) => {
+      const conferenceInfo = doc.data();
+      allConferenceInfo.push({
+        faculty: conferenceInfo.faculty,
+        roomName: conferenceInfo.roomName,
+        available_Time: conferenceInfo.available_Time,
+        available_People: conferenceInfo.available_People,
+        conferenceImage: conferenceInfo.conferenceImage,
+      });
+    });
+
+    res
+      .status(200)
+      .json({
+        message: "fetch all conference info successfully",
+        allConferenceInfo,
+      });
+  } catch (error) {
+    //오류 발생 시 오류 응답
+    console.error("Error fetching conference info", error);
+    res.status(500).json({ error: "Failed to fetch conference info" });
+  }
+});
 
 export default adminRoom;
