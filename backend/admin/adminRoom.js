@@ -89,6 +89,7 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
   }
 });
 
+// 강의실 예약 승인
 adminRoom.post("/agree", isAdmin, async (req, res) => {
   const { userId, roomName, date, startTime, endTime } = req.body;
   try {
@@ -328,4 +329,115 @@ adminRoom.delete("/delete/conferenceInfo", isAdmin, async (req, res) => {
   }
 });
 
+// 강의실 예약 
+adminRoom.post("/reserve", isAdmin, async (req, res) => {
+  const {
+    userId,
+    roomName,
+    date,
+    startTime,
+    endTime,
+    usingPurpose, 
+    studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
+    numberOfPeople,
+  } = req.body;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Classroom`;
+
+    const facultyConferenceCollection = collection(db, collectionName);
+    const conferenceRoomDoc = doc(facultyConferenceCollection, roomName);
+    
+    
+    const dateCollection = collection(conferenceRoomDoc, date);
+
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+
+      if (reservationDocSnap.exists()) {
+        return res.status(400).json({
+          error: `This Conference ${roomName} room  is already reserved from ${i}-${
+            i + 1
+          }`,
+        });
+      }
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        if (studentIds.length !== (parseInt(numberOfPeople)-1)) {
+          return res.status(401).json({
+            error: "The number of people does not match number of students",
+          });
+        } else {
+          // 각 학생의 이름과 전공을 저장할 배열
+          const studentNames = [];
+          const studentDepartments = [];
+          for (const studentId of studentIds) {
+            const collectionRef = collection(db, "users");
+            const userDoc = query(
+              collectionRef,
+              where("studentId", "==", studentId)
+            );
+
+            const userDocSnapshot = await getDocs(userDoc);
+            if (!userDocSnapshot.empty) {
+              const userData = userDocSnapshot.docs[0].data();
+              const studentName = userData.name;
+              const studentDepartment = userData.department;
+
+              // 배열에 학생의 이름과 전공 추가
+              studentNames.push(studentName);
+              studentDepartments.push(studentDepartment);
+            }
+          }
+
+          await setDoc(reservationDocRef, {
+            mainName: userData.name, // 누가 대표로 예약을 했는지(책임 문제)
+            mainFaculty: userData.faculty, // 대표자 소속
+            mainStudentId: userData.studentId, // 대표자 학번
+            mainPhoneNumber: userData.phone, // 대표자 전화번호
+            mainEmail: userData.email, // 대표자 이메일
+            studentName: studentNames,
+            studentId: studentIds,
+            studentDepartment: studentDepartments,
+            usingPurpose: usingPurpose,
+            boolAgree: true,
+          });
+        }
+      }
+    }
+
+    // 예약 성공 시 응답
+    res
+      .status(201)
+      .json({ message: "Administrator reservation Conference created successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error administrator reserve conference room", error);
+    res.status(500).json({ error: "Failed to administrator reserve conference room" });
+  }
+});
 export default adminRoom;
