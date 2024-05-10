@@ -4,6 +4,7 @@ import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/pageManagement.css';
 
+
 const PageManagement = () => {
   const initialRoomData = {
       roomName: '',
@@ -42,23 +43,19 @@ const PageManagement = () => {
       reader.onload = async () => {
         try {
           const base64EncodedImage = reader.result.split(',')[1]; // 이미지 데이터만 추출
-          const formData = new FormData();
-          formData.append('faculty', roomData.faculty);
-          formData.append('roomName', roomData.roomName);
-          formData.append('available_Time', roomData.available_Time);
-          formData.append('available_People', roomData.available_People);
-          formData.append('conferenceImage', base64EncodedImage); // Base64 인코딩된 이미지 데이터
-  
-          console.log('Sending the following data to the server:');
-        console.log('Faculty:', roomData.faculty);
-        console.log('Room Name:', roomData.roomName);
-        console.log('Available Time:', roomData.available_Time);
-        console.log('Available People:', roomData.available_People);
-        console.log('Conference Image (Base64 Encoded):', base64EncodedImage.substring(0, 30) + '...'); // Show only first 30 characters
+          const payload = {
+            faculty: roomData.faculty,
+            roomName: roomData.roomName,
+            available_Time: roomData.available_Time,
+            available_People: roomData.available_People,
+            conferenceImage: base64EncodedImage, // Base64 인코딩된 이미지 데이터
+          };
 
-          const response = await axios.post('http://localhost:3000/adminRoom/create/room', formData, {
+          console.log('Sending the following data to the server:', payload);
+
+          const response = await axios.post('http://localhost:3000/adminRoom/create/room', payload, {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              'Content-Type': 'application/json',
             },
           });
           if (response.status === 200) {
@@ -169,6 +166,7 @@ const PageManagement = () => {
                   </div>
                   <hr></hr>
                   <div className='addition_chart'>
+                    
                   </div>
                 </div>
                 <div className='blank'></div>
