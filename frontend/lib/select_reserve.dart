@@ -47,6 +47,40 @@ class _select extends State<Select_reserve> {
     }
   }
 
+  // 선택된 날짜를 서버로 전송하는 함수
+  void sendSelectedDateToServer(DateTime selectedDate) async {
+    try {
+      const url = 'http://localhost:3000/reserveclub/selectdate';
+
+      final Map<String, String> data = {
+        'userId': uid!,
+        'roomName': roomName,
+        'date':
+            '${selectedDate.year}-${selectedDate.month}-${selectedDate.day}',
+      };
+
+      debugPrint('$data');
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      // 서버 응답 처리
+      if (response.statusCode == 200) {
+        // 서버 응답이 성공적인 경우
+        print('Date sent successfully');
+        print('Response body: ${response.body}');
+      } else {
+        // 서버 에러 처리
+        print('Failed to send date. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Error sending date: $e');
+    }
+  }
+
   void _showGuidanceDialog() {
     showDialog(
       context: context,
@@ -325,8 +359,13 @@ class _select extends State<Select_reserve> {
                         ),
 
                         // 캘린더에서 날짜가 선택될때 이벤트
-                        onDaySelected: onDaySelected,
-                        // 특정 날짜가 선택된 날짜와 동일한지 여부 판단
+                        onDaySelected: (selectedDay, focusedDay) {
+                          setState(() {
+                            selectedDate = selectedDay; // 날짜 상태 업데이트
+                            sendSelectedDateToServer(
+                                selectedDate); // 선택된 날짜를 서버로 전송
+                          });
+                        },
                         selectedDayPredicate: (date) {
                           return isSameDay(selectedDate, date);
                         },
@@ -781,8 +820,8 @@ class _select extends State<Select_reserve> {
     const url = 'http://localhost:3000/reserveclub/';
     final Map<String, String> data = {
       'userId': uid!,
-      'roomName': room_name,
-      'date': selectedDate.toString(),
+      'roomName': roomName,
+      'date': '${selectedDate.year}-${selectedDate.month}-${selectedDate.day}',
       'startTime': startTime,
       'endTime': endTime,
       'tableNumber': table_number.toString(),
