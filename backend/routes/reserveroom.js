@@ -156,64 +156,6 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
-// 해당 날짜에 모든 예약 내역 조회
-reserveroom.get("/reservationrooms/:userId/:date", async (req, res) => {
-  const userId = req.params.userId;
-  const date = req.params.date;
-
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
-
-    // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_Classroom`;
-
-    // 해당 날짜의 모든 예약 내역 가져오기
-    const reservationsSnapshot = await getDocs(
-      query(collection(db, `${collectionName}`), where("date", "==", date))
-    );
-
-    // 예약이 없는 경우
-    if (reservationsSnapshot.empty) {
-      return res
-        .status(404)
-        .json({ message: "No reservations found for this date" });
-    }
-
-    // 예약 내역 반환
-    const reservations = [];
-    reservationsSnapshot.forEach((doc) => {
-      const reservation = doc.data();
-      reservations.push({
-        id: doc.id, // 예약 문서 ID
-        userId: reservation.userId,
-        userName: reservation.userName,
-        roomId: reservation.roomId,
-        date: reservation.date,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime,
-        numberOfPeople: reservation.numberOfPeople,
-      });
-    });
-
-    // 해당 날짜의 모든 예약 내역 반환
-    res.status(200).json({
-      message: "Reservations for the date fetched successfully",
-      reservations,
-    });
-  } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error fetching reservations for the date", error);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch reservations for the date" });
-  }
-});
 
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
 reserveroom.get(
@@ -298,6 +240,49 @@ reserveroom.get(
     }
   }
 );
+
+// 강의실 예약 내역 삭제
+reserveroom.delete("/delete", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime } = req.body;
+
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Classroom_queue`;
+
+    const conferenceRoomCollection = collection(db, collectionName);
+    const roomDocRef = doc(conferenceRoomCollection, roomName);
+
+    const dateCollection = collection(roomDocRef, date);
+
+    // 예약 시간대 확인
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    // 예약 내역 삭제
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      await deleteDoc(reservationDocRef);
+    }
+
+    // 삭제 성공 시 응답
+    res.status(200).json({ message: "Reservation deleted successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error deleting reservation", error);
+    res.status(500).json({ error: "Failed to delete reservation" });
+  }
+});
+
 
 
 export default reserveroom;
