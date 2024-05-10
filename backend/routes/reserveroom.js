@@ -38,9 +38,9 @@ reserveroom.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    usingPurpose, // 소속, 학번, 성명, 연락처, 이메일
-    studentIds, // studentIds 리스트 형태로!
-    signImagesEncode, // 서명이미지 인코딩된 값 리스트 형태로!
+    usingPurpose, 
+    studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
+    signImagesEncode, // 서명이미지 인코딩된 값 리스트 형태로!(대표자 서명도 포함)
     numberOfPeople,
   } = req.body;
   try {
@@ -101,7 +101,7 @@ reserveroom.post("/", async (req, res) => {
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
       const reservationDocSnap = await getDoc(reservationDocRef);
       if (!reservationDocSnap.exists()) {
-        if (studentIds.length !== parseInt(numberOfPeople)) {
+        if (studentIds.length !== (parseInt(numberOfPeople)-1)) {
           return res.status(401).json({
             error: "The number of people does not match number of students",
           });
@@ -130,6 +130,10 @@ reserveroom.post("/", async (req, res) => {
 
           await setDoc(reservationDocRef, {
             mainName: userData.name, // 누가 대표로 예약을 했는지(책임 문제)
+            mainFaculty: userData.faculty, // 대표자 소속
+            mainStudentId: userData.studentId, // 대표자 학번
+            mainPhoneNumber: userData.phone, // 대표자 전화번호
+            mainEmail: userData.email, // 대표자 이메일
             studentName: studentNames,
             studentId: studentIds,
             studentDepartment: studentDepartments,
