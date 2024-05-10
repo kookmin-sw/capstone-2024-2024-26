@@ -440,4 +440,46 @@ adminRoom.post("/reserve", isAdmin, async (req, res) => {
     res.status(500).json({ error: "Failed to administrator reserve conference room" });
   }
 });
+
+// 강의실 예약 내역 삭제
+adminRoom.delete("/delete", isAdmin, async (req, res) => {
+  const { userId, roomName, date, startTime, endTime } = req.body;
+
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Classroom`;
+
+    const conferenceRoomCollection = collection(db, collectionName);
+    const roomDocRef = doc(conferenceRoomCollection, roomName);
+
+    const dateCollection = collection(roomDocRef, date);
+
+    // 예약 시간대 확인
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    // 예약 내역 삭제
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      await deleteDoc(reservationDocRef);
+    }
+
+    // 삭제 성공 시 응답
+    res.status(200).json({ message: "Reservation deleted successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error deleting reservation", error);
+    res.status(500).json({ error: "Failed to delete reservation" });
+  }
+});
 export default adminRoom;
