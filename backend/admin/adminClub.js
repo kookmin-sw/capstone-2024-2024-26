@@ -237,7 +237,8 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
     available_Table,
     available_People,
     available_Time,
-    clubRoomImage,
+    clubRoomImage, // 인코딩된 이미지 값(강의실 사진)
+    clubRoomDesignImage // 인코딩된 이미지 값(강의실 도안 사진)
   } = req.body;
   try {
     // 단과대학 동아리 컬렉션 생성
@@ -254,6 +255,7 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
       available_People: available_People,
       available_Time: available_Time,
       clubRoomImage: clubRoomImage,
+      clubRoomDesignImage: clubRoomDesignImage
     };
 
     // 강의실 정보 및 이미지 URL 저장
