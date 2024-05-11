@@ -295,7 +295,7 @@ adminRoom.get("/conferenceInfo/:faculty", async (req, res) => {
 });
 
 // 강의실 정보 삭제
-adminRoom.delete("/delete/conferenceInfo", isAdmin, async (req, res) => {
+adminRoom.delete("/delete/conferenceInfo", async (req, res) => {
   const { faculty, roomName } = req.body;
 
   try {

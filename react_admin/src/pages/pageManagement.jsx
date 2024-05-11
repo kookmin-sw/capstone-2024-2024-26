@@ -20,6 +20,7 @@ const PageManagement = () => {
   const [roomData, setRoomData] = useState(initialRoomData);
   const [conferenceInfo, setConferenceInfo] = useState([]);
 
+  //추가된 강의실 정보 사이드 이펙트 실행 함수 : 리액트 컴포넌트가 랜더링 된 뒤에 작업이 이루어짐
   useEffect(() => {
     const fetchConferenceInfo = async () => {
       const faculty = localStorage.getItem('faculty');
@@ -109,6 +110,23 @@ const PageManagement = () => {
       setShowPopup(false);
   };
 
+  //강의실 삭제 이벤트 핸들러 함수 : 버튼 클릭시 저장된 Uid를 통해서 서버에 요청을 보냄
+  const handleDeleteRoom = async (roomName, faculty) => {
+    try {
+      const response = await axios.delete('http://localhost:3000/adminRoom/delete/conferenceInfo', {
+        data: { faculty, roomName }
+      });
+  
+      if (response.status === 200) {
+        alert('강의실 삭제 완료');
+        // 삭제 후 리스트 업데이트
+        setConferenceInfo(conferenceInfo.filter(info => info.roomName !== roomName));
+      }
+    } catch (error) {
+      console.error('Error deleting room:', error);
+      alert('강의실 삭제 실패');
+    }
+  };
 
     return (
         <div className="main-container">
@@ -204,7 +222,7 @@ const PageManagement = () => {
                             <p>강의실: {info.roomName}</p>
                             <p>사용가능 시간: {info.available_Time}</p>
                             <p>사용가능 인원: {info.available_People}</p>
-                            <button>삭제</button>
+                            <button onClick={() => handleDeleteRoom(info.roomName, info.faculty)}>삭제</button>
                           </div>
                         </div>
                         </li>
