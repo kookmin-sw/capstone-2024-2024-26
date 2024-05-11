@@ -32,13 +32,28 @@
     overflow-y: auto;
     background-color: rgb(141, 141, 141);
 }
-.popup {
+.popup_class {
     position: fixed; /* 고정된 위치 */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* 중앙 정렬 */
     background-color: rgb(218, 218, 218);
     width: 20vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: solid 1px black;
+    padding: 10px;
+
+}
+.popup_room {
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(218, 218, 218);
+    width: 40vw;
     height: 90vh;
     display: flex;
     flex-direction: column;
@@ -63,6 +78,14 @@
     background-color: transparent;
     border: none;
     margin-left: 9vw;
+}
+.popup_inner_box{
+    display: flex;
+    flex-direction: row;
+}
+.popup_inner_input_image{
+    display: flex;
+    flex-direction: column;
 }
 .image_preview {
     height: 35vh;
