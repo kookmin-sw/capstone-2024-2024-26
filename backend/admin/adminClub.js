@@ -60,7 +60,6 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
   const {
     faculty,
     roomName,
-    location,
     available_Table,
     available_People,
     available_Time,
@@ -80,7 +79,6 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
     const data = {
       faculty: faculty,
       roomName: roomName,
-      location: location,
       available_Table: available_Table,
       available_People: available_People,
       available_Time: available_Time,
