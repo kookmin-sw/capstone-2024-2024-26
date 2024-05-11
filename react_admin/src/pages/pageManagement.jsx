@@ -21,6 +21,7 @@ const PageManagement = () => {
   const [showClubPopup, setShowClubPopup] = useState(false);
   const [roomData, setRoomData] = useState(initialRoomData);
   const [conferenceInfo, setConferenceInfo] = useState([]);
+  const [clubRoomInfo, setClubRoomInfo] = useState([]);
 
   //추가된 강의실 정보 사이드 이펙트 실행 함수 : 리액트 컴포넌트가 랜더링 된 뒤에 작업이 이루어짐
   useEffect(() => {
@@ -42,6 +43,28 @@ const PageManagement = () => {
       fetchConferenceInfo();
     }
   }, []);
+
+  //공유공간(동아리방) 정보 사이드 이펙트 실행 함수 : 리액트 컴포넌트가 랜더링 된 뒤에 작업이 이루어짐
+  useEffect(() => {
+    const fetchClubRoomInfo = async () => {
+      const faculty = localStorage.getItem('faculty'); // 로컬 스토리지에서 faculty 정보 가져오기
+      if (faculty) {
+        try {
+          const response = await axios.get(`http://localhost:3000/adminClub/clubRoomInfo/${faculty}`);
+          if (response.status === 200) {
+            setClubRoomInfo(response.data.allClubRoomInfo); // 상태 업데이트
+          } else {
+            console.error('Failed to fetch club room info');
+          }
+        } catch (error) {
+          console.error('Error while fetching club room info:', error);
+        }
+      }
+    };
+
+    fetchClubRoomInfo();
+  }, []);
+
 
   const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -191,6 +214,25 @@ const handleCloseClubPopup = () => {
       alert('두 이미지 모두 추가해주세요.');
     }
   };
+
+  //공유공간(동아리방)삭제 이벤트 핸들러 함수 : 버튼에 있는 Uid값으로 요청을 보냄
+  const handleDeleteClubRoom = async (faculty, roomName) => {
+    try {
+      const response = await axios.delete('http://localhost:3000/adminClub/delete/clubRoomInfo', {
+        data: { faculty, roomName },
+      });
+  
+      if (response.status === 200) {
+        alert('동아리방이 성공적으로 삭제되었습니다.');
+        // 삭제 후 상태 업데이트
+        setClubRoomInfo(prev => prev.filter(info => info.roomName !== roomName || info.faculty !== faculty));
+      }
+    } catch (error) {
+      console.error('Error deleting club room:', error);
+      alert('동아리방 삭제 실패');
+    }
+  };
+
 
     return (
         <div className="main-container">
@@ -392,6 +434,29 @@ const handleCloseClubPopup = () => {
                   </div>
                   <hr></hr>
                   <div className='addition_chart'>
+                  {clubRoomInfo.length > 0 ? (
+          <ul>
+            {clubRoomInfo.map((room, index) => (
+              <li key={index}>
+                <div className='addition_chart_element'>
+                  <div className='chart_element_image'>
+                    {room.clubRoomImage && <img src={`data:image/jpeg;base64,${room.clubRoomImage}`} alt="Club Room" />}
+                  </div>
+                  <div className='chart_element_data'>
+                            <p>{room.faculty}</p>
+                            <p>강의실: {room.roomName}</p>
+                            <p>사용가능 시간: {room.available_Time}</p>
+                            <p>사용가능 인원: {room.available_People}</p>
+                            <p>사용가능 테이블: {room.available_Table}</p>
+                            <button onClick={() => handleDeleteClubRoom(room.faculty, room.roomName)}>삭제</button>
+                  </div>
+                  </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No club room information available.</p>
+        )}
                   </div>
                 </div>
               </div>

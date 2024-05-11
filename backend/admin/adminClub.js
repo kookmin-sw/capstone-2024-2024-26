@@ -347,7 +347,7 @@ adminClub.get(
 );
 
 // 동아리방 정보 불러오기
-adminClub.get("/clubRoomInfo/:faculty", isAdmin, async (req, res) => {
+adminClub.get("/clubRoomInfo/:faculty", async (req, res) => {
   const faculty = req.params.faculty;
 
   try {
@@ -389,7 +389,7 @@ adminClub.get("/clubRoomInfo/:faculty", isAdmin, async (req, res) => {
 });
 
 // 동아리방 정보 삭제
-adminClub.delete("/delete/clubRoomInfo", isAdmin, async (req, res) => {
+adminClub.delete("/delete/clubRoomInfo", async (req, res) => {
   const { faculty, roomName } = req.body;
 
   try {
