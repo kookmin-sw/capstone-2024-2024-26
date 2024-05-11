@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
@@ -6,6 +6,7 @@ import '../styles/pageManagement.css';
 
 
 const PageManagement = () => {
+  //강의실 데이터 초기화
   const initialRoomData = {
       roomName: '',
       available_Time: '',
@@ -17,6 +18,27 @@ const PageManagement = () => {
 
   const [showPopup, setShowPopup] = useState(false);
   const [roomData, setRoomData] = useState(initialRoomData);
+  const [conferenceInfo, setConferenceInfo] = useState([]);
+
+  useEffect(() => {
+    const fetchConferenceInfo = async () => {
+      const faculty = localStorage.getItem('faculty');
+      try {
+        const response = await axios.get(`http://localhost:3000/adminRoom/conferenceInfo/${faculty}`);
+        if (response.status === 200) {
+          setConferenceInfo(response.data.allConferenceInfo);
+        } else {
+          console.error('Failed to fetch conference info');
+        }
+      } catch (error) {
+        console.error('Error while fetching conference info:', error);
+      }
+    };
+
+    if (localStorage.getItem('faculty')) {
+      fetchConferenceInfo();
+    }
+  }, []);
 
   const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -36,6 +58,7 @@ const PageManagement = () => {
     }
   };
 
+  //강의실 생성 이벤트 핸들러 함수
   const handleCreateRoom = async () => {
     if (roomData.conferenceImage) {
       const reader = new FileReader();
@@ -44,13 +67,14 @@ const PageManagement = () => {
         try {
           const base64EncodedImage = reader.result.split(',')[1]; // 이미지 데이터만 추출
           const payload = {
-            faculty: roomData.faculty,
-            roomName: roomData.roomName,
-            available_Time: roomData.available_Time,
-            available_People: roomData.available_People,
+            faculty: roomData.faculty, //단과대학
+            roomName: roomData.roomName, //건물,강의실번호
+            available_Time: roomData.available_Time, //사용가능 시간
+            available_People: roomData.available_People, //사용가능 인원 수
             conferenceImage: base64EncodedImage, // Base64 인코딩된 이미지 데이터
           };
 
+          localStorage.setItem('faculty', roomData.faculty); //로컬 스토리지에 단과대학 저장 : 강의실 불러올때 사용할 데이터
           console.log('Sending the following data to the server:', payload);
 
           const response = await axios.post('http://localhost:3000/adminRoom/create/room', payload, {
@@ -85,11 +109,12 @@ const PageManagement = () => {
       setShowPopup(false);
   };
 
+
     return (
-        <div className="main-container"> {/* 최상단 컨테이너 */}
-          <Banner /> {/* 배너 컴포넌트를 최상단에 표시 */}
-          <div className="sidebar-and-content"> {/* 사이드바와 내용을 담는 컨테이너 */}
-            <Sidebar /> {/* 사이드바를 좌측에 표시 */}
+        <div className="main-container">
+          <Banner />
+          <div className="sidebar-and-content">
+            <Sidebar />
             <div className="main-content">
               <div className='addition_container'>
                 <div className='addition_box'>
@@ -166,7 +191,28 @@ const PageManagement = () => {
                   </div>
                   <hr></hr>
                   <div className='addition_chart'>
-                    
+                  {conferenceInfo.length > 0 ? (
+                  <ul>
+                    {conferenceInfo.map((info, index) => (
+                      <li key={index}>
+                        <div className='addition_chart_element'>
+                          <div className='chart_element_image'>
+                          {info.conferenceImage && <img src={`data:image/jpeg;base64,${info.conferenceImage}`} alt="Conference Room" className="rommImage_preview" />}
+                          </div>
+                          <div className='chart_element_data'>
+                            <p>{info.faculty}</p>
+                            <p>강의실: {info.roomName}</p>
+                            <p>사용가능 시간: {info.available_Time}</p>
+                            <p>사용가능 인원: {info.available_People}</p>
+                            <button>삭제</button>
+                          </div>
+                        </div>
+                        </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No conference information available.</p>
+                )}
                   </div>
                 </div>
                 <div className='blank'></div>

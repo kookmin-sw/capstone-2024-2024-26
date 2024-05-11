@@ -13,8 +13,6 @@ import {
 import { initializeApp } from "firebase/app";
 import express from "express";
 import dotenv from "dotenv";
-import mime from "mime-types";
-import fs from "fs";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 dotenv.config();
 const firebaseConfig = {
@@ -52,16 +50,22 @@ function isAdmin(req, res, next) {
 
 // 강의실 생성 설정
 adminRoom.post("/create/room", async (req, res) => {
-  const { faculty, roomName, available_People, available_Time, conferenceImage } = req.body;
+  const {
+    faculty,
+    roomName,
+    available_People,
+    available_Time,
+    conferenceImage,
+  } = req.body;
 
   try {
-    // 단과대학 동아리 컬렉션 생성
+    // 단과대학 강의실 컬렉션 생성
     const facultyClubCollectionRef = collection(
       db,
       `${faculty}_Classroom_queue`
     );
 
-    // 동아리방 위치 문서 생성
+    // 강의실 위치 문서 생성
     const classRoomDocRef = doc(facultyClubCollectionRef, `${roomName}`);
 
     // 정보 생성
@@ -70,7 +74,7 @@ adminRoom.post("/create/room", async (req, res) => {
       roomName: roomName,
       available_People: available_People,
       available_Time: available_Time,
-      conferenceImage: conferenceImage
+      conferenceImage: conferenceImage,
     };
 
     // 강의실 정보 및 이미지 URL 저장
@@ -83,6 +87,7 @@ adminRoom.post("/create/room", async (req, res) => {
   }
 });
 
+// 강의실 예약 승인
 adminRoom.post("/agree", isAdmin, async (req, res) => {
   const { userId, roomName, date, startTime, endTime } = req.body;
   try {
@@ -170,18 +175,266 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
   }
 });
 
-// 관리자 강의실 예약
-adminRoom.post("/create", isAdmin, async (req, res) => {
+adminRoom.get(
+  "/reservations/:startDate/:endDate",
+  isAdmin,
+  async (req, res) => {
+    const { faculty } = req.body;
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
+
+    try {
+      const collectionName = `${faculty}_Classroom`;
+
+      // 각 단과대별 강의실 컬렉션
+      const facultyConferenceCollcetion = collection(db, collectionName);
+
+      // 해당 컬렉션의 모든 문서 가져오기
+      const querySnapshot = await getDocs(facultyConferenceCollcetion);
+
+      // 모든 문서 데이터를 저장할 배열
+      const allDocData = [];
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                // 예약된 문서 정보 조회
+                allDocData.push({
+                  roomName: roomName,
+                  mainName: reservationData.mainName,
+                  date: dateString,
+                  startTime: startTime,
+                  endTime: endTime,
+                  studentName: reservationData.studentNames,
+                  studentDepartment: reservationData.studentDepartments,
+                  studentId: reservationData.studentIds,
+                  usingPurpose: reservationData.usingPurpose,
+                  boolAgree: reservationData.boolAgree,
+                });
+              }
+            });
+          }
+        })
+      );
+
+      // 사용자 예약 내역 반환
+      res.status(200).json({
+        message: "Administrator reservations fetched successfully",
+        reservations: allDocData,
+      });
+    } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching Administrator reservations", error);
+      res
+        .status(500)
+        .json({ error: "Failed to fetch administrator reservations" });
+    }
+  }
+);
+
+
+// 강의실 정보 불러오기
+adminRoom.get("/conferenceInfo/:faculty", async (req, res) => {
+  const faculty = req.params.faculty;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Classroom_queue`;
+
+    const facultyConferenceCollcetion = collection(db, collectionName);
+
+    const querySnapshot = await getDocs(facultyConferenceCollcetion);
+
+    if (querySnapshot.empty) {
+      return res.status(401).json({ error: "Conference Info does not exist" });
+    }
+
+    const allConferenceInfo = [];
+
+    querySnapshot.forEach((doc) => {
+      const conferenceInfo = doc.data();
+      allConferenceInfo.push({
+        faculty: conferenceInfo.faculty,
+        roomName: conferenceInfo.roomName,
+        available_Time: conferenceInfo.available_Time,
+        available_People: conferenceInfo.available_People,
+        conferenceImage: conferenceInfo.conferenceImage,
+      });
+    });
+
+    res.status(200).json({
+      message: "fetch all conference info successfully",
+      allConferenceInfo,
+    });
+  } catch (error) {
+    //오류 발생 시 오류 응답
+    console.error("Error fetching conference info", error);
+    res.status(500).json({ error: "Failed to fetch conference info" });
+  }
+});
+
+// 강의실 정보 삭제
+adminRoom.delete("/delete/conferenceInfo", isAdmin, async (req, res) => {
+  const { faculty, roomName } = req.body;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Classroom_queue`;
+
+    const facultyConferenceCollcetion = collection(db, collectionName);
+
+    const roomDocRef = doc(facultyConferenceCollcetion, roomName);
+
+    const roomDocSnapshot = await getDoc(roomDocRef);
+    if (!roomDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    await deleteDoc(roomDocRef);
+
+    res.status(200).json({ message: "Room deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting room", error);
+    res.status(500).json({ error: "Failed to delete room" });
+  }
+});
+
+// 강의실 예약 
+adminRoom.post("/reserve", isAdmin, async (req, res) => {
   const {
     userId,
-    roomId,
+    roomName,
     date,
     startTime,
     endTime,
-    usingPurpose,
-    studentIds,
+    usingPurpose, 
+    studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
     numberOfPeople,
   } = req.body;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Classroom`;
+
+    const facultyConferenceCollection = collection(db, collectionName);
+    const conferenceRoomDoc = doc(facultyConferenceCollection, roomName);
+    
+    
+    const dateCollection = collection(conferenceRoomDoc, date);
+
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+
+      if (reservationDocSnap.exists()) {
+        return res.status(400).json({
+          error: `This Conference ${roomName} room  is already reserved from ${i}-${
+            i + 1
+          }`,
+        });
+      }
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        if (studentIds.length !== (parseInt(numberOfPeople)-1)) {
+          return res.status(401).json({
+            error: "The number of people does not match number of students",
+          });
+        } else {
+          // 각 학생의 이름과 전공을 저장할 배열
+          const studentNames = [];
+          const studentDepartments = [];
+          for (const studentId of studentIds) {
+            const collectionRef = collection(db, "users");
+            const userDoc = query(
+              collectionRef,
+              where("studentId", "==", studentId)
+            );
+
+            const userDocSnapshot = await getDocs(userDoc);
+            if (!userDocSnapshot.empty) {
+              const userData = userDocSnapshot.docs[0].data();
+              const studentName = userData.name;
+              const studentDepartment = userData.department;
+
+              // 배열에 학생의 이름과 전공 추가
+              studentNames.push(studentName);
+              studentDepartments.push(studentDepartment);
+            }
+          }
+
+          await setDoc(reservationDocRef, {
+            mainName: userData.name, // 누가 대표로 예약을 했는지(책임 문제)
+            mainFaculty: userData.faculty, // 대표자 소속
+            mainStudentId: userData.studentId, // 대표자 학번
+            mainPhoneNumber: userData.phone, // 대표자 전화번호
+            mainEmail: userData.email, // 대표자 이메일
+            studentName: studentNames,
+            studentId: studentIds,
+            studentDepartment: studentDepartments,
+            usingPurpose: usingPurpose,
+            boolAgree: true,
+          });
+        }
+      }
+    }
+
+    // 예약 성공 시 응답
+    res
+      .status(201)
+      .json({ message: "Administrator reservation Conference created successfully" });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error administrator reserve conference room", error);
+    res.status(500).json({ error: "Failed to administrator reserve conference room" });
+  }
+});
+
+// 강의실 예약 내역 삭제
+adminRoom.delete("/delete", isAdmin, async (req, res) => {
+  const { userId, roomName, date, startTime, endTime } = req.body;
 
   try {
     // 사용자 정보 가져오기
@@ -194,152 +447,30 @@ adminRoom.post("/create", isAdmin, async (req, res) => {
 
     const collectionName = `${userData.faculty}_Classroom`;
 
-    // 예약된 시간대와 좌석 확인
-    const existingReservationsSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("date", "==", date),
-      where("roomId", "==", roomId)
-    );
+    const conferenceRoomCollection = collection(db, collectionName);
+    const roomDocRef = doc(conferenceRoomCollection, roomName);
 
-    // 겹치는 예약이 있는지 확인
-    const overlappingReservation = existingReservationsSnapshot.docs.find(
-      (doc) => {
-        const reservation = doc.data();
-        // 기존 예약의 시작 시간과 끝 시간
-        const existingStartTime = reservation.startTime;
-        const existingEndTime = reservation.endTime;
-        const existingDate = reservation.date;
-        const existingRoomId = reservation.roomId;
-        const startTimeClub = startTime;
-        const endTimeClub = endTime;
+    const dateCollection = collection(roomDocRef, date);
 
-        // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-        if (
-          (existingDate == date &&
-            startTimeClub == existingStartTime &&
-            endTimeClub == existingEndTime &&
-            roomId == existingRoomId) ||
-          (existingDate == date &&
-            roomId == existingRoomId &&
-            startTimeClub < existingEndTime &&
-            endTimeClub > existingStartTime)
-        ) {
-          return true;
-        }
-        return false;
-      }
-    );
+    // 예약 시간대 확인
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
 
-    // 겹치는 예약이 있는 경우 에러 반환
-    if (overlappingReservation) {
-      return res
-        .status(401)
-        .json({ error: "The room is already reserved for this time" });
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    // 예약 내역 삭제
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      await deleteDoc(reservationDocRef);
     }
 
-    // 학생들의 학번을 공백을 기준으로 분할하여 리스트를 만듦
-    const studentIdList = studentIds.split(" ");
-    if (studentIdList.length != numberOfPeople) {
-      return res.status(400).json({
-        error:
-          "The numberOfPeople does not match the number of given studentIds",
-      });
-    }
-
-    // 각 학생의 정보를 가져오는 비동기 함수
-    const getUserInfoPromises = studentIdList.map(async (studentId) => {
-      const userQuerySnapshot = await getDocs(
-        query(collection(db, "users"), where("studentId", "==", studentId))
-      );
-      if (!userQuerySnapshot.empty) {
-        const userData = userQuerySnapshot.docs[0].data();
-        return {
-          studentId: studentId,
-          name: userData.name,
-          faculty: userData.faculty,
-        };
-      } else {
-        throw new Error(`User with ID ${studentId} not found`);
-      }
-    });
-
-    // 비동기 함수들을 병렬로 실행하여 학생 정보를 가져옵니다.
-    const studentInfoList = await Promise.all(getUserInfoPromises);
-
-    const existingMyReservationSnapshot = await getDocs(
-      query(collection(db, `${collectionName}`), where("roomId", "==", roomId))
-    );
-
-    // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
-    const reservationCount = existingMyReservationSnapshot.size + 1;
-    // 겹치는 예약이 없으면 예약 추가
-    await setDoc(
-      doc(
-        db,
-        `${collectionName}`,
-        `${roomId}_${userData.studentId}_${reservationCount}`
-      ),
-      {
-        mainName: userData.name,
-        roomId: roomId,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        usingPurpose: usingPurpose,
-        numberOfPeople: numberOfPeople,
-        studentIds: studentIdList,
-        studentNames: studentInfoList.map((student) => student.name),
-        studentFaculty: studentInfoList.map((student) => student.faculty),
-        boolAgree: true,
-      }
-    );
-
-    // 예약 성공 시 응답
-    res.status(201).json({ message: "Reservation room created successfully" });
+    // 삭제 성공 시 응답
+    res.status(200).json({ message: "Reservation deleted successfully" });
   } catch (error) {
     // 오류 발생 시 오류 응답
-    console.error("Error creating reservation room", error);
-    res.status(500).json({ error: "Failed reservation room" });
+    console.error("Error deleting reservation", error);
+    res.status(500).json({ error: "Failed to delete reservation" });
   }
 });
-
-// 관리자 강의실 예약 내역 삭제
-adminRoom.delete(
-  "/delete/:userId/:reservationUID",
-  isAdmin,
-  async (req, res) => {
-    const userId = req.params.userId;
-    const reservationUID = req.params.reservationUID;
-
-    try {
-      // 사용자 정보 가져오기
-      const userDoc = await getDoc(doc(db, "users", userId));
-
-      if (!userDoc.exists()) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      const userData = userDoc.data();
-
-      // 컬렉션 이름 설정(예약내역)
-      const collectionName = `${userData.faculty}_Classroom`;
-
-      // 컬렉션 이름 설정(대기열)
-      const collectionNameQueue = `${userData.faculty}_Classroom_queue`;
-
-      // Firestore에서 강의실 예약내역 삭제
-      await deleteDoc(doc(db, `${collectionName}`, reservationUID));
-
-      // Firestore에서 강의실 대기열 예약내역 삭제
-      await deleteDoc(doc(db, `${collectionNameQueue}`, reservationUID));
-
-      res
-        .status(200)
-        .json({ message: "Reservation club deleted successfully" });
-    } catch (error) {
-      console.log("Error deleting reservation club", error);
-      res.status(500).json({ error: "Failed to delete reservation club" });
-    }
-  }
-);
-
 export default adminRoom;
