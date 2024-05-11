@@ -53,7 +53,6 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
   const {
     faculty,
     roomName,
-    location,
     available_People,
     available_Time,
     conferenceImage,
@@ -73,7 +72,6 @@ adminRoom.post("/create/room", isAdmin, async (req, res) => {
     const data = {
       faculty: faculty,
       roomName: roomName,
-      location: location,
       available_People: available_People,
       available_Time: available_Time,
       conferenceImage: conferenceImage,
