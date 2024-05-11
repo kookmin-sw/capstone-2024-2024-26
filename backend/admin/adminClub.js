@@ -154,7 +154,80 @@ adminClub.post("/reserve", isAdmin, async (req, res) => {
   }
 });
 
-
+// 관리자 동아리방 예약 내역 삭제
+adminClub.post(
+  "/delete",
+  isAdmin,
+  async (req, res) => {
+    const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
+    try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
+  
+      if (!userDoc.exists()) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+  
+      const collectionName = `${userData.faculty}_Club`;
+  
+      const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+  
+      if (!existDocSnapShot.exists()) {
+        // 해당 문서가 존재하지 않는 경우
+        return res.status(404).json({ error: "This Club room does not exists" });
+      }
+      const facultyClubCollection = collection(db, collectionName);
+      const clubRoomDoc = doc(facultyClubCollection, roomName);
+      const clubRoomDocSnap = await getDoc(clubRoomDoc);
+  
+      // 해당 동아리방이 있는지 확인
+      if (!clubRoomDocSnap.exists()) {
+        return res.status(404).json({
+          error: `${roomName} does not exist in ${collectionName} collection`,
+        });
+      }
+  
+      const dateCollection = collection(clubRoomDoc, date);
+  
+      const startTimeParts = startTime.split(":");
+      const startTimeHour = parseInt(startTimeParts[0]);
+  
+      const endTimeParts = endTime.split(":");
+      const endTimeHour = parseInt(endTimeParts[0]);
+  
+      // 시작 시간부터 종료 시간까지 각 시간대에 대해 예약 문서를 업데이트합니다.
+      for (let i = startTimeHour; i < endTimeHour; i++) {
+        const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+        const reservationDocSnap = await getDoc(reservationDocRef);
+  
+        // 해당 시간대 예약 문서가 있는지 확인
+        if (reservationDocSnap.exists()) {
+          const reservationData = reservationDocSnap.data();
+  
+          // 해당 테이블 번호의 예약을 취소하고 상태를 false로 변경합니다.
+          const index = parseInt(tableNumber) - 1;
+          if (reservationData.tableData[index][`T${tableNumber}`]) {
+            console.log(reservationData.tableData[index]);
+            // 예약 취소 및 테이블 상태 변경
+            reservationData.tableData[index][`T${tableNumber}`] = false;
+            delete reservationData.tableData[index].name;
+            delete reservationData.tableData[index].studentId;
+  
+            await updateDoc(reservationDocRef, {
+              tableData: reservationData.tableData,
+            });
+          }
+        }
+      }
+  
+      res.status(200).json({ message: "Reservation canceled successfully" });
+    } catch (error) {
+      console.error("Error canceling reservation", error);
+      return res.status(500).json({ error: "Failed to cancel reservation" });
+    }
+  }
+);
 
 // 관리자 동아리방 설정 생성
 adminClub.post("/create/room", isAdmin, async (req, res) => {
