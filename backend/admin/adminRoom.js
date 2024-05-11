@@ -254,20 +254,12 @@ adminRoom.get(
 );
 
 // 강의실 정보 불러오기
-adminRoom.get("/conferenceInfo/:userId", isAdmin, async (req, res) => {
-  const userId = req.params.userId;
+adminRoom.get("/conferenceInfo/:faculty", isAdmin, async (req, res) => {
+  const faculty = req.params.faculty;
 
   try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
-
     // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_Classroom_queue`;
+    const collectionName = `${faculty}_Classroom_queue`;
 
     const facultyConferenceCollcetion = collection(db, collectionName);
 
