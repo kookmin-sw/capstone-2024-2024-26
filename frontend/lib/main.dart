@@ -184,6 +184,7 @@ class _MainPageState extends State<MainPage> {
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
           spaceData.add(responseData['share_room_data']);
+          print(spaceData);
         });
       } else {}
     } else {
@@ -596,7 +597,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         ? Select_reserve_cf(
                             roomName: roomName,
                           )
-                        : Select_reserve(roomName: roomName)),
+                        : Select_reserve(roomName: roomName, time: time)),
               );
             },
             style: ElevatedButton.styleFrom(

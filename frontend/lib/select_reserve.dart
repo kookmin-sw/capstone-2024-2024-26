@@ -13,18 +13,85 @@ import 'notice.dart';
 
 class Select_reserve extends StatefulWidget {
   final String roomName;
-
-  Select_reserve({Key? key, required this.roomName}) : super(key: key);
+  final String time;
+  Select_reserve({Key? key, required this.roomName, required this.time})
+      : super(key: key);
 
   @override
-  State<Select_reserve> createState() => _select(roomName: roomName);
+  State<Select_reserve> createState() =>
+      _select(roomName: roomName, time: time);
 }
 
 class _select extends State<Select_reserve> {
   bool isFirstVisit = true; // 사용자가 첫 방문인지 여부
   bool isAgreed = false; // 사용자가 안내사항에 동의했는지 여부
+  String time;
   final ScrollController _scrollController = ScrollController();
 
+  Map<String, dynamic> reservations = {}; // 예약 정보를 불러와서 비활성화할거임 .
+
+  String roomName;
+  _select({
+    required this.roomName,
+    required this.time,
+  });
+
+  final double intervalWidth = 50.0;
+
+  final ExpansionTileController controller = ExpansionTileController();
+  bool timeSelected = false; // 시간 선택 상태를 추적하는 변수
+  String startTime = ''; //server
+  String endTime = '';
+  String room_name = '';
+  int table_number = 0; // server
+
+  Map<int, List<bool>> timeTableStatus = {};
+
+  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+  String? uid = '';
+  int setting = 0;
+
+  int st = 0;
+  int ed = 0;
+
+  List<bool> isButtonPressedList =
+      List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
+
+  List<bool> isButtonPressedTable =
+      List.generate(16, (index) => false); // 실제 테이블 수에 맞게 크기 조정 필요
+
+  List<bool> updatedIsButtonPressedList =
+      List.generate(16, (index) => false); //시간 차있는지 확인
+
+// tablelist는 서버에서 받아온 데이터로 대체
+  List<dynamic> tableList = [
+    {
+      'available': '4',
+      'table_name': 'T1',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T2',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T3',
+      'table_status': 'true',
+    },
+    {
+      'available': '6',
+      'table_name': 'T4',
+      'table_status': 'true',
+    },
+  ];
+
+  DateTime selectedDate = DateTime.utc(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
   final Widget emptyDataWidget = Container(
     width: 50,
     // Customize your empty data representation
@@ -32,8 +99,54 @@ class _select extends State<Select_reserve> {
   @override
   void initState() {
     super.initState();
+
     _checkUidStatus();
+
     _checkFirstVisit();
+
+    selectedDate = DateTime.now();
+    sendSelectedDateToServer(selectedDate);
+  }
+
+  _checkUidStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+  }
+
+  _checkReservation(
+    Map<String, dynamic> reservations,
+  ) async {
+    for (var reservation in reservations['reservations']) {
+      updatedIsButtonPressedList =
+          List.generate(16, (index) => false); //시간 차있는지 확인
+      List<bool> updatedIsButtonPressedTable = List.generate(
+          reservation['tables'].length, (index) => false); // 테이블 차있는지 확인
+      String timeRange = reservation['timeRange'];
+      int startHour = int.parse(timeRange.split('-')[0]);
+
+      int startIndex = startHour - 9;
+
+      List<dynamic> tables = reservation['tables'];
+
+      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
+        timeTableStatus[i] =
+            List.generate(reservation['tables'].length, (index) => false);
+      }
+      for (int i = 0; i < tables.length; i++) {
+        var table = tables[i];
+        // 테이블이 예약되어 있으면 해당 테이블 버튼을 비활성화
+        if (table['T${i + 1}'] == true) {
+          updatedIsButtonPressedTable[i] = true;
+        }
+      }
+
+      if (updatedIsButtonPressedTable.every((element) => element == true)) {
+        updatedIsButtonPressedList[startIndex] = true;
+      }
+
+      timeTableStatus[startIndex] = updatedIsButtonPressedTable;
+      return timeTableStatus;
+    }
   }
 
   // 사용자의 첫 방문 여부를 확인
@@ -48,10 +161,11 @@ class _select extends State<Select_reserve> {
   }
 
   // 선택된 날짜를 서버로 전송하는 함수
-  void sendSelectedDateToServer(DateTime selectedDate) async {
+  sendSelectedDateToServer(DateTime selectedDate) async {
     try {
       const url = 'http://localhost:3000/reserveclub/selectdate';
-
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      uid = prefs.getString('uid');
       final Map<String, String> data = {
         'userId': uid!,
         'roomName': roomName,
@@ -59,7 +173,6 @@ class _select extends State<Select_reserve> {
             '${selectedDate.year}-${selectedDate.month}-${selectedDate.day}',
       };
 
-      debugPrint('$data');
       final response = await http.post(
         Uri.parse(url),
         body: json.encode(data),
@@ -69,8 +182,9 @@ class _select extends State<Select_reserve> {
       // 서버 응답 처리
       if (response.statusCode == 200) {
         // 서버 응답이 성공적인 경우
-        print('Date sent successfully');
-        print('Response body: ${response.body}');
+
+        reservations = json.decode(response.body);
+        _checkReservation(reservations);
       } else {
         // 서버 에러 처리
         print('Failed to send date. Status code: ${response.statusCode}');
@@ -163,83 +277,6 @@ class _select extends State<Select_reserve> {
       },
     );
   }
-
-  String roomName;
-  _select({
-    required this.roomName,
-  });
-
-  final double intervalWidth = 50.0;
-
-  final ExpansionTileController controller = ExpansionTileController();
-  bool timeSelected = false; // 시간 선택 상태를 추적하는 변수
-  String startTime = ''; //server
-  String endTime = '';
-  String room_name = '';
-  int table_number = 0; // server
-
-  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
-  String? uid = '';
-  int setting = 0;
-
-  int st = 0;
-  int ed = 0;
-
-  List<bool> isButtonPressedList =
-      List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
-  List<bool> isButtonPressedTable =
-      List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
-
-// tablelist는 서버에서 받아온 데이터로 대체
-  List<dynamic> tableList = [
-    {
-      'available': '4',
-      'table_name': 'T1',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T2',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T3',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T4',
-      'table_status': 'true',
-    },
-  ];
-
-  List<Offset> circlePositions = [
-    const Offset(10, 0),
-    const Offset(40, 0),
-    const Offset(70, 0),
-    const Offset(10, 30),
-    const Offset(40, 30),
-    const Offset(70, 30),
-  ]; // 의자 위치
-
-  List<Offset> circlePositions_4 = [
-    const Offset(10, 0),
-    const Offset(40, 0),
-    const Offset(10, 30),
-    const Offset(40, 30),
-  ]; // 의자 위치
-
-  _checkUidStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    uid = prefs.getString('uid');
-  }
-
-  DateTime selectedDate = DateTime.utc(
-    DateTime.now().year,
-    DateTime.now().month,
-    DateTime.now().day,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -462,93 +499,144 @@ class _select extends State<Select_reserve> {
                             16,
                             (index) {
                               int hour = index + 9;
-                              return Padding(
-                                padding: EdgeInsets.zero,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start, // 텍스트를 왼쪽으로 정렬
-                                  children: [
-                                    Text(
-                                      '$hour시',
-                                      style: const TextStyle(
-                                        color: Color(0xFFA3A3A3),
-                                        fontSize: 10,
-                                        fontFamily: 'Inter',
+
+                              sendSelectedDateToServer(selectedDate);
+
+                              if (updatedIsButtonPressedList[index] == true) {
+                                return Padding(
+                                  padding: EdgeInsets.zero,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start, // 텍스트를 왼쪽으로 정렬
+                                    children: [
+                                      Text(
+                                        '$hour시',
+                                        style: const TextStyle(
+                                          color: Color(0xFFA3A3A3),
+                                          fontSize: 10,
+                                          fontFamily: 'Inter',
+                                        ),
                                       ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isButtonPressedList[index] =
-                                                  !isButtonPressedList[index];
-                                              if (isButtonPressedList[index] ==
-                                                  true) {
-                                                setting += 1;
-                                                if (setting == 1) {
-                                                  st = hour;
-                                                  ed = hour + 1;
-                                                } else if (setting == 2) {
-                                                  if (hour == st + 1) {
-                                                    // 새로운 시간이 시작 시간 다음 시간과 일치하는지 확인
-                                                    ed = hour +
-                                                        1; // 조건을 만족하는 경우 종료 시간 업데이트
-                                                  } else {
-                                                    showErrorAndReset(index,
-                                                        '예약은 연속 2시간만 가능합니다.'); // 연속된 시간이 아니면 에러 표시
+                                      Row(
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: null,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  const Color(0XFFD9D9D9),
+                                              minimumSize: const Size(50, 30),
+                                              shape:
+                                                  const RoundedRectangleBorder(),
+                                              elevation: 0.2, // 그림자 제거
+                                            ),
+                                            child: const Text('마감',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 8,
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                          ),
+                                          Container(
+                                            height: 25.74,
+                                            width: 1,
+                                            color: Colors.grey.withOpacity(0.2),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: EdgeInsets.zero,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start, // 텍스트를 왼쪽으로 정렬
+                                    children: [
+                                      Text(
+                                        '$hour시',
+                                        style: const TextStyle(
+                                          color: Color(0xFFA3A3A3),
+                                          fontSize: 10,
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isButtonPressedList[index] =
+                                                    !isButtonPressedList[index];
+                                                if (isButtonPressedList[
+                                                        index] ==
+                                                    true) {
+                                                  setting += 1;
+                                                  if (setting == 1) {
+                                                    st = hour;
+                                                    ed = hour + 1;
+                                                  } else if (setting == 2) {
+                                                    if (hour == st + 1) {
+                                                      // 새로운 시간이 시작 시간 다음 시간과 일치하는지 확인
+                                                      ed = hour +
+                                                          1; // 조건을 만족하는 경우 종료 시간 업데이트
+                                                    } else {
+                                                      showErrorAndReset(index,
+                                                          '예약은 연속 2시간만 가능합니다.'); // 연속된 시간이 아니면 에러 표시
+                                                    }
+                                                  }
+
+                                                  if (setting > 2) {
+                                                    setState(() {
+                                                      isButtonPressedList[
+                                                          index] = false;
+                                                      setting -= 1;
+                                                    });
+                                                    FlutterDialog(
+                                                        '예약은 최대 2시간까지 가능합니다.',
+                                                        '확인');
+                                                  }
+                                                  timeSelected =
+                                                      true; // 시간이 선택되었음을 나타냄
+                                                } else {
+                                                  timeSelected = false;
+                                                  setting -= 1;
+                                                  ed = 0;
+                                                  if (setting == 0) {
+                                                    st = 0;
+                                                    ed = 0;
+                                                  } else if (setting == 1) {
+                                                    st = ed;
+                                                    ed = st;
                                                   }
                                                 }
-
-                                                if (setting > 2) {
-                                                  setState(() {
-                                                    isButtonPressedList[index] =
-                                                        false;
-                                                    setting -= 1;
-                                                  });
-                                                  FlutterDialog(
-                                                      '예약은 최대 2시간까지 가능합니다.',
-                                                      '확인');
-                                                }
-                                                timeSelected =
-                                                    true; // 시간이 선택되었음을 나타냄
-                                              } else {
-                                                timeSelected = false;
-                                                setting -= 1;
-                                                ed = 0;
-                                                if (setting == 0) {
-                                                  st = 0;
-                                                  ed = 0;
-                                                } else if (setting == 1) {
-                                                  st = ed;
-                                                  ed = st;
-                                                }
-                                              }
-                                            });
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: isButtonPressedList[
-                                                    index]
-                                                ? const Color(0XFF004F9E)
-                                                : const Color(
-                                                    0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
-                                            minimumSize: const Size(50, 30),
-                                            shape:
-                                                const RoundedRectangleBorder(),
-                                            elevation: 0.2, // 그림자 제거
+                                              });
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: isButtonPressedList[
+                                                      index]
+                                                  ? const Color(0XFF004F9E)
+                                                  : const Color(
+                                                      0xFFF8F8F8), // 해당 버튼의 눌림 여부에 따라 색을 변경
+                                              minimumSize: const Size(50, 30),
+                                              shape:
+                                                  const RoundedRectangleBorder(),
+                                              elevation: 0.2, // 그림자 제거
+                                            ),
+                                            child: const Text('  '),
                                           ),
-                                          child: const Text('  '),
-                                        ),
-                                        Container(
-                                          height: 25.74,
-                                          width: 1,
-                                          color: Colors.grey.withOpacity(0.2),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
+                                          Container(
+                                            height: 25.74,
+                                            width: 1,
+                                            color: Colors.grey.withOpacity(0.2),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                             },
                           ),
                         ),
@@ -613,7 +701,7 @@ class _select extends State<Select_reserve> {
                           physics: NeverScrollableScrollPhysics(),
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3, // 한 줄에 3개의 좌석을 표시
+                            crossAxisCount: 4, // 한 줄에 3개의 좌석을 표시
                             childAspectRatio: 2 /
                                 1, // 아이템의 가로 세로 비율을 조정 (가로 길이를 세로 길이의 3배로 설정)
                           ),
@@ -621,8 +709,6 @@ class _select extends State<Select_reserve> {
                           itemBuilder: (BuildContext context, int index) {
                             return _CustomTableWidget(
                               isButtonPressedTable: isButtonPressedTable,
-                              circlePositions: circlePositions,
-                              circlePositions_4: circlePositions_4,
                               timeSelected: timeSelected,
                               onTablePressed: (index) {
                                 setState(() {
@@ -805,6 +891,7 @@ class _select extends State<Select_reserve> {
     for (int i = 0; i < isButtonPressedTable.length; i++) {
       if (isButtonPressedTable[i]) {
         table_number = i + 1;
+
         break;
       }
     }
@@ -957,8 +1044,7 @@ class _select extends State<Select_reserve> {
 
 class _CustomTableWidget extends StatefulWidget {
   final List<bool> isButtonPressedTable;
-  final List<Offset> circlePositions;
-  final List<Offset> circlePositions_4;
+
   final bool timeSelected;
   final int tableIndex; // 테이블의 인덱스
   final ValueSetter<int> onTablePressed;
@@ -967,8 +1053,6 @@ class _CustomTableWidget extends StatefulWidget {
     Key? key,
     required this.isButtonPressedTable,
     required this.timeSelected,
-    required this.circlePositions,
-    required this.circlePositions_4,
     required this.onTablePressed,
     required this.tableIndex,
     required this.tableList,
