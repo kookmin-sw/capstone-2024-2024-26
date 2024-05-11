@@ -11,12 +11,14 @@ const PageManagement = () => {
       roomName: '',
       available_Time: '',
       available_People: '',
+      available_Table: '',
       faculty: '',
       conferenceImage: null,
       preview: null,
   };
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [showRoomPopup, setShowRoomPopup] = useState(false);
+  const [showClubPopup, setShowClubPopup] = useState(false);
   const [roomData, setRoomData] = useState(initialRoomData);
   const [conferenceInfo, setConferenceInfo] = useState([]);
 
@@ -86,7 +88,7 @@ const PageManagement = () => {
           if (response.status === 200) {
             alert('강의실 생성 완료');
             resetRoomData();
-            setShowPopup(false);
+            setShowRoomPopup(false);
           }
         } catch (error) {
           console.error('Error creating room:', error);
@@ -105,10 +107,15 @@ const PageManagement = () => {
       setRoomData(initialRoomData);
   };
 
-  const handleClosePopup = () => {
-      resetRoomData();
-      setShowPopup(false);
-  };
+  const handleCloseRoomPopup = () => {
+    resetRoomData();
+    setShowRoomPopup(false);
+};
+
+const handleCloseClubPopup = () => {
+    resetRoomData();
+    setShowClubPopup(false);
+};
 
   //강의실 삭제 이벤트 핸들러 함수 : 버튼 클릭시 저장된 Uid를 통해서 서버에 요청을 보냄
   const handleDeleteRoom = async (roomName, faculty) => {
@@ -128,6 +135,63 @@ const PageManagement = () => {
     }
   };
 
+  //공유공간 관련 함수 시작 구간
+  //공유공간 추가 이벤트 핸들러 함수 : 사진 2개 인코딩(공유공간사진, 공유공간도안)
+  const handleCreateClub = async () => {
+    if (roomData.clubRoomImage && roomData.clubRoomDesignImage) {
+      // 두 이미지 모두 존재하는 경우에만 서버로 데이터 전송
+      try {
+        const reader1 = new FileReader();
+        const reader2 = new FileReader();
+  
+        reader1.readAsDataURL(roomData.clubRoomImage);
+        reader2.readAsDataURL(roomData.clubRoomDesignImage);
+  
+        reader1.onload = async () => {
+          const clubRoomImageEncoded = reader1.result.split(',')[1]; // 첫 번째 이미지 인코딩
+          reader2.onload = async () => {
+            const clubRoomDesignImageEncoded = reader2.result.split(',')[1]; // 두 번째 이미지 인코딩
+  
+            const payload = {
+              faculty: roomData.faculty,
+              roomName: roomData.roomName,
+              available_Table: roomData.available_Table,
+              available_People: roomData.available_People,
+              available_Time: roomData.available_Time,
+              clubRoomImage: clubRoomImageEncoded,
+              clubRoomDesignImage: clubRoomDesignImageEncoded
+            };
+  
+            // POST 요청으로 서버에 공유공간 데이터 전송
+            const response = await axios.post('http://localhost:3000/adminClub/create/room', payload, {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+  
+            if (response.status === 200) {
+              alert('공유공간이 성공적으로 등록되었습니다.');
+              resetRoomData(); // 데이터 초기화
+            }
+          };
+          reader2.onerror = error => {
+            console.error('Error loading design image:', error);
+            alert('공유공간 도안 이미지 로딩 실패');
+          };
+        };
+        reader1.onerror = error => {
+          console.error('Error loading room image:', error);
+          alert('공유공간 이미지 로딩 실패');
+        };
+      } catch (error) {
+        console.error('Error creating club room:', error);
+        alert('공유공간 생성 실패');
+      }
+    } else {
+      alert('두 이미지 모두 추가해주세요.');
+    }
+  };
+
     return (
         <div className="main-container">
           <Banner />
@@ -138,14 +202,14 @@ const PageManagement = () => {
                 <div className='addition_box'>
                   <div className='addition_banner'>
                     <p className='addition_title'>강의실 관리</p>
-                    <button className='addition_room_button' onClick={() => setShowPopup(true)}>강의실 추가</button>
+                    <button className='addition_room_button' onClick={() => setShowRoomPopup(true)}>강의실 추가</button>
 
-                    {showPopup && (
+                    {showRoomPopup && (
                       <div className='popup'>
                         <div className='popup_inner'>
                           <div className='popup_inner_banner'>
                           <h2>강의실 생성</h2>
-                          <button className='popup_inner_banner_back' onClick={handleClosePopup}>✖️</button>
+                          <button className='popup_inner_banner_back' onClick={handleCloseRoomPopup}>✖️</button>
                           </div>
                           <hr></hr>
                           <div className='popup_inner_input'>
@@ -188,7 +252,6 @@ const PageManagement = () => {
                             onChange={handleInputChange}
                           />
                           </div>
-                          
                           <div className='popup_inner_input'>
                           {roomData.preview && (
                                                     <img
@@ -215,7 +278,7 @@ const PageManagement = () => {
                       <li key={index}>
                         <div className='addition_chart_element'>
                           <div className='chart_element_image'>
-                          {info.conferenceImage && <img src={`data:image/jpeg;base64,${info.conferenceImage}`} alt="Conference Room" className="rommImage_preview" />}
+                          {info.conferenceImage && <img src={`data:image/jpeg;base64,${info.conferenceImage}`} alt="Conference Room" className="roomImage_preview" />}
                           </div>
                           <div className='chart_element_data'>
                             <p>{info.faculty}</p>
@@ -237,7 +300,95 @@ const PageManagement = () => {
                 <div className='addition_box'>
                   <div className='addition_banner'>
                     <p className='addition_title'>공유공간 관리</p>
-                    <button className='addition_club_button'>공유공간 추가</button>
+                    <button className='addition_club_button' onClick={() => setShowClubPopup(true)}>공유공간 추가</button>
+                    {showClubPopup && (
+                      <div className='popup'>
+                        <div className='popup_inner'>
+                          <div className='popup_inner_banner'>
+                          <h2>공유공간 생성</h2>
+                          <button className='popup_inner_banner_back' onClick={handleCloseClubPopup}>✖️</button>
+                          </div>
+                          <hr></hr>
+                          <div className='popup_inner_input'>
+                          <p className='popup_input_title'>단과대학</p>
+                          <input
+                            type='text'
+                            name='faculty'
+                            placeholder='단과대학'
+                            value={roomData.faculty}
+                            onChange={handleInputChange}
+                          />
+                          </div>
+                          <div className='popup_inner_input'>
+                          <p className='popup_input_title'>강의실 이름</p>
+                          <input
+                            type='text'
+                            name='roomName'
+                            placeholder='⬜⬜관 000호'
+                            value={roomData.roomName}
+                            onChange={handleInputChange}
+                          />
+                          <div className='popup_inner_input'>
+                          <p className='popup_input_title'>사용가능 테이블</p>
+                          <input
+                            type='text'
+                            name='available_Table'
+                            placeholder=" '00' "
+                            value={roomData.available_Table}
+                            onChange={handleInputChange}
+                          />
+                          </div>
+                          </div>
+                          <div className='popup_inner_input'>
+                          <p className='popup_input_title'>수용 인원</p>
+                          <input
+                            type='text'
+                            name='available_People'
+                            placeholder='"00"'
+                            value={roomData.available_People}
+                            onChange={handleInputChange}
+                          />
+                          </div>
+                          <div className='popup_inner_input'>
+                          <p className='popup_input_title'>사용가능 시간</p>
+                          <input
+                            type='text'
+                            name='available_Time'
+                            placeholder=" '00:00-00:00' "
+                            value={roomData.available_Time}
+                            onChange={handleInputChange}
+                          />
+                          </div>
+                          <div className='popup_inner_input'>
+                          {roomData.preview && (
+                                                    <img
+                                                        src={roomData.preview}
+                                                        alt="미리보기"
+                                                        className='image_preview'
+                                                    />
+                                                )}
+                          <p className='popup_input_title'>공유공간 사진</p>
+                          <input type='file' name="clubRoomImage" onChange={handleFileChange} />
+                          </div>
+
+                          <div className='popup_inner_input'>
+                          {roomData.preview && (
+                                                    <img
+                                                        src={roomData.preview}
+                                                        alt="미리보기"
+                                                        className='image_preview'
+                                                    />
+                                                )}
+                          <p className='popup_input_title'>공유공간 도안</p>
+                          <input type='file' name="clubRoomDesignImage" onChange={handleFileChange} />
+                          </div>
+                          </div>
+                          <button onClick={handleCreateClub}>생성하기</button>                          
+                        </div>
+                        
+
+                    )}
+
                   </div>
                   <hr></hr>
                   <div className='addition_chart'>

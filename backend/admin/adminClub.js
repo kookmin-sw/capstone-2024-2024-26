@@ -230,7 +230,7 @@ adminClub.post(
 );
 
 // 관리자 동아리방 설정 생성
-adminClub.post("/create/room", isAdmin, async (req, res) => {
+adminClub.post("/create/room", async (req, res) => {
   const {
     faculty,
     roomName,
@@ -345,5 +345,75 @@ adminClub.get(
     }
   }
 );
+
+// 동아리방 정보 불러오기
+adminClub.get("/clubRoomInfo/:faculty", isAdmin, async (req, res) => {
+  const faculty = req.params.faculty;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Club`;
+
+    const facultyClubCollcetion = collection(db, collectionName);
+
+    const querySnapshot = await getDocs(facultyClubCollcetion);
+
+    if (querySnapshot.empty) {
+      return res.status(401).json({ error: "ClubRoom Info does not exist" });
+    }
+
+    const allClubRoomInfo = [];
+
+    querySnapshot.forEach((doc) => {
+      const clubRoomInfo = doc.data();
+      allClubRoomInfo.push({
+        faculty: clubRoomInfo.faculty,
+        roomName: clubRoomInfo.roomName,
+        available_Table: clubRoomInfo.available_Table,
+        available_Time: clubRoomInfo.available_Time,
+        available_People: clubRoomInfo.available_People,
+        clubRoomImage: clubRoomInfo.clubRoomImage,
+        clubRoomDesignImage: clubRoomInfo.clubRoomDesignImage
+      });
+    });
+
+    res.status(200).json({
+      message: "fetch all clubRoom info successfully",
+      allClubRoomInfo,
+    });
+  } catch (error) {
+    //오류 발생 시 오류 응답
+    console.error("Error fetching clubRoom info", error);
+    res.status(500).json({ error: "Failed to fetch clubRoom info" });
+  }
+});
+
+// 동아리방 정보 삭제
+adminClub.delete("/delete/clubRoomInfo", isAdmin, async (req, res) => {
+  const { faculty, roomName } = req.body;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Club`;
+
+    const facultyClubCollcetion = collection(db, collectionName);
+
+    const roomDocRef = doc(facultyClubCollcetion, roomName);
+
+    const roomDocSnapshot = await getDoc(roomDocRef);
+    if (!roomDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    await deleteDoc(roomDocRef);
+
+    res.status(200).json({ message: "Room deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting room", error);
+    res.status(500).json({ error: "Failed to delete room" });
+  }
+});
+
+
 
 export default adminClub;
