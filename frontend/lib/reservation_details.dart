@@ -3,50 +3,69 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'return.dart';
 import 'congestion.dart';
 import 'notice.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Details extends StatefulWidget {
-  final DateTime? selectedDate;
-  final int? startTime;
-  final int? endTime;
-  final String? roomName;
-  final String? table_number;
-
-  const Details(
-      {Key? key,
-      this.selectedDate,
-      this.startTime,
-      this.endTime,
-      this.roomName,
-      this.table_number})
-      : super(key: key);
+  const Details({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _Details(
-        selectedDate: selectedDate,
-        startTime: startTime,
-        endTime: endTime,
-        roomName: roomName,
-        table_number: table_number,
-      );
+  _Details createState() => _Details();
 }
 
 class _Details extends State<Details> {
-  final DateTime? selectedDate;
-  final int? startTime;
-  final int? endTime;
-  final String? roomName;
-  final String? table_number;
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now().add(Duration(days: 14)); // 현재로부터 14일 후
+  String userId = '';
+  @override
+  void initState() {
+    super.initState();
+    fetchReservations(userId, startDate, endDate);
+  }
 
-  _Details({
-    this.selectedDate,
-    this.startTime,
-    this.endTime,
-    this.roomName,
-    this.table_number,
-  });
+  Future<List<dynamic>> fetchReservations(
+      String userId, DateTime start, DateTime end) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('uid');
+
+    String formattedStartDate =
+        "${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}";
+    String formattedEndDate =
+        "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
+
+    final url =
+        'http://localhost:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+    print(url);
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // 서버로부터 정상적인 응답을 받았을 때
+        Map<String, dynamic> data = json.decode(response.body);
+        print(data['reservations']);
+        print('sival');
+        return data['reservations'];
+      } else {
+        // 서버로부터 오류 응답을 받았을 때
+        throw Exception('Failed to load reservations');
+      }
+    } catch (e) {
+      throw Exception('Failed to load reservations: $e');
+    }
+  }
+
+  final DateTime selectedDate = DateTime.now();
+  final int startTime = 12;
+  final int endTime = 15;
+  final String roomName = '미래관 610호';
+  final String table_number = '';
+
   bool isLent = false;
 
   @override
@@ -203,16 +222,37 @@ class _Details extends State<Details> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 13),
-            Text(
-              '[ ${roomName} ]',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '[ ${roomName} ]',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 110),
+                Container(
+                  height: 20.87,
+                  width: 1,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                const SizedBox(width: 30),
+                Text(
+                  '이용 예정',
+                  style: TextStyle(
+                    color: Color(0XFF484848),
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 13),
             const DottedLine(

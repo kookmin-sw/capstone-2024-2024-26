@@ -39,6 +39,7 @@ class _Complete extends State<Complete> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
   final int _currentIndex = 0;
+  bool roomtype = false;
   final DateTime selectedDate;
   final int startTime;
   final int endTime;
@@ -168,13 +169,7 @@ class _Complete extends State<Complete> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => Details(
-                                    selectedDate: selectedDate,
-                                    startTime: startTime,
-                                    endTime: endTime,
-                                    roomName: roomName,
-                                    table_number: table_number)),
+                            MaterialPageRoute(builder: (context) => Details()),
                           );
                         },
                         child: const Text(
