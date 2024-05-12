@@ -38,7 +38,7 @@ reserveroom.post("/", async (req, res) => {
     date,
     startTime,
     endTime,
-    usingPurpose, 
+    usingPurpose,
     studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
     signImagesEncode, // 서명이미지 인코딩된 값 리스트 형태로!(대표자 서명도 포함)
     numberOfPeople,
@@ -101,7 +101,7 @@ reserveroom.post("/", async (req, res) => {
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
       const reservationDocSnap = await getDoc(reservationDocRef);
       if (!reservationDocSnap.exists()) {
-        if (studentIds.length !== (parseInt(numberOfPeople)-1)) {
+        if (studentIds.length !== parseInt(numberOfPeople) - 1) {
           return res.status(401).json({
             error: "The number of people does not match number of students",
           });
@@ -156,7 +156,6 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
-
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
 reserveroom.get(
   "/reservationrooms/:userId/:startDate/:endDate",
@@ -208,20 +207,25 @@ reserveroom.get(
               if (reservationData) {
                 const startTime = docSnapshot.id.split("-")[0];
                 const endTime = docSnapshot.id.split("-")[1];
-
-                // 예약된 문서 정보 조회
+                // 여기 좀 수정해야함
+                if (reservationData.mainStudentId == userData.studentId) {
+                  // 예약된 문서 정보 조회
                   userReservations.push({
-                    roomName: roomName,
-                    mainName: userData.name,
-                    date: dateString,
                     startTime: startTime,
                     endTime: endTime,
-                    studentName: reservationData.studentNames,
-                    studentDepartment: reservationData.studentDepartments,
-                    studentId: reservationData.studentIds,
+                    mainName: reservationData.mainName, // 누가 대표로 예약을 했는지(책임 문제)
+                    mainFaculty: reservationData.faculty, // 대표자 소속
+                    mainStudentId: reservationData.mainStudentId, // 대표자 학번
+                    mainPhoneNumber: reservationData.mainPhoneNumber, // 대표자 전화번호
+                    mainEmail: reservationData.mainEmail, // 대표자 이메일
+                    studentName: reservationData.studentName,
+                    studentId: reservationData.studentId,
+                    studentDepartment: reservationData.studentDepartment,
                     usingPurpose: reservationData.usingPurpose,
-                    boolAgree: reservationData.boolAgree
+                    boolAgree: false,
+                    signImagesEncode: reservationData.signImagesEncode,
                   });
+                }
               }
             });
           }
@@ -282,7 +286,5 @@ reserveroom.delete("/delete", async (req, res) => {
     res.status(500).json({ error: "Failed to delete reservation" });
   }
 });
-
-
 
 export default reserveroom;
