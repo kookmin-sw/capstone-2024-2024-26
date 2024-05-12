@@ -39,10 +39,10 @@ def make_layers(cfg, in_channels = 3, batch_norm=False, dilation = False):
 
 # 이걸 이제 입력받은 이미지, 강의실 정보 가지고
 #임계값 알아서 지정 후 return 하면됨
-def count(image, info):
-
+def count(image):
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     #info = 카메라 어디껀지(자줏, 무상실등)
-    model = CSRNet()
+    model = CSRNet().to(device)
     # model_weights = torch.load('./ai/information/model.pt')
     model_weights = torch.load('./model/model.pt', map_location=torch.device('cpu'))
     model.load_state_dict(model_weights)
@@ -55,7 +55,7 @@ def count(image, info):
     ])
 
 
-    input_tensor = transform(image).unsqueeze(0)
+    input_tensor = transform(image).unsqueeze(0).to(device)
     # 배치 차원 추가
 
     # 모델을 사용한 밀도 맵 추정
@@ -67,5 +67,5 @@ def count(image, info):
     # print(f"수치: {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
     x = predicted_density_map.sum().item()
     a = round(x, 3)
-    data = {"score" : a , "info" : info}
+    data = {"score" : a}
     return data

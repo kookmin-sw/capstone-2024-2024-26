@@ -82,29 +82,83 @@ def receive_image():
 def classi():
 
     data = request.get_json()
-    if not data or 'image' not in data or 'info' not in data:
+    if not data or 'image' not in data:
         return jsonify({"error": "Invalid data"}), 400
     
     base64_image = data['image']
-    info = data['info']
+    myclass = data['class']
+    table = int(data['table'])
+    location = data['location']
+    date = data['date']
+    time = data['time']
 
-    
-    # 이 코드는 진짜 인코딩 된 값 불러 올때 사용
+    if myclass=='0':
+        a = "소프트웨어융합대학_Classroom_queue"
+        b = 'conferenceImage'
+        c = "소프트웨어융합대학_Classroom"
+    else:
+        a= "소프트웨어융합대학_Club"
+        b = 'clubRoomImage'
+
+    get_doc_ref = db.collection(a).document(location)
+    get_doc = get_doc_ref.get()
+    dd = get_doc.to_dict()
+    de_image = dd[b]
+
+    #2. 입력 이미지디코딩
+    #파베에있는 이미지
+    default_image = base64.b64decode(de_image)
+    image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
+
+
+    #입력으로 받은 이미지
     image_data = base64.b64decode(base64_image)
-    image = Image.open(io.BytesIO(image_data)).convert('RGB')
+    image2 = Image.open(io.BytesIO(image_data)).convert('RGB')
+        
+        
+    #3. classfication에 보내준 뒤 결과 받아오기
+    result = classification(image1, image2)
+
+    if result['score']==1:
+        if myclass=='0':
+            #여기서는 class에 저장
+            doc_ref = db.collection(c).document(location)
+            date_doc_ref = doc_ref.collection(date).document(time)
+            date_doc_ref.set({
+                'image': base64_image,  # 원하는 필드 이름과 값을 설정
+            }, merge=True)
+        else:
+            #여기서는 club에 저장
+            doc_ref = db.collection(a).document(location)
+            date_doc_ref = doc_ref.collection(date).document(time)
+            doc = date_doc_ref.get()
+            if doc.exists:
+                current_data = doc.to_dict()
+                if current_data:
+                    tableData = current_data.get('tableData', [])
 
 
-    result = classification(image)
-    if result['score'] ==1:
-        #이미지 인코딩해서 파베에 저장
-        # info로 파베 찾으러 가야됨
-        #이후 값 잘 왔다는 결과 보내줌
-        return 0
+                    # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
+
+                    if len(tableData) > table:
+                        if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
+                            tableData[table]['image'] = base64_image
+                        else:
+                            # table번 인덱스가 사전이 아니면 새로운 사전을 추가
+                            tableData[table] = {'image': base64_image}
+                    else:
+                        # 0번 인덱스가 없으면 새로운 사전을 추가
+                        tableData.append({'image': base64_image})
+
+                    # 수정된 배열을 다시 Firestore 문서에 저장
+                    date_doc_ref.update({
+                        'tableData': tableData
+                    })
+            else:
+                print("Document does not exist.")
+
     return jsonify(result)
 
-
-    #테스트용
-    # return render_template('display.html', result=result["score"])
 
 if __name__ == '__main__':
     #기존 코드
