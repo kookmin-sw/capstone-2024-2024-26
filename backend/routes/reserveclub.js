@@ -36,24 +36,35 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
  
   try {
     //이 데이터 웹에서 받아와서 디비에 저장해야함 .
-    const share_room_data = [{
+    // 사용자 정보 가져오기
+  const userDoc = await getDoc(doc(db, "users", uid));
 
-      'time' : '09:00-22:00',
-      'people' : "12" ,
-      'roomName' : "미래관 101호",
-    },
-    {
-      'time' : '09:00-22:00',
-      'people' : "18" ,
-      'roomName' : "복지관 101호",
-    }
-    ,{
-      'time' : '09:00-22:00',
-      'people' : "8" ,
-      'roomName' : "공학관 101호",
-    }
+  if (!userDoc.exists()) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  const userData = userDoc.data();
+
+  const collectionName = `${userData.faculty}_Club`;
+
+  const collectionRef = collection(db, collectionName);
+
+  const existDoc = query(collectionRef);
+
+  const existDocSnapShot = await getDocs(existDoc);
+
+  const share_room_data = [];
   
-  ]
+  existDocSnapShot.forEach((doc) => {
+    const existData = doc.data();
+    share_room_data.push({
+      roomName: doc.id,
+      
+      time: existData.available_Time,
+      people: existData.available_People,
+      conferenceImage: existData.conferenceImage,
+    });
+  });
+  console.log(share_room_data);
 
     // 사용자의 예약 정보 반환
     res.status(200).json({
@@ -72,24 +83,37 @@ reserveClub.post("/main_conference_room/:uid", async (req, res) => {
   const { uid } = req.body;
   
   try {
-    const share_room_data = [{
-
-      'time' : '09:00-21:00',
-      'people' : "70" ,
-      'roomName' : "미래관 611호",
-    },
-    {
-      'time' : '09:00-21:00',
-      'people' : "75" ,
-      'roomName' : "미래관 232호",
-    }
-    ,{
-      'time' : '09:00-21:00',
-      'people' : "80" ,
-      'roomName' : "미래관 424호",
-    }
   
-  ]
+  // 사용자 정보 가져오기
+  const userDoc = await getDoc(doc(db, "users", uid));
+
+  if (!userDoc.exists()) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  const userData = userDoc.data();
+
+  const collectionName = `${userData.faculty}_Classroom_queue`;
+
+  const collectionRef = collection(db, collectionName);
+
+  const existDoc = query(collectionRef);
+
+  const existDocSnapShot = await getDocs(existDoc);
+
+  const share_room_data = [];
+  
+  existDocSnapShot.forEach((doc) => {
+    const existData = doc.data();
+    share_room_data.push({
+      roomName: doc.id,
+      faculty: existData.faculty,
+      time: existData.available_Time,
+      people: existData.available_People,
+      conferenceImage: existData.conferenceImage,
+    });
+  });
+  console.log(share_room_data);
+
 
     // 사용자의 예약 정보 반환
     res.status(200).json({
@@ -239,7 +263,7 @@ reserveClub.post('/selectdate', async (req, res) => {
 
       // 예약된 시간대와 테이블 정보 반환
       res.status(200).json({
-          message: "Available reservations fetched successfully",
+          
           reservations: reservations
       });
 
@@ -250,13 +274,15 @@ reserveClub.post('/selectdate', async (req, res) => {
 });
 
 
-// 해당 날짜에 해당하는 모든 예약 내역 가져오기
+// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
 reserveClub.get(
-  "/reservationclubs/:userId/:date",
+  "/reservationclubs/:userId/:startDate/:endDate",
   async (req, res) => {
-    const date = req.params.date;
     const userId = req.params.userId;
-
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
+    
+    
     try {
       // 사용자 정보 가져오기
       const userDoc = await getDoc(doc(db, "users", userId));
@@ -269,45 +295,71 @@ reserveClub.get(
       // 컬렉션 이름 설정
       const collectionName = `${userData.faculty}_Club`;
 
-      // 해당 날짜의 모든 예약 내역 가져오기
-    const reservationsSnapshot = await getDocs(
-      query(collection(db, `${collectionName}`), where("date", "==", date))
-    );
+      // 사용자 예약 내역
+      const userReservations = [];
 
-      if (reservationsSnapshot.empty) {
-        return res
-          .status(404)
-          .json({ message: "No reservations found for this date" });
-      }
+      // 동아리방 컬렉션 참조
+      const facultyClubCollectionRef = collection(db, collectionName);
 
-      // 예약 내역 반환
-      const reservations = [];
-      reservationsSnapshot.forEach((doc) => {
-        const reservation = doc.data();
-        reservations.push({
-          id: doc.id, // 예약 문서 ID
-          userId: reservation.userId,
-          userName: reservation.userName,
-          userClub: reservation.userClub,
-          roomId: reservation.roomId,
-          date: reservation.date,
-          startTime: reservation.startTime,
-          endTime: reservation.endTime,
-          tableNumber: reservation.tableNumber,
-        });
-      });
+      const querySnapshot = await getDocs(facultyClubCollectionRef);
 
-      // 해당 날짜의 모든 예약 내역 반환
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+       
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+           
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+            
+        
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+             
+              if (reservationData && reservationData.tableData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+           
+                // 예약된 테이블 정보 조회
+                reservationData.tableData.forEach((table) => {
+                  if (table.studentId === userData.studentId) {
+                    userReservations.push({
+                      roomName: roomName,
+                      date: dateString,
+                      startTime: startTime,
+                      endTime: endTime,
+                      tableData: table,
+                    });
+                  }
+                });
+              }
+            });
+          }
+          
+        })
+      );
+
+      // 사용자 예약 내역 반환
       res.status(200).json({
-        message: "Reservations for the date fetched successfully",
-        reservations,
+        message: "User reservations fetched successfully",
+        reservations: userReservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
-      console.error("Error fetching reservations for the date", error);
-      res
-        .status(500)
-        .json({ error: "Failed to fetch reservations for the date" });
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
     }
   }
 );
