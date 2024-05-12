@@ -182,7 +182,7 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
 
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
 adminRoom.get(
-  "/reservations/:faculty/:startDate/:endDate",
+  "/reservations/:faculty/:startDate/:endDate", isAdmin,
   async (req, res) => {
     const faculty = req.params.faculty;
     const startDate = new Date(req.params.startDate);
@@ -192,23 +192,61 @@ adminRoom.get(
       // 컬렉션 이름 설정
       const collectionName = `${faculty}_Classroom`;
 
+      // 사용자 예약 내역
+      const userReservations = [];
+
       // 강의실 컬렉션 참조
       const facultyConferenceCollectionRef = collection(db, collectionName);
 
-      // 강의실 이름의 문서 가져오기
-      const docSnapshot = await getDocs(facultyConferenceCollectionRef);
+      const querySnapshot = await getDocs(facultyConferenceCollectionRef);
 
-      console.log(docSnapshot);
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
 
-      docSnapshot.docs.forEach((doc) => {
-        const roomName = doc.id;
-        console.log(roomName);
-      });
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                // 예약된 문서 정보 조회
+                  userReservations.push({
+                    roomName: roomName,
+                    mainName: reservationData.mainName,
+                    date: dateString,
+                    startTime: startTime,
+                    endTime: endTime,
+                    studentName: reservationData.studentNames,
+                    studentDepartment: reservationData.studentDepartments,
+                    studentId: reservationData.studentIds,
+                    usingPurpose: reservationData.usingPurpose,
+                    boolAgree: reservationData.boolAgree
+                  });
+              }
+            });
+          }
+        })
+      );
 
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
-        // reservations: reservations,
+        reservations: userReservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
