@@ -73,6 +73,7 @@ adminInquiry.post("/", isAdmin, async (req, res) => {
     await updateDoc(inquiryDocRef, {
       response: response,
       responseDate: responseDate,
+      responseStatus: true
     });
     res.status(200).json({
       message: "Administrator inquiry did response fetched successfully"
