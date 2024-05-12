@@ -231,9 +231,9 @@ adminRoom.get(
                     date: dateString,
                     startTime: startTime,
                     endTime: endTime,
-                    studentName: reservationData.studentNames,
-                    studentDepartment: reservationData.studentDepartments,
-                    studentId: reservationData.studentIds,
+                    studentName: reservationData.studentName,
+                    studentDepartment: reservationData.studentDepartment,
+                    studentId: reservationData.studentId,
                     usingPurpose: reservationData.usingPurpose,
                     boolAgree: reservationData.boolAgree
                   });
