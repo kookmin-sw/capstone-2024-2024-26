@@ -169,7 +169,12 @@ class _Complete extends State<Complete> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Details()),
+                                builder: (context) => Details(
+                                    selectedDate: selectedDate,
+                                    startTime: startTime,
+                                    endTime: endTime,
+                                    roomName: roomName,
+                                    table_number: table_number)),
                           );
                         },
                         child: const Text(

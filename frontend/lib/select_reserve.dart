@@ -40,6 +40,7 @@ class _select extends State<Select_reserve> {
 
   final ExpansionTileController controller = ExpansionTileController();
   bool timeSelected = false; // 시간 선택 상태를 추적하는 변수
+  int timeIndex = 0; // 선택된 시간대의 인덱스를 저장하는 변수
   String startTime = ''; //server
   String endTime = '';
   String room_name = '';
@@ -62,6 +63,7 @@ class _select extends State<Select_reserve> {
 
   List<bool> updatedIsButtonPressedList =
       List.generate(16, (index) => false); //시간 차있는지 확인
+  bool timeslot = false;
 
 // tablelist는 서버에서 받아온 데이터로 대체
   List<dynamic> tableList = [
@@ -144,8 +146,11 @@ class _select extends State<Select_reserve> {
         updatedIsButtonPressedList[startIndex] = true;
       }
 
+      if (updatedIsButtonPressedList.every((element) => element == true)) {
+        timeslot = true;
+      }
+
       timeTableStatus[startIndex] = updatedIsButtonPressedTable;
-      return timeTableStatus;
     }
   }
 
@@ -184,6 +189,7 @@ class _select extends State<Select_reserve> {
         // 서버 응답이 성공적인 경우
 
         reservations = json.decode(response.body);
+
         _checkReservation(reservations);
       } else {
         // 서버 에러 처리
@@ -396,11 +402,17 @@ class _select extends State<Select_reserve> {
                         ),
 
                         // 캘린더에서 날짜가 선택될때 이벤트
-                        onDaySelected: (selectedDay, focusedDay) {
+                        onDaySelected: (selectedDay, focusedDay) async {
+                          // 서버로부터 데이터를 받아온 후에 상태를 업데이트
+                          await sendSelectedDateToServer(
+                              selectedDay); // 선택된 날짜를 서버로 전송하고 응답을 기다립니다.
                           setState(() {
                             selectedDate = selectedDay; // 날짜 상태 업데이트
-                            sendSelectedDateToServer(
-                                selectedDate); // 선택된 날짜를 서버로 전송
+                            isButtonPressedList =
+                                List.generate(16, (index) => false);
+                            isButtonPressedTable =
+                                List.generate(16, (index) => false);
+                            setting = 0;
                           });
                         },
                         selectedDayPredicate: (date) {
@@ -499,9 +511,7 @@ class _select extends State<Select_reserve> {
                             16,
                             (index) {
                               int hour = index + 9;
-
-                              sendSelectedDateToServer(selectedDate);
-
+                              //sendSelectedDateToServer(selectedDate);
                               if (updatedIsButtonPressedList[index] == true) {
                                 return Padding(
                                   padding: EdgeInsets.zero,
@@ -531,7 +541,7 @@ class _select extends State<Select_reserve> {
                                             ),
                                             child: const Text('마감',
                                                 style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: Colors.black,
                                                   fontSize: 8,
                                                   fontFamily: 'Inter',
                                                   fontWeight: FontWeight.bold,
@@ -599,8 +609,11 @@ class _select extends State<Select_reserve> {
                                                   }
                                                   timeSelected =
                                                       true; // 시간이 선택되었음을 나타냄
+                                                  timeIndex =
+                                                      index; // 선택된 시간대의 인덱스 저장
                                                 } else {
                                                   timeSelected = false;
+                                                  timeIndex = -1;
                                                   setting -= 1;
                                                   ed = 0;
                                                   if (setting == 0) {
@@ -710,6 +723,8 @@ class _select extends State<Select_reserve> {
                             return _CustomTableWidget(
                               isButtonPressedTable: isButtonPressedTable,
                               timeSelected: timeSelected,
+                              timeIndex: timeIndex,
+                              timeTableStatus: timeTableStatus,
                               onTablePressed: (index) {
                                 setState(() {
                                   isButtonPressedTable[index] =
@@ -1046,6 +1061,8 @@ class _CustomTableWidget extends StatefulWidget {
   final List<bool> isButtonPressedTable;
 
   final bool timeSelected;
+  final int timeIndex;
+  final Map<int, List<bool>> timeTableStatus;
   final int tableIndex; // 테이블의 인덱스
   final ValueSetter<int> onTablePressed;
   final List<dynamic> tableList;
@@ -1053,6 +1070,8 @@ class _CustomTableWidget extends StatefulWidget {
     Key? key,
     required this.isButtonPressedTable,
     required this.timeSelected,
+    required this.timeIndex,
+    required this.timeTableStatus,
     required this.onTablePressed,
     required this.tableIndex,
     required this.tableList,
@@ -1076,11 +1095,14 @@ class _CustomTableWidgetState extends State<_CustomTableWidget> {
         children: [
           // 버튼을 Row 내에 포함
           ElevatedButton(
-            onPressed: widget.timeSelected
+            onPressed: widget.timeSelected &&
+                    !(widget.timeTableStatus[widget.timeIndex]
+                            ?[widget.tableIndex] ??
+                        false)
                 ? () {
                     widget.onTablePressed(widget.tableIndex);
                   }
-                : null, // timeSelected가 true일 때만 버튼 활성화
+                : null, // timeSelected가 true이고 해당 테이블이 예약되지 않았을 때만 활성화
             style: ElevatedButton.styleFrom(
               backgroundColor: widget.isButtonPressedTable[widget.tableIndex]
                   ? const Color(0xFF004F9E)
@@ -1090,11 +1112,15 @@ class _CustomTableWidgetState extends State<_CustomTableWidget> {
               elevation: 0.0,
             ),
             child: Text(
-              'T${widget.tableIndex + 1}', // 테이블 번호 표시
+              widget.timeTableStatus[widget.timeIndex]?[widget.tableIndex] ??
+                      false
+                  ? '마감'
+                  : 'T${widget.tableIndex + 1}',
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
+                color: Colors.black,
+                fontSize: 10,
                 fontFamily: 'Inter',
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

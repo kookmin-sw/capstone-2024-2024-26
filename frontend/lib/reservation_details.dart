@@ -8,13 +8,45 @@ import 'congestion.dart';
 import 'notice.dart';
 
 class Details extends StatefulWidget {
-  const Details({super.key});
+  final DateTime? selectedDate;
+  final int? startTime;
+  final int? endTime;
+  final String? roomName;
+  final String? table_number;
+
+  const Details(
+      {Key? key,
+      this.selectedDate,
+      this.startTime,
+      this.endTime,
+      this.roomName,
+      this.table_number})
+      : super(key: key);
 
   @override
-  _Details createState() => _Details();
+  State<StatefulWidget> createState() => _Details(
+        selectedDate: selectedDate,
+        startTime: startTime,
+        endTime: endTime,
+        roomName: roomName,
+        table_number: table_number,
+      );
 }
 
 class _Details extends State<Details> {
+  final DateTime? selectedDate;
+  final int? startTime;
+  final int? endTime;
+  final String? roomName;
+  final String? table_number;
+
+  _Details({
+    this.selectedDate,
+    this.startTime,
+    this.endTime,
+    this.roomName,
+    this.table_number,
+  });
   bool isLent = false;
 
   @override
@@ -172,8 +204,8 @@ class _Details extends State<Details> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 13),
-            const Text(
-              '[ 미래관 610호 ]',
+            Text(
+              '[ ${roomName} ]',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
@@ -196,12 +228,12 @@ class _Details extends State<Details> {
               dashGapRadius: 0.0,
             ),
             const SizedBox(height: 30),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '날짜  2024.3.19(화)',
+                  '날짜  ${selectedDate?.year}.${selectedDate?.month}.${selectedDate?.day}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF004F9E),
@@ -214,12 +246,12 @@ class _Details extends State<Details> {
               ),
             ),
             const SizedBox(height: 20),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '오후  12:00~15:00  |  좌석 T1',
+                  '${startTime}:00~${endTime}:00  |  좌석 T${table_number}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF7C7C7C),
@@ -260,25 +292,6 @@ class _Details extends State<Details> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () => FlutterDialog("예약을 변경하시겠습니까 ?", "변경하기"),
-                    child: const Text(
-                      '예약 변경',
-                      style: TextStyle(
-                        color: Color(0xFF8E8E8E),
-                        fontSize: 13,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 60),
-                  Container(
-                    height: 34.74,
-                    width: 1,
-                    color: Colors.grey.withOpacity(0.2),
-                  ),
-                  const SizedBox(width: 60),
                   TextButton(
                     onPressed: () => FlutterDialog("예약을 취소하시겠습니까 ?", "예약 취소"),
                     child: const Text(
