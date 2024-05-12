@@ -131,7 +131,6 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index].returnStatus = false;
           reservationData.tableData[index].entranceStatus = false;
 
-
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
           });
@@ -412,6 +411,83 @@ reserveClub.get("/future/reservations/:userId", async (req, res) => {
     // 오류 발생 시 오류 응답
     console.error("Error fetching user future reservations", error);
     res.status(500).json({ error: "Failed to fetch user future reservations" });
+  }
+});
+
+reserveClub.post("/entrance", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Club`;
+
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists" });
+    }
+    const facultyClubCollection = collection(db, collectionName);
+    const clubRoomDoc = doc(facultyClubCollection, roomName);
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
+    }
+
+    const dateCollection = collection(clubRoomDoc, date);
+
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        return res
+          .status(400)
+          .json({ error: "The reservation club room does not exist" });
+      } else {
+        // 해당 시간대의 문서가 존재할 때
+        const reservationData = reservationDocSnap.data();
+
+        // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
+        // 특정 테이블 번호를 true로 설정합니다.
+        const index = parseInt(tableNumber) - 1;
+        if (reservationData.tableData[index][`T${tableNumber}`] === true) {
+          // 해당 테이블에 대해 name과 studentId도 업데이트
+          reservationData.tableData[index].entranceStatus = true;
+
+          await updateDoc(reservationDocRef, {
+            tableData: reservationData.tableData,
+          });
+        }
+      }
+    }
+    res.status(200).json({
+      message: "Entrancing club room successfully"
+    });
+  } catch (error) {
+    console.error("Error entrancing reservation club room");
+    res.status(500).json({ error: "Failed to entrance reservation club room" });
   }
 });
 export default reserveClub;
