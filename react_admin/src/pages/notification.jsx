@@ -3,6 +3,7 @@ import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/notification.css';
 
+//알림관리 관리자 웹
 const Notification = () => {
     return (
         <div className="main-container">

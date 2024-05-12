@@ -4,6 +4,8 @@ import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/inquiry.css';
 
+
+//문의관리 관리자 웹
 const Inquiry = () => {
   const [searchDate, setSearchDate] = useState('');
   const [inquiries, setInquiries] = useState([]);

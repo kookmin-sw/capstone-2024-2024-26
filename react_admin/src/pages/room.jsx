@@ -1,8 +1,10 @@
 import React from 'react';
+import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/notification.css';
 
+//구현 기능 : 강의실 예약내역불러오기, 강의실 신청 승인, 강의실 예약 삭제, 
 const Room = () => {
     return (
         <div className="main-container">

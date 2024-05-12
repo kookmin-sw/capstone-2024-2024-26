@@ -230,7 +230,7 @@ adminClub.post(
 );
 
 // 관리자 동아리방 설정 생성
-adminClub.post("/create/room", async (req, res) => {
+adminClub.post("/create/room", isAdmin, async (req, res) => {
   const {
     faculty,
     roomName,
@@ -268,25 +268,25 @@ adminClub.post("/create/room", async (req, res) => {
   }
 });
 
+// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
 adminClub.get(
-  "/reservations/:startDate/:endDate",
-  isAdmin,
+  "/reservationclubs/:faculty/:startDate/:endDate",
   async (req, res) => {
-    const { faculty } = req.body;
+    const faculty = req.params.faculty;
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
 
     try {
-      const collectionName = `${faculty}_Classroom`;
+      // 컬렉션 이름 설정
+      const collectionName = `${faculty}_Club`;
 
-      // 각 단과대별 강의실 컬렉션
-      const facultyConferenceCollcetion = collection(db, collectionName);
+      // 사용자 예약 내역
+      const userReservations = [];
 
-      // 해당 컬렉션의 모든 문서 가져오기
-      const querySnapshot = await getDocs(facultyConferenceCollcetion);
+      // 동아리방 컬렉션 참조
+      const facultyClubCollectionRef = collection(db, collectionName);
 
-      // 모든 문서 데이터를 저장할 배열
-      const allDocData = [];
+      const querySnapshot = await getDocs(facultyClubCollectionRef);
 
       // 비동기 처리를 위해 Promise.all 사용
       await Promise.all(
@@ -308,22 +308,22 @@ adminClub.get(
 
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
-              if (reservationData) {
+              if (reservationData && reservationData.tableData) {
                 const startTime = docSnapshot.id.split("-")[0];
                 const endTime = docSnapshot.id.split("-")[1];
 
-                // 예약된 문서 정보 조회
-                allDocData.push({
-                  roomName: roomName,
-                  mainName: reservationData.mainName,
-                  date: dateString,
-                  startTime: startTime,
-                  endTime: endTime,
-                  studentName: reservationData.studentNames,
-                  studentDepartment: reservationData.studentDepartments,
-                  studentId: reservationData.studentIds,
-                  usingPurpose: reservationData.usingPurpose,
-                  boolAgree: reservationData.boolAgree,
+                console.log(reservationData.tableData);
+                // 예약된 테이블 정보 조회
+                reservationData.tableData.forEach((table) => {
+                  if (table.studentId) {
+                    userReservations.push({
+                      roomName: roomName,
+                      date: dateString,
+                      startTime: startTime,
+                      endTime: endTime,
+                      tableData: table,
+                    });
+                  }
                 });
               }
             });
@@ -333,15 +333,13 @@ adminClub.get(
 
       // 사용자 예약 내역 반환
       res.status(200).json({
-        message: "Administrator reservations fetched successfully",
-        reservations: allDocData,
+        message: "User reservations fetched successfully",
+        reservations: userReservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
-      console.error("Error fetching Administrator reservations", error);
-      res
-        .status(500)
-        .json({ error: "Failed to fetch administrator reservations" });
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
     }
   }
 );
@@ -389,7 +387,7 @@ adminClub.get("/clubRoomInfo/:faculty", async (req, res) => {
 });
 
 // 동아리방 정보 삭제
-adminClub.delete("/delete/clubRoomInfo", async (req, res) => {
+adminClub.delete("/delete/clubRoomInfo", isAdmin, async (req, res) => {
   const { faculty, roomName } = req.body;
 
   try {
