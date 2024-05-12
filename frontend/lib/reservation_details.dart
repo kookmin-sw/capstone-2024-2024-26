@@ -9,6 +9,7 @@ import 'congestion.dart';
 import 'notice.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 class Details extends StatefulWidget {
   const Details({
@@ -22,6 +23,7 @@ class Details extends StatefulWidget {
 class _Details extends State<Details> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now().add(Duration(days: 14)); // 현재로부터 14일 후
+
   String userId = '';
   @override
   void initState() {
@@ -41,7 +43,7 @@ class _Details extends State<Details> {
 
     final url =
         'http://localhost:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
-    print(url);
+
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -49,7 +51,7 @@ class _Details extends State<Details> {
         // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
         print(data['reservations']);
-        print('sival');
+
         return data['reservations'];
       } else {
         // 서버로부터 오류 응답을 받았을 때
@@ -125,7 +127,18 @@ class _Details extends State<Details> {
               ),
             ),
             const Padding(padding: EdgeInsets.only(bottom: 10)),
-            _buildReservationItem(),
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 1,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _buildReservationItem(),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 20),
             const DottedLine(
               direction: Axis.horizontal,
@@ -155,7 +168,18 @@ class _Details extends State<Details> {
               ),
             ),
             const Padding(padding: EdgeInsets.only(bottom: 10)),
-            _buildUsageHistoryItem(),
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 1,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _buildUsageHistoryItem(),
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -215,6 +239,10 @@ class _Details extends State<Details> {
   }
 
   Widget _buildReservationItem() {
+    bool showEntryButton =
+        now.isAfter(startDate.subtract(Duration(minutes: 10))) &&
+            now.isBefore(endDate.add(Duration(minutes: 10)));
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -305,23 +333,39 @@ class _Details extends State<Details> {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () => FlutterDialog("입장하시겠습니까?", "입장하기"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF004F9E),
-                minimumSize: const Size(330.11, 57.06),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+                onPressed: () {
+                  EnterDialog("입장하시겠습니까?", "입장하기");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF004F9E),
+                  minimumSize: const Size(330.11, 57.06),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-              ),
-              child: Text(
-                isLent ? '반납하기' : '입장하기',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+                child: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 15, // 기본 폰트 크기
+                      fontFamily: 'Inter', // 폰트 스타일
+                      fontWeight: FontWeight.w700, // 폰트 두께
+                      color: Colors.white, // 기본 색상
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: isLent ? '        반납하기 \n' : '입장하기',
+                      ),
+                      if (isLent)
+                        TextSpan(
+                          text: '남은 이용시간 $_remainingTime', // 남은 시간 변수
+                          style: const TextStyle(
+                            fontSize: 12, // 남은 시간 폰트 크기
+                            fontWeight: FontWeight.w500, // 남은 시간 폰트 두께
+                          ),
+                        ),
+                    ],
+                  ),
+                )),
             const SizedBox(height: 15),
             Container(
               height: 1,
@@ -520,6 +564,7 @@ class _Details extends State<Details> {
                           )),
                       onPressed: () {
                         Navigator.pop(context);
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => Return()),
@@ -534,5 +579,123 @@ class _Details extends State<Details> {
         );
       },
     );
+  }
+
+  void EnterDialog(String text, String text2) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          backgroundColor: Colors.white,
+          content: SizedBox(
+            width: 359.39,
+            height: 45.41,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 15.0,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 1,
+                  width: 350,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                Row(
+                  children: [
+                    const SizedBox(width: 35),
+                    TextButton(
+                      child: const Text("돌아가기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          )),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 35),
+                    Container(
+                      height: 34.74,
+                      width: 1,
+                      color: Colors.grey.withOpacity(0.2),
+                    ),
+                    const SizedBox(width: 50),
+                    TextButton(
+                      child: Text(text2,
+                          style: const TextStyle(
+                            color: Color(0XFF004F9E),
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          )),
+                      onPressed: () {
+                        Navigator.pop(context);
+
+                        isLent = true;
+                        startEntryTimer();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Timer? _timer;
+  String _remainingTime = '00:00:00'; // 시, 분, 초 형태로 초기화
+
+  DateTime now = DateTime.now();
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void startEntryTimer() {
+    DateTime endTime =
+        DateTime.now().add(Duration(hours: 2)); // 예약 종료 시간, 예시로 2시간 후 설정
+    int seconds = endTime.difference(DateTime.now()).inSeconds;
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (seconds > 0) {
+          seconds--;
+          int hours = seconds ~/ 3600;
+          int minutes = (seconds % 3600) ~/ 60;
+          int second = seconds % 60;
+          _remainingTime =
+              '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${second.toString().padLeft(2, '0')}';
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 }

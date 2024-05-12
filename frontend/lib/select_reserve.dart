@@ -118,9 +118,21 @@ class _select extends State<Select_reserve> {
   _checkReservation(
     Map<String, dynamic> reservations,
   ) async {
+    if (reservations['reservations'].isEmpty) {
+      updatedIsButtonPressedList =
+          List.generate(16, (index) => false); //시간 차있는지 확인
+
+      List<bool> updatedIsButtonPressedTable =
+          List.generate(tableList.length, (index) => false); // 테이블 차있는지 확인
+      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
+        timeTableStatus[i] = List.generate(tableList.length, (index) => false);
+      }
+      return;
+    }
     for (var reservation in reservations['reservations']) {
       updatedIsButtonPressedList =
           List.generate(16, (index) => false); //시간 차있는지 확인
+
       List<bool> updatedIsButtonPressedTable = List.generate(
           reservation['tables'].length, (index) => false); // 테이블 차있는지 확인
       String timeRange = reservation['timeRange'];
@@ -175,7 +187,7 @@ class _select extends State<Select_reserve> {
         'userId': uid!,
         'roomName': roomName,
         'date':
-            '${selectedDate.year}-${selectedDate.month}-${selectedDate.day}',
+            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
       };
 
       final response = await http.post(
