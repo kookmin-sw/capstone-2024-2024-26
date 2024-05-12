@@ -270,10 +270,10 @@ adminClub.post("/create/room", isAdmin, async (req, res) => {
 
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
 adminClub.get(
-  "/reservationclubs/:startDate/:endDate",
+  "/reservationclubs/:faculty/:startDate/:endDate",
   isAdmin,
   async (req, res) => {
-    const {faculty} = req.body;
+    const faculty = req.params.faculty;
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
 
