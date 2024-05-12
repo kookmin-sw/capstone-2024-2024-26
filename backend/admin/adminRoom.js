@@ -101,8 +101,6 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
 
     const collectionName = `${userData.faculty}_Classroom_queue`;
 
-    const collectionNameConference = `${userData.faculty}_Classroom`;
-
     const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
 
     if (!existDocSnapShot.exists()) {
@@ -110,12 +108,7 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
       return res.status(404).json({ error: "This Classroom does not exists" });
     }
     const facultyConferenceCollectionQueue = collection(db, collectionName);
-    const facultyConferenceCollcetion = collection(
-      db,
-      collectionNameConference
-    );
 
-    const conferenceRoomDoc = doc(facultyConferenceCollcetion, roomName);
     const conferenceRoomDocQueue = doc(
       facultyConferenceCollectionQueue,
       roomName
@@ -130,8 +123,10 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
       });
     }
 
-    const dateCollection = collection(conferenceRoomDoc, date);
-    const dateCollectionQueue = collection(conferenceRoomDocQueue, date);
+    const dateCollectionQueue = collection(
+      db,
+      `${collectionName}/${roomName}/${date}`
+    );
 
     const startTimeParts = startTime.split(":");
     const startTimeHour = parseInt(startTimeParts[0]);
@@ -145,8 +140,17 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
       return res.status(402).json({ error: "Unvaild startTime and endTime" });
     }
 
+    const data = [];
+
+    await setDoc(doc(db, `${userData.faculty}_Classroom`, roomName), {});
+
+    const roomDocRef = doc(db, `${userData.faculty}_Classroom`, roomName);
+
+    const dateCollection = collection(roomDocRef, date);
+
     for (let i = startTimeHour; i < endTimeHour; i++) {
       const reservationDocRefQueue = doc(dateCollectionQueue, `${i}-${i + 1}`);
+
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
 
       const reservationDocSnap = await getDoc(reservationDocRefQueue);
@@ -156,16 +160,17 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
         if (!reservationData.boolAgree) {
           await updateDoc(reservationDocRefQueue, { boolAgree: true });
 
-          const reservationDocDataSnap = await getDoc(reservationDocRefQueue);
-          const reservationData = reservationDocDataSnap.data();
+          const reservationDocSnapLast = await getDoc(reservationDocRefQueue);
+          const reservationDataLast = reservationDocSnapLast.data();
+          data.push(reservationDataLast);
 
-          await setDoc(reservationDocRef, reservationData);
-
-          await deleteDoc(reservationDocRefQueue);
+          // 해당 시간대의 데이터를 컬렉션에 저장
+          
+          await setDoc(reservationDocRef, reservationDataLast);
         }
       }
     }
-
+    console.log(data);
     res
       .status(200)
       .json({ message: "Agree Conference reservation successfully" });
@@ -175,80 +180,40 @@ adminRoom.post("/agree", isAdmin, async (req, res) => {
   }
 });
 
+// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
 adminRoom.get(
-  "/reservations/:startDate/:endDate",
-  isAdmin,
+  "/reservations/:faculty/:startDate/:endDate",
   async (req, res) => {
-    const { faculty } = req.body;
+    const faculty = req.params.faculty;
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
 
     try {
+      // 컬렉션 이름 설정
       const collectionName = `${faculty}_Classroom`;
 
-      // 각 단과대별 강의실 컬렉션
-      const facultyConferenceCollcetion = collection(db, collectionName);
+      // 강의실 컬렉션 참조
+      const facultyConferenceCollectionRef = collection(db, collectionName);
 
-      // 해당 컬렉션의 모든 문서 가져오기
-      const querySnapshot = await getDocs(facultyConferenceCollcetion);
+      // 강의실 이름의 문서 가져오기
+      const docSnapshot = await getDocs(facultyConferenceCollectionRef);
 
-      // 모든 문서 데이터를 저장할 배열
-      const allDocData = [];
+      console.log(docSnapshot);
 
-      // 비동기 처리를 위해 Promise.all 사용
-      await Promise.all(
-        querySnapshot.docs.map(async (roomDoc) => {
-          const roomName = roomDoc.id;
-          for (
-            let currentDate = new Date(startDate);
-            currentDate <= new Date(endDate);
-            currentDate.setDate(currentDate.getDate() + 1)
-          ) {
-            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
-            const dateCollectionRef = collection(
-              db,
-              `${collectionName}/${roomName}/${dateString}`
-            ); // 컬렉션 참조 생성
-
-            // 해당 날짜별 시간 대 예약 내역 조회
-            const timeDocSnapshot = await getDocs(dateCollectionRef);
-
-            timeDocSnapshot.forEach((docSnapshot) => {
-              const reservationData = docSnapshot.data();
-              if (reservationData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
-
-                // 예약된 문서 정보 조회
-                allDocData.push({
-                  roomName: roomName,
-                  mainName: reservationData.mainName,
-                  date: dateString,
-                  startTime: startTime,
-                  endTime: endTime,
-                  studentName: reservationData.studentNames,
-                  studentDepartment: reservationData.studentDepartments,
-                  studentId: reservationData.studentIds,
-                  usingPurpose: reservationData.usingPurpose,
-                  boolAgree: reservationData.boolAgree,
-                });
-              }
-            });
-          }
-        })
-      );
+      docSnapshot.docs.forEach((doc) => {
+        const roomName = doc.id;
+        console.log(roomName);
+      });
 
       // 사용자 예약 내역 반환
       res.status(200).json({
-        message: "Administrator reservations fetched successfully",
-        reservations: allDocData,
+        message: "User reservations fetched successfully",
+        // reservations: reservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
-      console.error("Error fetching Administrator reservations", error);
-      res
-        .status(500)
-        .json({ error: "Failed to fetch administrator reservations" });
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
     }
   }
 );
@@ -319,7 +284,7 @@ adminRoom.delete("/delete/conferenceInfo", isAdmin, async (req, res) => {
   }
 });
 
-// 강의실 예약 
+// 강의실 예약
 adminRoom.post("/reserve", isAdmin, async (req, res) => {
   const {
     userId,
@@ -327,7 +292,7 @@ adminRoom.post("/reserve", isAdmin, async (req, res) => {
     date,
     startTime,
     endTime,
-    usingPurpose, 
+    usingPurpose,
     studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
     numberOfPeople,
   } = req.body;
@@ -344,8 +309,7 @@ adminRoom.post("/reserve", isAdmin, async (req, res) => {
 
     const facultyConferenceCollection = collection(db, collectionName);
     const conferenceRoomDoc = doc(facultyConferenceCollection, roomName);
-    
-    
+
     const dateCollection = collection(conferenceRoomDoc, date);
 
     const startTimeParts = startTime.split(":");
@@ -377,7 +341,7 @@ adminRoom.post("/reserve", isAdmin, async (req, res) => {
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
       const reservationDocSnap = await getDoc(reservationDocRef);
       if (!reservationDocSnap.exists()) {
-        if (studentIds.length !== (parseInt(numberOfPeople)-1)) {
+        if (studentIds.length !== parseInt(numberOfPeople) - 1) {
           return res.status(401).json({
             error: "The number of people does not match number of students",
           });
@@ -421,13 +385,15 @@ adminRoom.post("/reserve", isAdmin, async (req, res) => {
     }
 
     // 예약 성공 시 응답
-    res
-      .status(201)
-      .json({ message: "Administrator reservation Conference created successfully" });
+    res.status(201).json({
+      message: "Administrator reservation Conference created successfully",
+    });
   } catch (error) {
     // 오류 발생 시 오류 응답
     console.error("Error administrator reserve conference room", error);
-    res.status(500).json({ error: "Failed to administrator reserve conference room" });
+    res
+      .status(500)
+      .json({ error: "Failed to administrator reserve conference room" });
   }
 });
 
