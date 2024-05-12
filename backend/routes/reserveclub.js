@@ -295,4 +295,118 @@ reserveClub.post("/delete", async (req, res) => {
   }
 });
 
+// 이용 예정 내역
+reserveClub.get("/future/reservations/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    // 컬렉션 이름 설정
+    const collectionName = `${userData.faculty}_Club`;
+
+    // 사용자 예약 내역
+    const userReservations = [];
+
+    // 동아리방 컬렉션 참조
+    const facultyClubCollectionRef = collection(db, collectionName);
+
+    const querySnapshot = await getDocs(facultyClubCollectionRef);
+
+    // 비동기 처리를 위해 Promise.all 사용
+    await Promise.all(
+      querySnapshot.docs.map(async (roomDoc) => {
+        const roomName = roomDoc.id;
+        const offset = 1000 * 60 * 60 * 9;
+        const koreaNow = new Date(new Date().getTime() + offset);
+
+        let endDate = new Date();
+        endDate.setDate(koreaNow.getDate() + 14);
+
+        const currentDate = koreaNow.toISOString().split("T")[0];
+        for (; koreaNow <= endDate; koreaNow.setDate(koreaNow.getDate() + 1)) {
+          const dateString = koreaNow.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+
+          if (currentDate == dateString) {
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData && reservationData.tableData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                if (parseInt(startTime) > koreaNow.getHours()) {
+                  // 예약된 테이블 정보 조회
+                  reservationData.tableData.forEach((table) => {
+                    if (table.studentId === userData.studentId) {
+                      userReservations.push({
+                        roomName: roomName,
+                        date: dateString,
+                        startTime: startTime,
+                        endTime: endTime,
+                        tableData: table,
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          } else {
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData && reservationData.tableData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+                // 예약된 테이블 정보 조회
+                reservationData.tableData.forEach((table) => {
+                  if (table.studentId === userData.studentId) {
+                    userReservations.push({
+                      roomName: roomName,
+                      date: dateString,
+                      startTime: startTime,
+                      endTime: endTime,
+                      tableData: table,
+                    });
+                  }
+                });
+              }
+            });
+          }
+        }
+      })
+    );
+
+    // 사용자 예약 내역 반환
+    res.status(200).json({
+      message: "User future reservations fetched successfully",
+      reservations: userReservations,
+    });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error fetching user future reservations", error);
+    res.status(500).json({ error: "Failed to fetch user future reservations" });
+  }
+});
 export default reserveClub;
