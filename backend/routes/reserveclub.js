@@ -108,6 +108,8 @@ reserveClub.post("/", async (req, res) => {
           if (j === parseInt(tableNumber)) {
             tableInfo.name = userData.name;
             tableInfo.studentId = userData.studentId;
+            tableInfo.returnStatus = false;
+            tableInfo.entranceStatus = false;
           }
           tableData.push(tableInfo);
         }
@@ -126,6 +128,9 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index][`T${tableNumber}`] = true;
           reservationData.tableData[index].name = userData.name;
           reservationData.tableData[index].studentId = userData.studentId;
+          reservationData.tableData[index].returnStatus = false;
+          reservationData.tableData[index].entranceStatus = false;
+
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
