@@ -10,6 +10,7 @@ import 'notice.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'loading.dart';
 
 class Details extends StatefulWidget {
   const Details({
@@ -23,8 +24,10 @@ class Details extends StatefulWidget {
 class _Details extends State<Details> with WidgetsBindingObserver {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now().add(Duration(days: 14)); // 현재로부터 14일 후
-
+  List<dynamic> reservations = [];
   String userId = '';
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +39,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       String userId, DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
-
+    setState(() {
+      isLoading = true;
+    });
     String formattedStartDate =
         "${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}";
     String formattedEndDate =
@@ -51,7 +56,11 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       if (response.statusCode == 200) {
         // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
-        print(data['reservations']);
+
+        setState(() {
+          isLoading = false;
+          reservations = data['reservations'];
+        });
 
         return data['reservations'];
       } else {
@@ -73,173 +82,178 @@ class _Details extends State<Details> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '예약 내역',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: Container(),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyNotice()),
-              );
-            },
-            icon: SvgPicture.asset('assets/icons/notice_none.svg'),
-          ),
-        ],
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-        bottomOpacity: 0.0,
-        elevation: 0.0,
-        scrolledUnderElevation: 0,
-        shape: const Border(
-          bottom: BorderSide(
-            color: Colors.grey,
-            width: 0.5,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Padding(padding: EdgeInsets.only(top: 20)),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.only(left: 30),
-                child: Text(
-                  '이용 예정',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0XFF004F9E),
-                  ),
-                ),
-              ),
+    if (isLoading) {
+      return const LoadingScreen();
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            '예약 내역',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.bold,
             ),
-            const Padding(padding: EdgeInsets.only(bottom: 10)),
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: 1,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _buildReservationItem(),
-                  ],
+          ),
+          leading: Container(),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyNotice()),
                 );
               },
-            ),
-            const SizedBox(height: 20),
-            const DottedLine(
-              direction: Axis.horizontal,
-              alignment: WrapAlignment.center,
-              lineLength: 350,
-              lineThickness: 0.5,
-              dashLength: 3.0,
-              dashColor: Colors.grey,
-              dashRadius: 0.0,
-              dashGapLength: 6.0,
-              dashGapColor: Colors.transparent,
-              dashGapRadius: 0.0,
-            ),
-            const Padding(padding: EdgeInsets.only(top: 20)),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.only(left: 30),
-                child: Text(
-                  '이용 내역',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 10)),
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: 1,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _buildUsageHistoryItem(),
-                  ],
-                );
-              },
+              icon: SvgPicture.asset('assets/icons/notice_none.svg'),
             ),
           ],
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.black,
+          bottomOpacity: 0.0,
+          elevation: 0.0,
+          scrolledUnderElevation: 0,
+          shape: const Border(
+            bottom: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
+          ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 2,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MainPage()),
-              );
-              break;
-            case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Congestion()),
-              );
-              break;
-            case 2:
-              break;
-            case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyPage()),
-              );
-              break;
-          }
-        },
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/lent_off.svg'),
-            label: '공간대여',
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Padding(padding: EdgeInsets.only(top: 20)),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 30),
+                  child: Text(
+                    '이용 예정',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0XFF004F9E),
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 10)),
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: reservations.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> reservation = reservations[index];
+                  return Column(
+                    children: [
+                      _buildReservationItem('공유공간'),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              const DottedLine(
+                direction: Axis.horizontal,
+                alignment: WrapAlignment.center,
+                lineLength: 350,
+                lineThickness: 0.5,
+                dashLength: 3.0,
+                dashColor: Colors.grey,
+                dashRadius: 0.0,
+                dashGapLength: 6.0,
+                dashGapColor: Colors.transparent,
+                dashGapRadius: 0.0,
+              ),
+              const Padding(padding: EdgeInsets.only(top: 20)),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 30),
+                  child: Text(
+                    '이용 내역',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(bottom: 10)),
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: 1,
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _buildUsageHistoryItem(),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
-            label: '혼잡도',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/reserved_on.svg'),
-            label: '예약내역',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/mypage.svg'),
-            label: '마이페이지',
-          ),
-        ],
-        selectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        selectedItemColor: Colors.black,
-        unselectedLabelStyle:
-            const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-        unselectedItemColor: Colors.grey,
-      ),
-    );
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: 2,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainPage()),
+                );
+                break;
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Congestion()),
+                );
+                break;
+              case 2:
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyPage()),
+                );
+                break;
+            }
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent_off.svg'),
+              label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved_on.svg'),
+              label: '예약내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
+        ),
+      );
+    }
   }
 
-  Widget _buildReservationItem() {
+  Widget _buildReservationItem(String roomtype) {
     bool showEntryButton =
         now.isAfter(startDate.subtract(Duration(minutes: 10))) &&
             now.isBefore(endDate.add(Duration(minutes: 10)));
@@ -265,15 +279,25 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 110),
+                const SizedBox(width: 80),
+                Text(
+                  roomtype,
+                  style: TextStyle(
+                    color: Color(0XFF484848),
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Container(
                   height: 20.87,
                   width: 1,
                   color: Colors.grey.withOpacity(0.2),
                 ),
-                const SizedBox(width: 30),
+                const SizedBox(width: 10),
                 Text(
-                  '이용 예정',
+                  isLent ? '이용 중' : '이용 예정',
                   style: TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
@@ -422,13 +446,23 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 110),
+                const SizedBox(width: 80),
+                const Text(
+                  '공유공간',
+                  style: TextStyle(
+                    color: Color(0XFF484848),
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Container(
                   height: 20.87,
                   width: 1,
                   color: Colors.grey.withOpacity(0.2),
                 ),
-                const SizedBox(width: 30),
+                const SizedBox(width: 10),
                 const Text(
                   '이용 완료',
                   style: TextStyle(

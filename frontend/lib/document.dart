@@ -105,9 +105,10 @@ class _FormPageState extends State<FormPage> {
 
     debugPrint('${response.statusCode}');
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
-      if (responseData['message'] == 'Creating reservation club successfully') {
+      if (responseData['message'] ==
+          'Reservation Conference created successfully') {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -322,7 +323,12 @@ class _FormPageState extends State<FormPage> {
                           final signature = await main_controller.toPngBytes();
                           if (signature != null && signature.isNotEmpty) {
                             Navigator.of(context).pop(signature);
-                            // 여기서 필요한 로직을 추가하여 서명 데이터를 저장하거나 처리합니다.
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('서명이 저장되었습니다.'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           } else {
                             // 사용자에게 서명이 비어 있음을 알립니다.
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -332,92 +338,6 @@ class _FormPageState extends State<FormPage> {
                               ),
                             );
                           }
-                        },
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showSignaturePad(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(3.0),
-          ),
-          child: Container(
-            width: 359.39,
-            height: 200.41,
-            color: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 359.39,
-                  height: 120.41,
-                  child: Signature(
-                    controller: _controller,
-                    backgroundColor: Color(0XFFFFFFFF),
-                  ),
-                ),
-                Container(
-                  height: 1,
-                  width: 350,
-                  color: Colors.grey.withOpacity(0.2),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        child: const Text(
-                          '지우기',
-                          style: TextStyle(
-                            color: Color(0xFF8E8E8E),
-                            fontSize: 13,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: () {
-                          _controller.clear();
-                        },
-                      ),
-                      SizedBox(width: 35),
-                      Container(
-                        height: 34.74,
-                        width: 1,
-                        color: Colors.grey.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 35),
-                      TextButton(
-                        child: const Text(
-                          '저장',
-                          style: TextStyle(
-                            color: Color(0xFF004F9E),
-                            fontSize: 13,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: () {
-                          _controller.toPngBytes().then((signature) {
-                            if (signature != null) {
-                              Navigator.of(context).pop(signature);
-                            }
-                          });
                         },
                       ),
                     ],
@@ -1005,8 +925,6 @@ class _FormPageState extends State<FormPage> {
                             if (_purposeController.text.isEmpty) {
                               // 사용 목적 필드가 비어있는 경우 경고 다이얼로그 표시
                               FlutterDialog('사용 목적을 입력해주세요.', '확인');
-                            } else if (_controller.isEmpty) {
-                              FlutterDialog('참여자 서명을 입력해주세요.', '확인');
                             } else if (main_controller.isEmpty) {
                               FlutterDialog('대표자 서명을 입력해주세요.', '확인');
                             } else if (participants.isEmpty) {

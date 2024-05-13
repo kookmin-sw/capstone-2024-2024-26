@@ -148,10 +148,10 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final ExpansionTileController controller = ExpansionTileController();
   bool is_tap = false;
-
+  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String time = '';
   String people = '';
   String roomName = '';
@@ -159,12 +159,31 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     _checkRoomStatus();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 포그라운드로 돌아올 때 실행될 로직
+      _checkRoomStatus();
+    }
   }
 
   _checkRoomStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
+    setState(() {
+      isLoading = true; // 로딩 시작
+    });
 
     const url = 'http://localhost:3000/reserveclub/main_lentroom/:uid';
 
@@ -184,7 +203,7 @@ class _MainPageState extends State<MainPage> {
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
           spaceData.add(responseData['share_room_data']);
-          print(spaceData);
+          isLoading = false; // 로딩 끝
         });
       } else {}
     } else {
@@ -198,7 +217,9 @@ class _MainPageState extends State<MainPage> {
   _checkRoom2Status() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
-
+    setState(() {
+      isLoading = true; // 로딩 시작
+    });
     const url = 'http://localhost:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
@@ -217,6 +238,7 @@ class _MainPageState extends State<MainPage> {
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
           spaceData2.add(responseData['share_room_data']);
+          isLoading = false; // 로딩 끝
         });
       } else {}
     } else {
@@ -231,215 +253,220 @@ class _MainPageState extends State<MainPage> {
 
   List<dynamic> spaceData2 = [];
 
-  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '공간대여',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.bold,
+    if (isLoading) {
+      return const LoadingScreen();
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            '공간대여',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          leading: Container(),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyNotice()),
+                );
+              },
+              icon: SvgPicture.asset('assets/icons/notice_none.svg'),
+            ),
+          ],
+          backgroundColor: Colors.transparent, // 상단바 배경색
+          foregroundColor: Colors.black, //상단바 아이콘색
+          bottomOpacity: 0.0,
+          elevation: 0.0,
+          scrolledUnderElevation: 0,
+          shape: const Border(
+            bottom: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
           ),
         ),
-        leading: Container(),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyNotice()),
-              );
-            },
-            icon: SvgPicture.asset('assets/icons/notice_none.svg'),
-          ),
-        ],
-        backgroundColor: Colors.transparent, // 상단바 배경색
-        foregroundColor: Colors.black, //상단바 아이콘색
-        bottomOpacity: 0.0,
-        elevation: 0.0,
-        scrolledUnderElevation: 0,
-        shape: const Border(
-          bottom: BorderSide(
-            color: Colors.grey,
-            width: 0.5,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Center(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        is_tap = !is_tap;
-                      });
-                      _checkRoomStatus();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      textStyle: TextStyle(
-                        fontSize: 15, // Set the button text size
-                        fontWeight:
-                            FontWeight.bold, // Set the button text weight
-                        color: Color(0XFF004F9E),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(
-                            width: 0.50,
-                            color: is_tap
-                                ? Color(0xFFD6D6D6)
-                                : const Color(0xFF004F9E)),
-                      ),
-                      minimumSize: Size(169, 55), // Set the button minimum size
-                      backgroundColor:
-                          is_tap ? Colors.white : Color(0X0C004F9E),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Center(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          is_tap = !is_tap;
 
-                      elevation: 0, // Set the elevation for the button shadow
-                      shadowColor: Colors.white.withOpacity(
-                          0.5), // Set the color of the button shadow
+                          _checkRoomStatus();
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        textStyle: TextStyle(
+                          fontSize: 15, // Set the button text size
+                          fontWeight:
+                              FontWeight.bold, // Set the button text weight
+                          color: Color(0XFF004F9E),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: BorderSide(
+                              width: 0.50,
+                              color: is_tap
+                                  ? Color(0xFFD6D6D6)
+                                  : const Color(0xFF004F9E)),
+                        ),
+                        minimumSize:
+                            Size(169, 55), // Set the button minimum size
+                        backgroundColor:
+                            is_tap ? Colors.white : Color(0X0C004F9E),
+
+                        elevation: 0, // Set the elevation for the button shadow
+                        shadowColor: Colors.white.withOpacity(
+                            0.5), // Set the color of the button shadow
+                      ),
+                      child: Text('공유공간 대여',
+                          style: TextStyle(
+                              color: is_tap
+                                  ? Color(0XFF7C7C7C)
+                                  : Color(0xFF004F9E))),
                     ),
-                    child: Text('공유공간 대여',
-                        style: TextStyle(
-                            color: is_tap
-                                ? Color(0XFF7C7C7C)
-                                : Color(0xFF004F9E))),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        is_tap = !is_tap;
-                      });
-                      _checkRoom2Status();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      textStyle: TextStyle(
-                        fontSize: 15, // Set the button text size
-                        fontWeight:
-                            FontWeight.bold, // Set the button text weight
-                        color: Color(0XFF004F9E),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        side: BorderSide(
-                            width: 0.50,
-                            color: is_tap
-                                ? const Color(0xFF004F9E)
-                                : Color(0xFFD6D6D6)),
-                      ),
-                      minimumSize: Size(169, 55), // Set the button minimum size
-                      backgroundColor:
-                          is_tap ? Color(0X0C004F9E) : Colors.white,
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          is_tap = !is_tap;
+                          _checkRoom2Status();
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        textStyle: TextStyle(
+                          fontSize: 15, // Set the button text size
+                          fontWeight:
+                              FontWeight.bold, // Set the button text weight
+                          color: Color(0XFF004F9E),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: BorderSide(
+                              width: 0.50,
+                              color: is_tap
+                                  ? const Color(0xFF004F9E)
+                                  : Color(0xFFD6D6D6)),
+                        ),
+                        minimumSize:
+                            Size(169, 55), // Set the button minimum size
+                        backgroundColor:
+                            is_tap ? Color(0X0C004F9E) : Colors.white,
 
-                      elevation: 0, // Set the elevation for the button shadow
-                      shadowColor: Colors.white.withOpacity(
-                          0.5), // Set the color of the button shadow
+                        elevation: 0, // Set the elevation for the button shadow
+                        shadowColor: Colors.white.withOpacity(
+                            0.5), // Set the color of the button shadow
+                      ),
+                      child: Text('강의실 대여',
+                          style: TextStyle(
+                              color: is_tap
+                                  ? Color(0xFF004F9E)
+                                  : Color(0XFF7C7C7C))),
                     ),
-                    child: Text('강의실 대여',
-                        style: TextStyle(
-                            color: is_tap
-                                ? Color(0xFF004F9E)
-                                : Color(0XFF7C7C7C))),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: is_tap
-                    ? (spaceData2.isEmpty ? 0 : spaceData2[0].length)
-                    : (spaceData.isEmpty ? 0 : spaceData[0].length),
-                itemBuilder: (context, index) {
-                  final data = is_tap
-                      ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
-                      : (spaceData.isNotEmpty ? spaceData[0][index] : null);
-                  return Column(
-                    children: [
-                      SizedBox(height: 10), // Add spacing here
+                  ],
+                ),
+                SizedBox(height: 20),
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: is_tap
+                      ? (spaceData2.isEmpty ? 0 : spaceData2[0].length)
+                      : (spaceData.isEmpty ? 0 : spaceData[0].length),
+                  itemBuilder: (context, index) {
+                    final data = is_tap
+                        ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
+                        : (spaceData.isNotEmpty ? spaceData[0][index] : null);
+                    return Column(
+                      children: [
+                        SizedBox(height: 10), // Add spacing here
 
-                      data != null
-                          ? _CustomScrollViewWidget(
-                              time: data['time']!,
-                              people: data['people']!,
-                              roomName: data['roomName']!,
-                              istap: is_tap,
-                            )
-                          : Container(), // Return empty container if data is null
-                    ],
-                  );
-                },
-              ),
-            ],
+                        data != null
+                            ? _CustomScrollViewWidget(
+                                time: data['time']!,
+                                people: data['people']!,
+                                roomName: data['roomName']!,
+                                istap: is_tap,
+                              )
+                            : Container(), // Return empty container if data is null
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      // 하단 바
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
+        // 하단 바
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
 
-        currentIndex: 0, // Adjust the index according to your need
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              break;
+          currentIndex: 0, // Adjust the index according to your need
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                break;
 
-            case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Congestion()),
-              );
-              break;
-            case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Details()),
-              );
-              break;
-            case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyPage()),
-              );
-              break;
-          }
-        },
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/lent.svg'),
-            label: '공간대여',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
-            label: '혼잡도',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/reserved.svg'),
-            label: '예약내역',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/mypage.svg'),
-            label: '마이페이지',
-          ),
-        ],
-        selectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        selectedItemColor: Colors.black,
-        unselectedLabelStyle:
-            const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-        unselectedItemColor: Colors.grey,
-      ),
-    );
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Congestion()),
+                );
+                break;
+              case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Details()),
+                );
+                break;
+              case 3:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyPage()),
+                );
+                break;
+            }
+          },
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/lent.svg'),
+              label: '공간대여',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/reserved.svg'),
+              label: '예약내역',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/mypage.svg'),
+              label: '마이페이지',
+            ),
+          ],
+          selectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          selectedItemColor: Colors.black,
+          unselectedLabelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+          unselectedItemColor: Colors.grey,
+        ),
+      );
+    }
   }
 }
 

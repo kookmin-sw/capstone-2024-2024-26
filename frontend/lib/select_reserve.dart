@@ -507,7 +507,7 @@ class _select extends State<Select_reserve> {
                           ),
                           SizedBox(width: 10),
                           Text(
-                            '일일 최대 2시간 이용가능',
+                            '최대 연속 2시간씩 예약 가능 ',
                             style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFFA3A3A3),
