@@ -86,4 +86,65 @@ inquiry.post("/", async (req, res) => {
   }
 });
 
+// 사용자 전체 문의 내역 가져오기
+inquiry.get("/list/:userId/:startDate/:endDate", async (req, res) => {
+  const userId = req.params.userId;
+  const startDate = req.params.startDate;
+  const endDate = req.params.endDate;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Inquiry`;
+
+    // 전체 문의 내역
+    const allInquiry = [];
+
+    for (
+      let currentDate = new Date(startDate);
+      currentDate <= new Date(endDate);
+      currentDate.setDate(currentDate.getDate() + 1)
+    ) {
+      const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+      const dateCollectionRef = collection(
+        db,
+        `${collectionName}/${userData.studentId}/${dateString}`
+      ); // 컬렉션 참조 생성
+
+      // 해당 날짜별 시간 문서 조회
+      const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+      timeDocSnapshot.forEach((docSnapshot) => {
+        const reservationData = docSnapshot.data();
+        // 문의 정보 조회
+        allInquiry.push({
+          faculty: reservationData.faculty,
+          name: reservationData.name,
+          studentId: reservationData.studentId,
+          date: reservationData.date,
+          title: reservationData.title,
+          content: reservationData.content,
+          response: reservationData.response,
+          responseDate: reservationData.responseDate,
+          responseStatus: reservationData.responseStatus,
+        });
+      });
+    }
+
+    res.status(200).json({
+      message: "Inquiry retrieves successfully",
+      inquiries: allInquiry,
+    });
+  } catch (error) {
+    // 오류 발생 시 오류 응답
+    console.error("Error retrieving inquiry", error);
+    res.status(500).json({ error: "Failed to retrieve inquiry" });
+  }
+});
+
 export default inquiry;
