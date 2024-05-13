@@ -24,7 +24,11 @@ class Details extends StatefulWidget {
 class _Details extends State<Details> with WidgetsBindingObserver {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now().add(Duration(days: 14)); // 현재로부터 14일 후
+  DateTime previousDate =
+      DateTime.now().subtract(Duration(days: 14)); // 현재로부터 14일 전
   List<dynamic> reservations = [];
+  List<dynamic> done_reservations = [];
+
   String userId = '';
   bool isLoading = false;
 
@@ -33,6 +37,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     fetchReservations(userId, startDate, endDate);
+    done_Reservations(userId, previousDate, startDate);
   }
 
   Future<List<dynamic>> fetchReservations(
@@ -72,11 +77,58 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
+  Future<List<dynamic>> done_Reservations(
+      String userId, DateTime start, DateTime end) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('uid');
+    setState(() {
+      isLoading = true;
+    });
+    String formattedStartDate =
+        "${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}";
+    String formattedEndDate =
+        "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
+
+    final url =
+        'http://localhost:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // 서버로부터 정상적인 응답을 받았을 때
+        Map<String, dynamic> data = json.decode(response.body);
+
+        setState(() {
+          isLoading = false;
+          done_reservations = data['reservations'];
+        });
+
+        return data['reservations'];
+      } else {
+        // 서버로부터 오류 응답을 받았을 때
+        throw Exception('Failed to load reservations');
+      }
+    } catch (e) {
+      throw Exception('Failed to load reservations: $e');
+    }
+  }
+
   final DateTime selectedDate = DateTime.now();
   final int startTime = 12;
   final int endTime = 15;
-  final String roomName = '미래관 610호';
+  final String roomName = '';
   final String table_number = '';
+
+  // tableData 내부에서 true 값을 가진 키 찾기
+  String getKeyWithTrueValue(Map<String, dynamic> tableData) {
+    for (String key in tableData.keys) {
+      if (tableData[key] == true) {
+        return key; // true 값을 가진 첫 번째 키를 반환
+      }
+    }
+    return 'No key with true value found'; // true 값을 가진 키가 없을 경우
+  }
 
   bool isLent = false;
 
@@ -145,12 +197,25 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 shrinkWrap: true,
                 itemCount: reservations.length,
                 itemBuilder: (context, index) {
-                  Map<String, dynamic> reservation = reservations[index];
-                  return Column(
-                    children: [
-                      _buildReservationItem('공유공간'),
-                    ],
-                  );
+                  if (reservations[index]['tableData']['status'] ==
+                      'previous') {
+                    // 이용 예정인 예약만 표시
+                    Map<String, dynamic> reservation = reservations[index];
+
+                    return Column(
+                      children: [
+                        _buildReservationItem(
+                          reservation['roomName'],
+                          reservation['date'],
+                          reservation['startTime'],
+                          reservation['endTime'],
+                          getKeyWithTrueValue(reservation['tableData']),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -185,13 +250,28 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: 1,
+                itemCount: done_reservations.length,
                 itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      _buildUsageHistoryItem(),
-                    ],
-                  );
+                  if (done_reservations[index]['tableData']['status'] ==
+                      'done') {
+                    // 이용 완료인 예약만 표시
+                    Map<String, dynamic> done_reservation =
+                        done_reservations[index];
+
+                    return Column(
+                      children: [
+                        _buildUsageHistoryItem(
+                          done_reservation['roomName'],
+                          done_reservation['date'],
+                          done_reservation['startTime'],
+                          done_reservation['endTime'],
+                          getKeyWithTrueValue(done_reservation['tableData']),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
                 },
               ),
             ],
@@ -253,7 +333,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
-  Widget _buildReservationItem(String roomtype) {
+  Widget _buildReservationItem(String roomName, String date, String startTime,
+      String endTime, String table_number) {
     bool showEntryButton =
         now.isAfter(startDate.subtract(Duration(minutes: 10))) &&
             now.isBefore(endDate.add(Duration(minutes: 10)));
@@ -281,7 +362,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
                 const SizedBox(width: 80),
                 Text(
-                  roomtype,
+                  '공유공간',
                   style: TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
@@ -326,7 +407,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '날짜  ${selectedDate?.year}.${selectedDate?.month}.${selectedDate?.day}',
+                  '날짜  ${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF004F9E),
@@ -344,7 +425,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '${startTime}:00~${endTime}:00  |  좌석 T${table_number}',
+                  '${startTime}:00~${endTime}:00  |  좌석 ${table_number}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF7C7C7C),
@@ -424,7 +505,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildUsageHistoryItem() {
+  Widget _buildUsageHistoryItem(String roomName, String date, String startTime,
+      String endTime, String table_number) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -436,8 +518,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  '[ 미래관 610호 ]',
+                Text(
+                  '[ ${roomName} ]',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
@@ -488,12 +570,12 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               dashGapRadius: 0.0,
             ),
             const SizedBox(height: 30),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '날짜  2024.3.19(화)',
+                  '날짜  ${date}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF004F9E),
@@ -506,12 +588,12 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               ),
             ),
             const SizedBox(height: 20),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '오후  12:00~15:00  |  좌석 T1',
+                  '${startTime}:00~${endTime}:00  |  좌석 ${table_number}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF7C7C7C),

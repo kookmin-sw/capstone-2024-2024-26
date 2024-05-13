@@ -295,7 +295,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           ),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Center(
             child: Column(
               children: [
@@ -326,7 +325,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                   : const Color(0xFF004F9E)),
                         ),
                         minimumSize:
-                            Size(169, 55), // Set the button minimum size
+                            Size(193.7, 50), // Set the button minimum size
                         backgroundColor:
                             is_tap ? Colors.white : Color(0X0C004F9E),
 
@@ -363,7 +362,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                   : Color(0xFFD6D6D6)),
                         ),
                         minimumSize:
-                            Size(169, 55), // Set the button minimum size
+                            Size(193.7, 50), // Set the button minimum size
                         backgroundColor:
                             is_tap ? Color(0X0C004F9E) : Colors.white,
 
