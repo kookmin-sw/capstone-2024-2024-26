@@ -30,9 +30,9 @@ const db = getFirestore(app);
 
 const inquiry = express.Router();
 
-// 문의하기 
+// 문의하기
 inquiry.post("/", async (req, res) => {
-  const { userId, date, content } = req.body;
+  const { userId, date, title, content } = req.body;
 
   try {
     // 사용자 정보 가져오기
@@ -45,18 +45,33 @@ inquiry.post("/", async (req, res) => {
 
     const collectionName = `${userData.faculty}_Inquiry`;
 
-    // 학번을 문서 ID로 사용하여 문의 문서 참조 생성
-    const inquiryDocRef = doc(db, collectionName, userData.studentId);
+    // Inquiry 컬렉션 생성
+    await setDoc(doc(db, collectionName, userData.studentId), {});
 
-    // 날짜별 문의 컬렉션 참조 생성 (자동으로 문서 ID가 생성됨)
-    const dateCollectionRef = collection(inquiryDocRef, date);
+    const studentIdDocRef = doc(db, collectionName, userData.studentId);
+
+    const offset = 1000 * 60 * 60 * 9;
+    const koreaNow = new Date(new Date().getTime() + offset);
+
+    const year = koreaNow.getFullYear();
+    const month = String(koreaNow.getMonth() + 1).padStart(2, "0");
+    const day = String(koreaNow.getDate()).padStart(2, "0");
+    const hours = String(koreaNow.getHours()).padStart(2, "0");
+    const minutes = String(koreaNow.getMinutes()).padStart(2, "0");
+
+    const time = `${year}-${month}-${day}-${hours}-${minutes}`;
+
+    const dateCollectionRef = collection(studentIdDocRef, date);
+
+    const timeDocRef = doc(dateCollectionRef, time);
 
     // 문의 정보 추가
-    await addDoc(dateCollectionRef, {
+    await setDoc(timeDocRef, {
       faculty: userData.faculty,
       name: userData.name,
       studentId: userData.studentId,
-      date: date,
+      date: time,
+      title: title,
       content: content,
       response: "",
       responseDate: "",
