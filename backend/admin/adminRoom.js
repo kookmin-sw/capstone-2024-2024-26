@@ -275,21 +275,19 @@ adminRoom.get(
 
                 // 예약된 문서 정보 조회
                 userReservations.push({
-                  roomName: roomName,
-                  mainFaculty: reservationData.mainFaculty,
+                  roomName: reservationData.roomName,
+                  date: reservationData.date,
+                  startTime: reservationData.startTime,
+                  endTime: reservationData.endTime,
+                  mainName: reservationData.mainName, // 누가 대표로 예약을 했는지(책임 문제)
+                  mainFaculty: reservationData.mainFaculty, // 대표자 소속
                   mainStudentId: reservationData.mainStudentId, // 대표자 학번
                   mainPhoneNumber: reservationData.mainPhoneNumber, // 대표자 전화번호
-                  mainEmail: reservationData.mainEmail,
-                  mainName: reservationData.mainName,
-                  date: dateString,
-                  startTime: startTime,
-                  endTime: endTime,
-                  studentName: reservationData.studentName,
-                  studentDepartment: reservationData.studentDepartment,
-                  studentId: reservationData.studentId,
+                  mainEmail: reservationData.mainEmail, // 대표자 이메일
+                  participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
                   boolAgree: reservationData.boolAgree,
-                  signImagesEncode: reservationData.signImagesEncode,
+                  signature: reservationData.signature,
                 });
               }
             });
@@ -300,7 +298,7 @@ adminRoom.get(
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
-        reservations: userReservations,
+        confirmReservations: userReservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
@@ -356,21 +354,19 @@ adminRoom.get(
 
                 // 예약된 문서 정보 조회
                 userReservations.push({
-                  roomName: roomName,
-                  mainFaculty: reservationData.mainFaculty,
+                  roomName: reservationData.roomName,
+                  date: reservationData.date,
+                  startTime: reservationData.startTime,
+                  endTime: reservationData.endTime,
+                  mainName: reservationData.mainName, // 누가 대표로 예약을 했는지(책임 문제)
+                  mainFaculty: reservationData.mainFaculty, // 대표자 소속
                   mainStudentId: reservationData.mainStudentId, // 대표자 학번
                   mainPhoneNumber: reservationData.mainPhoneNumber, // 대표자 전화번호
-                  mainEmail: reservationData.mainEmail,
-                  mainName: reservationData.mainName,
-                  date: dateString,
-                  startTime: startTime,
-                  endTime: endTime,
-                  studentName: reservationData.studentName,
-                  studentDepartment: reservationData.studentDepartment,
-                  studentId: reservationData.studentId,
+                  mainEmail: reservationData.mainEmail, // 대표자 이메일
+                  participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
                   boolAgree: reservationData.boolAgree,
-                  signImagesEncode: reservationData.signImagesEncode,
+                  signature: reservationData.signature,
                 });
               }
             });
@@ -381,7 +377,7 @@ adminRoom.get(
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
-        reservations: userReservations,
+        notConfirmReservations: userReservations,
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
