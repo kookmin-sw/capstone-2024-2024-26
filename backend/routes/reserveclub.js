@@ -108,8 +108,7 @@ reserveClub.post("/", async (req, res) => {
           if (j === parseInt(tableNumber)) {
             tableInfo.name = userData.name;
             tableInfo.studentId = userData.studentId;
-            tableInfo.returnStatus = false;
-            tableInfo.entranceStatus = false;
+            tableInfo.status = "previous";
           }
           tableData.push(tableInfo);
         }
@@ -128,8 +127,7 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index][`T${tableNumber}`] = true;
           reservationData.tableData[index].name = userData.name;
           reservationData.tableData[index].studentId = userData.studentId;
-          reservationData.tableData[index].returnStatus = false;
-          reservationData.tableData[index].entranceStatus = false;
+          reservationData.tableData[index].status = "previous";
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -284,6 +282,7 @@ reserveClub.post("/delete", async (req, res) => {
           reservationData.tableData[index][`T${tableNumber}`] = false;
           delete reservationData.tableData[index].name;
           delete reservationData.tableData[index].studentId;
+          delete reservationData.tableData[index].status;
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -414,6 +413,7 @@ reserveClub.get("/future/reservations/:userId", async (req, res) => {
   }
 });
 
+// 입장하기
 reserveClub.post("/entrance", async (req, res) => {
   const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
   try {
@@ -474,7 +474,7 @@ reserveClub.post("/entrance", async (req, res) => {
         const index = parseInt(tableNumber) - 1;
         if (reservationData.tableData[index][`T${tableNumber}`] === true) {
           // 해당 테이블에 대해 name과 studentId도 업데이트
-          reservationData.tableData[index].entranceStatus = true;
+          reservationData.tableData[index].status = "using";
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -491,6 +491,7 @@ reserveClub.post("/entrance", async (req, res) => {
   }
 });
 
+// 반납하기
 reserveClub.post("/return", async (req, res) => {
   const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
   try {
@@ -549,9 +550,9 @@ reserveClub.post("/return", async (req, res) => {
         // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
         // 특정 테이블 번호를 true로 설정합니다.
         const index = parseInt(tableNumber) - 1;
-        if (reservationData.tableData[index][`T${tableNumber}`] === true && reservationData.tableData[index].entranceStatus == true) {
+        if (reservationData.tableData[index][`T${tableNumber}`] === true && reservationData.tableData[index].status == "using") {
           // 해당 테이블에 대해 name과 studentId도 업데이트
-          reservationData.tableData[index].returnStatus = true;
+          reservationData.tableData[index].status = "done";
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
