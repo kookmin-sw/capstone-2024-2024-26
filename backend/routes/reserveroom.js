@@ -160,11 +160,18 @@ reserveroom.get(
       // 컬렉션 이름 설정
       const collectionName = `${userData.faculty}_Classroom_queue`;
 
+      const collectionName1 = `${userData.faculty}_Classroom`;
+
       // 사용자 예약 내역(승인 전)
       const userReservations = [];
 
+      // 사용자 예약 내역(승인 후)
+      const userReservations1 = [];
+
       // 강의실 컬렉션 참조
       const facultyConferenceCollectionRef = collection(db, collectionName);
+
+      const facultyConferenceCollectionRef1 = collection(db, collectionName1);
 
       const querySnapshot = await getDocs(facultyConferenceCollectionRef);
 
@@ -196,6 +203,56 @@ reserveroom.get(
                   userReservations.push({
                     roomName: reservationData.roomName,
                     date: reservationData.date,
+                    startTime: reservationData.startTime,
+                    endTime: reservationData.endTime,
+                    mainName: reservationData.mainName, // 누가 대표로 예약을 했는지(책임 문제)
+                    mainFaculty: reservationData.mainFaculty, // 대표자 소속
+                    mainStudentId: reservationData.mainStudentId, // 대표자 학번
+                    mainPhoneNumber: reservationData.mainPhoneNumber, // 대표자 전화번호
+                    mainEmail: reservationData.mainEmail, // 대표자 이메일
+                    participants: reservationData.participants,
+                    usingPurpose: reservationData.usingPurpose,
+                    boolAgree: reservationData.boolAgree,
+                    signature: reservationData.signature,
+                    statusMessage: "관리자 승인 전 강의실 예약 내역"
+                  });
+                }
+              }
+            });
+          }
+        })
+      );
+
+      const querySnapshot1= await getDocs(facultyConferenceCollectionRef1);
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot1.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+              if (reservationData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+                if (reservationData.mainStudentId == userData.studentId) {
+                  // 예약된 문서 정보 조회
+                  userReservations1.push({
+                    roomName: reservationData.roomName,
+                    date: reservationData.date,
                     startTime: startTime,
                     endTime: endTime,
                     mainName: reservationData.mainName, // 누가 대표로 예약을 했는지(책임 문제)
@@ -207,7 +264,7 @@ reserveroom.get(
                     usingPurpose: reservationData.usingPurpose,
                     boolAgree: false,
                     signature: reservationData.signature,
-                    statusMessage: "관리자 승인 전 강의실 예약 내역"
+                    statusMessage: "관리자 승인 후 강의실 예약 내역"
                   });
                 }
               }
@@ -219,7 +276,8 @@ reserveroom.get(
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
-        notConfirmReservations: userReservations,
+        notConfirmReservations: userReservations, // 관리자 승인 전 예약 내역
+        confrimReservations: userReservations1 // 관리자 승인 후 예약 내역
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
@@ -338,7 +396,7 @@ reserveroom.get("/future/reservations/:userId", async (req, res) => {
                     mainEmail: reservationData.mainEmail, // 대표자 이메일
                     participants: reservationData.participants,
                     usingPurpose: reservationData.usingPurpose,
-                    boolAgree: false,
+                    boolAgree: reservationData.boolAgree,
                     signature: reservationData.signature,
                     statusMessage: "관리자 승인 전 강의실 예약 내역"
                   });
