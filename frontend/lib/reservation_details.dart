@@ -20,7 +20,7 @@ class Details extends StatefulWidget {
   _Details createState() => _Details();
 }
 
-class _Details extends State<Details> {
+class _Details extends State<Details> with WidgetsBindingObserver {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now().add(Duration(days: 14)); // 현재로부터 14일 후
 
@@ -28,6 +28,7 @@ class _Details extends State<Details> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     fetchReservations(userId, startDate, endDate);
   }
 
@@ -334,7 +335,9 @@ class _Details extends State<Details> {
             const SizedBox(height: 30),
             ElevatedButton(
                 onPressed: () {
-                  EnterDialog("입장하시겠습니까?", "입장하기");
+                  isLent
+                      ? FlutterDialog("반납하시겠습니까?", "반납하기")
+                      : EnterDialog("입장하시겠습니까?", "입장하기");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF004F9E),
@@ -565,10 +568,17 @@ class _Details extends State<Details> {
                       onPressed: () {
                         Navigator.pop(context);
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Return()),
-                        );
+                        if (text2 == '반납하기') {
+                          setState(() {
+                            isLent = false;
+                            _timer?.cancel();
+                          });
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Return()),
+                          );
+                        }
                       },
                     ),
                   ],
@@ -654,6 +664,7 @@ class _Details extends State<Details> {
                         Navigator.pop(context);
 
                         isLent = true;
+
                         startEntryTimer();
                       },
                     ),
@@ -669,13 +680,22 @@ class _Details extends State<Details> {
 
   Timer? _timer;
   String _remainingTime = '00:00:00'; // 시, 분, 초 형태로 초기화
-
+  DateTime? _endTime;
   DateTime now = DateTime.now();
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 다시 활성화될 때 타이머 재시작
+      startEntryTimer();
+    }
   }
 
   void startEntryTimer() {
