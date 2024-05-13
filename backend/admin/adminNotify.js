@@ -16,11 +16,11 @@ const serviceAccount = {
   token_uri: process.env.TOKEN_URI,
   auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
   client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
-  universe_domain: process.env.UNIVERSE_DOMAIN
+  universe_domain: process.env.UNIVERSE_DOMAIN,
 };
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -40,6 +40,7 @@ function isAdmin(req, res, next) {
   }
 }
 
+// 모든 사용자에게 알림 보내기
 adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
   const { title, body } = req.body;
   try {
@@ -53,8 +54,9 @@ adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
       const userData = doc.data();
       if (userData.fcmToken) {
         userTokens.push(userData.fcmToken);
-        const today = new Date();
-        const formattedDate = today.toISOString().split("T")[0]; // ISO 포맷에서 'T'를 기준으로 분리하여 날짜 부분만 가져옴
+        const offset = 1000 * 60 * 60 * 9;
+        const koreaNow = new Date(new Date().getTime() + offset);
+        const formattedDate = koreaNow.toISOString().split("T")[0];
 
         // 알림 컬렉션에 알림 추가
         const tokenCollectionRef = db
@@ -64,7 +66,7 @@ adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
         tokenCollectionRef.add({
           title: title,
           body: body,
-          timestamp: admin.firestore.FieldValue.serverTimestamp(), // 서버 시간으로 타임스탬프 추가
+          timestamp: koreaNow,
         });
       }
     });
@@ -88,6 +90,68 @@ adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error sending notification to all users:", error);
     res.status(500).json({ error: "Error sending notification to all users" });
+  }
+});
+
+// 개별 사용자에게 알림 보내기
+adminNotify.post("/sendNotificationToUser", async (req, res) => {
+  const { userId, title, body } = req.body;
+  try {
+    // Firestore에서 사용자 정보 가져오기
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userData = userDoc.data();
+    if (!userData.fcmToken) {
+      return res
+        .status(400)
+        .json({ error: "FCM token not found for the user" });
+    }
+
+    const userTokens = [];
+
+    if (userData.fcmToken) {
+      userTokens.push(userData.fcmToken);
+      const offset = 1000 * 60 * 60 * 9;
+      const koreaNow = new Date(new Date().getTime() + offset);
+      const formattedDate = koreaNow.toISOString().split("T")[0];
+      const formattedDateString = koreaNow.toISOString();
+
+      // 알림 컬렉션에 알림 추가
+      const tokenCollectionRef = db
+        .collection("notifications")
+        .doc(userData.fcmToken)
+        .collection(formattedDate);
+      tokenCollectionRef.add({
+        title: title,
+        body: body,
+        timestamp: formattedDateString,
+      });
+    }
+
+    // 알림 메시지 생성
+    const notificationMessage = {
+      notification: {
+        title: title,
+        body: body,
+      },
+    };
+
+    // 개별 사용자에게 알림 보내기
+    const response = await messaging.sendEach([{
+      token: userData.fcmToken,
+      message: notificationMessage
+    }]);
+
+    res.status(200).json({
+      message: "Notification sent to the user successfully",
+      response,
+    });
+  } catch (error) {
+    console.error("Error sending notification to the user:", error);
+    res.status(500).json({ error: "Error sending notification to the user" });
   }
 });
 
