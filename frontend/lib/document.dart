@@ -48,6 +48,10 @@ class _FormPageState extends State<FormPage> {
   String name = '';
   String contact = '';
   String email = '';
+  final SignatureController main_controller = SignatureController(
+    penStrokeWidth: 2, // 펜 두께
+    penColor: Colors.black, // 펜 색상
+  );
   final SignatureController _controller = SignatureController(
     penStrokeWidth: 2, // 펜 두께
     penColor: Colors.black, // 펜 색상
@@ -70,6 +74,8 @@ class _FormPageState extends State<FormPage> {
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
+    final signatureBytes = await main_controller.toPngBytes();
+    String base64Signature = base64Encode(signatureBytes!);
 
     const url = 'http://localhost:3000/reserveroom/';
     final Map<String, String> data = {
@@ -83,7 +89,7 @@ class _FormPageState extends State<FormPage> {
       'studentId': studentId,
       'participants': json.encode(participants.map((p) => p.toJson()).toList()),
       'numberOfPeople': (participants.length + 1).toString(),
-      'signature': _controller.toPngBytes().toString(),
+      'signature': base64Signature,
     };
 
     debugPrint('$data');
@@ -226,7 +232,8 @@ class _FormPageState extends State<FormPage> {
 
   void _addParticipant() {
     setState(() {
-      participants.add(Participant(name: '', department: '', studentId: ''));
+      participants.add(Participant(
+          name: '', department: '', studentId: '', p_signature: Uint8List(0)));
     });
   }
 
@@ -240,7 +247,102 @@ class _FormPageState extends State<FormPage> {
 
   void dipose() {
     _controller.dispose();
+    main_controller.dispose();
     super.dispose();
+  }
+
+  void _showmainSignaturePad(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          child: Container(
+            width: 359.39,
+            height: 200.41,
+            color: Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 359.39,
+                  height: 120.41,
+                  child: Signature(
+                    controller: main_controller,
+                    backgroundColor: Color(0XFFFFFFFF),
+                  ),
+                ),
+                Container(
+                  height: 1,
+                  width: 350,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: const Text(
+                          '지우기',
+                          style: TextStyle(
+                            color: Color(0xFF8E8E8E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          main_controller.clear();
+                        },
+                      ),
+                      SizedBox(width: 35),
+                      Container(
+                        height: 34.74,
+                        width: 1,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                      SizedBox(width: 35),
+                      TextButton(
+                        child: const Text(
+                          '저장',
+                          style: TextStyle(
+                            color: Color(0xFF004F9E),
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () async {
+                          final signature = await main_controller.toPngBytes();
+                          if (signature != null && signature.isNotEmpty) {
+                            Navigator.of(context).pop(signature);
+                            // 여기서 필요한 로직을 추가하여 서명 데이터를 저장하거나 처리합니다.
+                          } else {
+                            // 사용자에게 서명이 비어 있음을 알립니다.
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('서명이 비어 있습니다. 서명을 완료해주세요.'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showSignaturePad(BuildContext context) {
@@ -869,7 +971,8 @@ class _FormPageState extends State<FormPage> {
                                     fontWeight: FontWeight.bold)),
                             SizedBox(width: 10),
                             GestureDetector(
-                              onTap: () => _showSignaturePad(context), // 함수 참조
+                              onTap: () =>
+                                  _showmainSignaturePad(context), // 함수 참조
                               child: Container(
                                   width: 189.95,
                                   height: 55.13,
@@ -903,13 +1006,16 @@ class _FormPageState extends State<FormPage> {
                               // 사용 목적 필드가 비어있는 경우 경고 다이얼로그 표시
                               FlutterDialog('사용 목적을 입력해주세요.', '확인');
                             } else if (_controller.isEmpty) {
-                              FlutterDialog('서명을 입력해주세요.', '확인');
+                              FlutterDialog('참여자 서명을 입력해주세요.', '확인');
+                            } else if (main_controller.isEmpty) {
+                              FlutterDialog('대표자 서명을 입력해주세요.', '확인');
                             } else if (participants.isEmpty) {
-                              FlutterDialog('참가자 정보를 입력해주세요.', '확인');
+                              FlutterDialog('참여자 정보를 입력해주세요.', '확인');
                             } else if (participants.any((participant) =>
                                 participant.name.isEmpty ||
                                 participant.department.isEmpty ||
-                                participant.studentId.isEmpty)) {
+                                participant.studentId.isEmpty ||
+                                participant.p_signature.isEmpty)) {
                               FlutterDialog('모든 참가자 정보를 입력해주세요.', '확인');
                             } else {
                               // 사용 목적이 제대로 입력된 경우 예약 진행
@@ -1063,14 +1169,20 @@ class Participant {
   String name = '';
   String department = '';
   String studentId = '';
+  Uint8List p_signature = Uint8List(0);
 
-  Participant({this.name = '', this.department = '', this.studentId = ''});
+  Participant(
+      {this.name = '',
+      this.department = '',
+      this.studentId = '',
+      required this.p_signature});
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'department': department,
       'studentId': studentId,
+      'p_signature': base64Encode(p_signature),
     };
   }
 }
@@ -1106,6 +1218,8 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
     _nameController.text = widget.participant.name;
     _departmentController.text = widget.participant.department;
     _studentIdController.text = widget.participant.studentId;
+
+    _controller.addListener(_updateSignature);
     _nameController.addListener(_updateName);
     _departmentController.addListener(_updateDepartment);
     _studentIdController.addListener(_updateStudentId);
@@ -1113,6 +1227,10 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
 
   void _updateName() {
     widget.participant.name = _nameController.text;
+  }
+
+  Future<void> _updateSignature() async {
+    widget.participant.p_signature = (await _controller.toPngBytes())!;
   }
 
   void _updateDepartment() {
@@ -1128,6 +1246,7 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
     _nameController.removeListener(_updateName);
     _departmentController.removeListener(_updateDepartment);
     _studentIdController.removeListener(_updateStudentId);
+    _controller.removeListener(_updateSignature);
     _controller.dispose();
     _nameController.dispose();
 
@@ -1136,11 +1255,12 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
     super.dispose();
   }
 
-  void saveParticipantData() {
+  void saveParticipantData() async {
     // 입력된 데이터를 Participant 객체에 저장
     widget.participant.name = _nameController.text;
     widget.participant.department = _departmentController.text;
     widget.participant.studentId = _studentIdController.text;
+    widget.participant.p_signature = (await _controller.toPngBytes())!;
   }
 
   @override
@@ -1339,12 +1459,18 @@ class _ParticipantEntryState extends State<ParticipantEntry> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {
-                          _controller.toPngBytes().then((signature) {
-                            if (signature != null) {
-                              Navigator.of(context).pop(signature);
-                            }
-                          });
+                        onPressed: () async {
+                          final signature = await _controller.toPngBytes();
+                          if (signature != null && signature.isNotEmpty) {
+                            widget.participant.p_signature = signature;
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('서명이 저장되었습니다.'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ],
