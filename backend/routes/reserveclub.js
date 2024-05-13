@@ -350,8 +350,9 @@ reserveClub.get("/future/reservations/:userId", async (req, res) => {
               if (reservationData && reservationData.tableData) {
                 const startTime = docSnapshot.id.split("-")[0];
                 const endTime = docSnapshot.id.split("-")[1];
+                const timeString = koreaNow.toISOString().split("T")[1].substring(0,2); 
 
-                if (parseInt(startTime) > koreaNow.getHours()) {
+                if (parseInt(startTime) > parseInt(timeString)) {
                   // 예약된 테이블 정보 조회
                   reservationData.tableData.forEach((table) => {
                     if (table.studentId === userData.studentId) {
