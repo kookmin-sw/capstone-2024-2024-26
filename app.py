@@ -43,6 +43,28 @@ def index():
     return "동작완료"
 
 
+#카메라 상태 켜져있으면1, 꺼져있으면 0
+@app.route('/api/state', methods=['POST'])
+def spfolks():
+    doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
+    doc = doc_ref.get()
+    dd = doc.to_dict()
+    output = {'state' : dd['state']}
+    return jsonify(output)
+
+
+#혼잡도 정보 알려주는곳
+@app.route('/api/info', methods=['POST'])
+def qffdqgaf():
+    
+    doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
+    doc = doc_ref.get()
+    dd = doc.to_dict()
+    output = {'info' : dd['info']}
+    return jsonify(output)
+
+
+#라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
 def receive_image():
     if 'frame' in request.files in request.files:
@@ -57,13 +79,17 @@ def receive_image():
         if doc.exists:
             if result['score'] >=75:
                 #제일혼잡
-                doc_ref.update({'info': 4})
+                doc_ref.update({'info': 4,
+                                'state' : 1})
             elif result['score'] >= 55:
-                doc_ref.update({'info': 3})
+                doc_ref.update({'info': 3,
+                                'state' : 1})
             elif result['score'] >= 35:
-                doc_ref.update({'info': 2})
+                doc_ref.update({'info': 2,
+                                'state' : 1})
             else:
-                doc_ref.update({'info': 1})
+                doc_ref.update({'info': 1,
+                                'state' : 1})
         return result, 200
     else:
         #파베에 상태 flase로 변경
@@ -85,13 +111,13 @@ def classi():
     if not data or 'image' not in data:
         return jsonify({"error": "Invalid data"}), 400
     
-    base64_image = data['image']
-    myclass = data['class']
-    table = int(data['table'])
-    location = data['location']
-    date = data['date']
-    time = data['time']
-    user = data['user']
+    base64_image = data['image']# 이미지 인코딩된거
+    myclass = data['class']  #강의실 0, club 1
+    table = int(data['table']) #club일때 테이블 번호(0,1)
+    location = data['location'] # 강의실 이름
+    date = data['date'] #날짜(2024-05-12)
+    time = data['time'] #시간(10-11)
+    user = data['user'] #유저(문서 id)
     #여기서 user 문서 아이디 받아오기
 
     if myclass=='0':
