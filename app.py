@@ -192,11 +192,11 @@ def classi():
                 date_doc_ref.update({
                     'tableData': tableData
                 })
-        else:
-            print("Document does not exist.")
+    #     else:
+    #         print("Document does not exist.")
 
 
-    return jsonify(result)
+    # return jsonify(result)
 
 
 if __name__ == '__main__':
