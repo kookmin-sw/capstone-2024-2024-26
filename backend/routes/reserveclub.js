@@ -330,7 +330,7 @@ reserveClub.get("/future/reservations/:userId", async (req, res) => {
         const koreaNow = new Date(new Date().getTime() + offset);
 
         let endDate = new Date();
-        endDate.setDate(koreaNow.getDate() + 14);
+        endDate.setDate(koreaNow.getDate() + 3);
 
         const currentDate = koreaNow.toISOString().split("T")[0];
         for (; koreaNow <= endDate; koreaNow.setDate(koreaNow.getDate() + 1)) {
