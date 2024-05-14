@@ -91,6 +91,8 @@ def classi():
     location = data['location']
     date = data['date']
     time = data['time']
+    user = data['user']
+    #여기서 user 문서 아이디 받아오기
 
     if myclass=='0':
         a = "소프트웨어융합대학_Classroom_queue"
@@ -119,43 +121,54 @@ def classi():
     #3. classfication에 보내준 뒤 결과 받아오기
     result = classification(image1, image2)
 
-    if result['score']==1:
-        if myclass=='0':
-            #여기서는 class에 저장
-            doc_ref = db.collection(c).document(location)
-            date_doc_ref = doc_ref.collection(date).document(time)
-            date_doc_ref.set({
-                'image': base64_image,  # 원하는 필드 이름과 값을 설정
-            }, merge=True)
-        else:
-            #여기서는 club에 저장
-            doc_ref = db.collection(a).document(location)
-            date_doc_ref = doc_ref.collection(date).document(time)
-            doc = date_doc_ref.get()
-            if doc.exists:
-                current_data = doc.to_dict()
-                if current_data:
-                    tableData = current_data.get('tableData', [])
+    if result['score']==0:
+        #애초에 강의실이든 동방이든 0이면 패널티 줘야됨
+        doc_user = db.collection("users").document(user)
+        docc = doc_user.get()
+        penalty_value = docc.to_dict().get('penalty')
+        doc_user.set({
+            'penalty': penalty_value + 1,  # 원하는 필드 이름과 값을 설정
+        }, merge=True)
 
 
-                    # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
 
-                    if len(tableData) > table:
-                        if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
-                            tableData[table]['image'] = base64_image
-                        else:
-                            # table번 인덱스가 사전이 아니면 새로운 사전을 추가
-                            tableData[table] = {'image': base64_image}
+    if myclass=='0':
+        #여기서는 class에 저장
+        doc_ref = db.collection(c).document(location)
+        date_doc_ref = doc_ref.collection(date).document(time)
+        date_doc_ref.set({
+            'image': base64_image,  # 원하는 필드 이름과 값을 설정
+        }, merge=True)
+    else:
+        #여기서는 club에 저장
+        doc_ref = db.collection(a).document(location)
+        date_doc_ref = doc_ref.collection(date).document(time)
+        doc = date_doc_ref.get()
+        if doc.exists:
+            current_data = doc.to_dict()
+            if current_data:
+                tableData = current_data.get('tableData', [])
+
+
+                # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
+
+                if len(tableData) > table:
+                    if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
+                        tableData[table]['image'] = base64_image
                     else:
-                        # 0번 인덱스가 없으면 새로운 사전을 추가
-                        tableData.append({'image': base64_image})
+                        # table번 인덱스가 사전이 아니면 새로운 사전을 추가
+                        tableData[table] = {'image': base64_image}
+                else:
+                    # 0번 인덱스가 없으면 새로운 사전을 추가
+                    tableData.append({'image': base64_image})
 
-                    # 수정된 배열을 다시 Firestore 문서에 저장
-                    date_doc_ref.update({
-                        'tableData': tableData
-                    })
-            else:
-                print("Document does not exist.")
+                # 수정된 배열을 다시 Firestore 문서에 저장
+                date_doc_ref.update({
+                    'tableData': tableData
+                })
+        else:
+            print("Document does not exist.")
+
 
     return jsonify(result)
 
