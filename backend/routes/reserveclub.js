@@ -184,10 +184,14 @@ reserveClub.post("/", async (req, res) => {
         for (let j = 1; j <= availableTable; j++) {
           const tableInfo = {
             [`T${j}`]: j === parseInt(tableNumber) ? true : false,
+            name: '',
+            studentId: '',
+            status: 'previous'
           };
           if (j === parseInt(tableNumber)) {
             tableInfo.name = userData.name;
             tableInfo.studentId = userData.studentId;
+            tableInfo.status = 'previous';
           }
           tableData.push(tableInfo);
         }
@@ -210,6 +214,7 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index][`T${tableNumber}`] = true;
           reservationData.tableData[index].name = userData.name;
           reservationData.tableData[index].studentId = userData.studentId;
+          reservationData.tableData[index].status = 'previous';
     
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -282,7 +287,7 @@ reserveClub.get(
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
     
-    
+    console.log(userId, startDate, endDate);
     try {
       // 사용자 정보 가져오기
       const userDoc = await getDoc(doc(db, "users", userId));
