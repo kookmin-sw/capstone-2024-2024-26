@@ -1,41 +1,40 @@
-.notice_container{
+.classRoom_container{
     width: 90vw;
     height: 92vh;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     background-color: rgb(208, 208, 208);
 }
-.notice{
+.classRoom{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.notice_box{
-    height: 88vh;
+.classRoom_box{
+    height: 42vh;
     width: 86vw;
     background-color: white;
+    margin-top: 3.5vh;
 }
-.notice_box_button{
-    height: 8vh;
+.classRoom_box_inner{
     display: flex;
-    flex: row;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
 }
-.notice_title{
-    font-weight: bolder;
-    font-size: larger;
-    margin: 0 20px;
+.classRoom_title{
+    font-weight: bold;
+    margin: 0.5vw 0;
 }
-.notice_add_button{
+.classRoom_table{
+    max-height: 35vh;  /* 원하는 최대 높이 설정 */
+    overflow-y: auto;   /* 필요시 y축 스크롤 생성 */
+}
+.classRoom_add_button{
     position: absolute;
     right: 5vw;
     height: 4vh;
-    width: 3vw;
+    width: 10vw;
     color: rgb(102, 102, 206);
-    font-size: 3vh;
     font-weight: bolder;
     background-color: white;
     border: solid 1px black;

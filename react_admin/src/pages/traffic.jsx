@@ -139,7 +139,6 @@ const updateCameraLocation = async () => {
       <thead>
         <tr>
           <th className='cameraTable_num'>카메라 번호</th>
-          <th className='cameraTable_building'>건물 이름</th>
           <th className='cameraTable_location'>카메라 위치</th>
           <th className='cameraTable_status'>작동 여부</th>
           <th className='cameraTable_manage'>관리</th>
@@ -149,7 +148,6 @@ const updateCameraLocation = async () => {
         {cameras.map((camera) => (
           <tr key={camera.id}>
             <td>{camera.id}</td>
-            <td>{camera.building}</td>
             <td>{camera.location}</td>
             <td>{camera.status || 'N/A'}</td>
             <td>

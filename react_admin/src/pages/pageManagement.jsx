@@ -14,6 +14,7 @@ const PageManagement = () => {
     available_Table: '',
     faculty: '',
     conferenceImage: null,
+    conferenceImagePreview: null,
     clubRoomImage: null,
     clubRoomDesignImage: null,
     preview: null,
@@ -85,7 +86,6 @@ const PageManagement = () => {
       };
       reader.readAsDataURL(file);
     } else {
-      // 파일이 없을 경우 해당 미리보기를 null로 설정
       setRoomData(prevData => ({ ...prevData, [`${name}Preview`]: null }));
     }
   };
@@ -294,15 +294,15 @@ const handleCloseClubPopup = () => {
                           />
                           </div>
                           <div className='popup_inner_input'>
-                          {roomData.preview && (
+                          {roomData.conferenceImagePreview && (
                                                     <img
-                                                        src={roomData.preview}
+                                                        src={roomData.conferenceImagePreview}
                                                         alt="미리보기"
                                                         className='image_preview'
                                                     />
                                                 )}
                           <p className='popup_input_title'>사진 추가</p>
-                          <input type='file' onChange={handleFileChange} />
+                          <input type='file' name='conferenceImage' onChange={handleFileChange} />
                           </div>
                           </div>
                           <button onClick={handleCreateRoom}>생성하기</button>                          
@@ -441,26 +441,30 @@ const handleCloseClubPopup = () => {
                   {clubRoomInfo.length > 0 ? (
           <ul>
             {clubRoomInfo.map((room, index) => (
-              <li key={index}>
-                <div className='addition_chart_element'>
-                  <div className='chart_element_image'>
-                    {room.clubRoomImage && <img src={`data:image/jpeg;base64,${room.clubRoomImage}`} alt="Club Room" className="roomImage_preview" />}
-                  </div>
-                  <div className='chart_element_data'>
-                            <p>{room.faculty}</p>
-                            <p>강의실: {room.roomName}</p>
-                            <p>사용가능 시간: {room.available_Time}</p>
-                            <p>사용가능 인원: {room.available_People}</p>
-                            <p>사용가능 테이블: {room.available_Table}</p>
-                            <button onClick={() => handleDeleteClubRoom(room.faculty, room.roomName)}>삭제</button>
-                  </div>
-                  </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No club room information available.</p>
-        )}
+        <li key={index}>
+          <div className='addition_chart_element'>
+            <div className='chart_element_image'>
+              {room.clubRoomImage ? (
+                <img src={`data:image/jpeg;base64,${room.clubRoomImage}`} alt="Club Room" className="roomImage_preview" />
+              ) : (
+                <p>No Image Available</p>
+              )}
+            </div>
+            <div className='chart_element_data'>
+              <p>{room.faculty}</p>
+              <p>강의실: {room.roomName}</p>
+              <p>사용가능 시간: {room.available_Time}</p>
+              <p>사용가능 인원: {room.available_People}</p>
+              <p>테이블 개수: {room.available_Table}</p>
+              <button onClick={() => handleDeleteClubRoom(room.faculty, room.roomName)}>삭제</button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No club room information available.</p>
+  )}
                   </div>
                 </div>
               </div>
