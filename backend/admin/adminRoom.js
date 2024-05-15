@@ -29,7 +29,6 @@ const db = getFirestore(app);
 
 const adminRoom = express.Router();
 
-
 // 강의실 생성 설정
 adminRoom.post("/create/room", async (req, res) => {
   const {
@@ -137,23 +136,25 @@ adminRoom.delete("/delete/conferenceInfo", async (req, res) => {
 
 // 강의실 예약 승인
 adminRoom.post("/agree", async (req, res) => {
-  const { userId, roomName, date, startTime, endTime } = req.body;
+  const { studentId, roomName, date, startTime, endTime } = req.body;
   try {
     // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
+    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const userDocSnapshot = await getDocs(user);
 
-    if (!userDoc.exists()) {
+    if (userDocSnapshot.empty) {
       return res.status(404).json({ error: "User not found" });
     }
-    const userData = userDoc.data();
 
+    const userDoc = userDocSnapshot.docs[0];
+    const userData = userDoc.data();
     const collectionName = `${userData.faculty}_Classroom_queue`;
 
     const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
 
     if (!existDocSnapShot.exists()) {
       // 해당 문서가 존재하지 않는 경우
-      return res.status(404).json({ error: "This Classroom does not exists" });
+      return res.status(404).json({ error: "This Classroom does not exist" });
     }
     const facultyConferenceCollectionQueue = collection(db, collectionName);
 
@@ -185,7 +186,7 @@ adminRoom.post("/agree", async (req, res) => {
     const timeDiff = endTimeHour - startTimeHour;
 
     if (timeDiff < 1) {
-      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+      return res.status(402).json({ error: "Invalid startTime and endTime" });
     }
 
     const data = [];
@@ -270,8 +271,7 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
+                
 
                 // 예약된 문서 정보 조회
                 userReservations.push({
@@ -349,8 +349,7 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
+                
 
                 // 예약된 문서 정보 조회
                 userReservations.push({
@@ -389,15 +388,18 @@ adminRoom.get(
 
 // 강의실 예약 내역 삭제
 adminRoom.delete("/delete", async (req, res) => {
-  const { userId, roomName, date, startTime, endTime } = req.body;
+  const { studentId, roomName, date, startTime, endTime } = req.body;
 
   try {
     // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
+    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const userDocSnapshot = await getDocs(user);
 
-    if (!userDoc.exists()) {
+    if (userDocSnapshot.empty) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    const userDoc = userDocSnapshot.docs[0];
     const userData = userDoc.data();
 
     const collectionName = `${userData.faculty}_Classroom`;
@@ -432,7 +434,7 @@ adminRoom.delete("/delete", async (req, res) => {
 // 강의실 예약
 adminRoom.post("/reserve", async (req, res) => {
   const {
-    userId,
+    studentId,
     roomName,
     date,
     startTime,
@@ -443,11 +445,14 @@ adminRoom.post("/reserve", async (req, res) => {
   } = req.body;
   try {
     // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
+    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const userDocSnapshot = await getDocs(user);
 
-    if (!userDoc.exists()) {
+    if (userDocSnapshot.empty) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    const userDoc = userDocSnapshot.docs[0];
     const userData = userDoc.data();
 
     const collectionName = `${userData.faculty}_Classroom`;
@@ -524,7 +529,7 @@ adminRoom.post("/reserve", async (req, res) => {
             studentDepartment: studentDepartments,
             usingPurpose: usingPurpose,
             boolAgree: true,
-            signImagesEncode: []
+            signImagesEncode: [],
           });
         }
       }
