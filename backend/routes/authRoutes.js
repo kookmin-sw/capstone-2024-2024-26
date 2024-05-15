@@ -88,7 +88,7 @@ router.post("/signup", async (req, res) => {
 
 // 로그인
 router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, } = req.body;
 
   try {
     // Firebase를 이용하여 이메일과 비밀번호로 로그인

@@ -33,7 +33,7 @@ const reserveClub = express.Router();
 // 관리자가 등록한 예약 가능 공유공간 조회 (메인)
 reserveClub.post("/main_lentroom/:uid", async (req, res) => {
   const { uid } = req.body;
- 
+  console.log(uid);
   try {
     //이 데이터 웹에서 받아와서 디비에 저장해야함 .
     // 사용자 정보 가져오기
@@ -61,7 +61,8 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
       
       time: existData.available_Time,
       people: existData.available_People,
-      conferenceImage: existData.conferenceImage,
+      clubRoomImage: existData.clubRoomImage,
+      clubRoomDesignImage : existData.clubRoomDesignImage,
     });
   });
   console.log(share_room_data);

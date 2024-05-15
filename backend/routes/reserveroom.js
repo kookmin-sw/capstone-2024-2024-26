@@ -141,6 +141,55 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
+// 날짜 받았을때 가능 시간대 보여주기 
+reserveroom.post('/selectdate', async (req, res) => {
+  const { userId, roomName, date } = req.body; // 클라이언트로부터 userId, roomName, date를 쿼리 파라미터로 받습니다.
+
+ 
+  try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+          return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+
+      const collectionName = `${userData.faculty}_Classroom`;
+      const clubRoomDoc = doc(db, collectionName, roomName);
+
+      // 해당 동아리방 정보 조회
+      const clubRoomDocSnap = await getDoc(clubRoomDoc);
+      if (!clubRoomDocSnap.exists()) {
+          return res.status(404).json({ error: "Club room does not exist" });
+      }
+
+      // 해당 날짜에 대한 예약 컬렉션 참조
+      const dateCollection = collection(clubRoomDoc, date);
+      const querySnapshot = await getDocs(dateCollection);
+      
+      const reservations = [];
+      querySnapshot.forEach(doc => {
+          // 각 문서(예약)에서 예약된 시간추출
+          const data = doc.data();
+          reservations.push({
+              timeRange: doc.id, // 문서 ID는 예약 시간대 (예: "9-10")
+              
+          });
+      });
+
+      // 예약된 시간대 반환
+      res.status(200).json({
+          
+          reservations: reservations
+      });
+
+  } catch (error) {
+      console.error("Error fetching reservations", error);
+      res.status(500).json({ error: "Failed to fetch reservations" });
+  }
+});
+
+
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 강의실 예약 내역 조회
 reserveroom.get(
   "/reservationrooms/:userId/:startDate/:endDate",
