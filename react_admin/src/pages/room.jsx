@@ -12,6 +12,41 @@ const Room = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentReservation, setCurrentReservation] = useState(null);
   const [showApproveButton, setShowApproveButton] = useState(true);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [newReservation, setNewReservation] = useState({
+    studentId: '',
+    name: '',
+    email: '',
+    roomName: '',
+    date: '',
+    startTime: '',
+    endTime: ''
+  });
+
+  const handleOpenReservationModal = () => {
+    setIsReservationModalOpen(true);
+  };
+
+  const handleCloseReservationModal = () => {
+    setIsReservationModalOpen(false);
+  };
+
+  //새로운 강의실 예약 생성 이벤트 핸들러함수
+  const handleAddReservation = async (reservationData) => {
+    try {
+      const response = await axios.post('http://localhost:3000/adminRoom/addReservation', reservationData);
+      if (response.status === 200) {
+        alert('예약이 성공적으로 추가되었습니다.');
+        // Optionally refresh the reservations list here
+      } else {
+        throw new Error('Failed to add reservation');
+      }
+    } catch (error) {
+      console.error('예약 추가에 실패했습니다:', error);
+      alert('예약 추가에 실패했습니다.');
+    }
+    handleCloseReservationModal();
+  };
 
   const handleOpenModal = (reservation, isApproved = false) => {
     setCurrentReservation(reservation);
@@ -110,6 +145,46 @@ const Room = () => {
     }
 };
 
+//승인 강의실 예약 데이터 삭제 관련 이벤트 핸들러 함수
+const handleDeleteReservation = async (reservation) => {
+  const { mainStudentId, roomName, date, startTime, endTime } = reservation;
+
+  const startTimeHour = parseInt(startTime.split(":")[0]);
+  const endTimeHour = parseInt(endTime.split(":")[0]);
+
+  try {
+    for (let hour = startTimeHour; hour < endTimeHour; hour++) {
+      const start = `${hour}`;
+      const end = `${hour + 1}`;
+
+      const response = await axios.delete('http://localhost:3000/adminRoom/delete', {
+        data: {
+          studentId: mainStudentId,
+          roomName,
+          date,
+          startTime: `${start}:00`, // "10:00" 형식
+          endTime: `${end}:00` // "11:00" 형식
+        }
+      });
+
+      if (response.status !== 200) {
+        throw new Error(`Failed to delete reservation from ${start}:00 to ${end}:00`);
+      }
+    }
+
+    alert('예약이 성공적으로 삭제되었습니다.');
+    // 여기에서 상태 업데이트 로직 추가 (예약 목록에서 해당 예약 제거)
+    setApprovedReservations(prevReservations => 
+      prevReservations.filter(item => 
+        !(item.roomName === roomName && item.date === date && item.startTime === startTime && item.endTime === endTime)
+      )
+    );
+  } catch (error) {
+    console.error('예약 삭제에 실패했습니다:', error);
+    alert('예약 삭제에 실패했습니다.');
+  }
+};
+
   //승인 강의실 예약 데이터 관련 테이블 함수
   const ApprovedTable = ({ reservations, onDelete }) => {
     return (
@@ -139,9 +214,9 @@ const Room = () => {
               </button>
               </td>
               <td>
-                <button className="delete-button" onClick={() => onDelete(reservation)}>
-                  삭제하기
-                </button>
+              <button className="delete-button" onClick={() => handleDeleteReservation(reservation)}>
+                삭제하기
+              </button>
               </td>
             </tr>
           ))}
@@ -185,7 +260,7 @@ const Room = () => {
   };
 
   
-  const Modal = ({ reservation, onClose, onApprove, showApproveButton = true }) => {
+  const Modal = ({ reservation, onClose, onApprove}) => {
     let participants = [];
     try {
       participants = JSON.parse(reservation.participants);
@@ -205,25 +280,66 @@ const Room = () => {
         )}
         </div>
           <hr></hr>
+          <div className='form_box'>
           <h3>[강의실 신청 목적]</h3>
           <p>내용: {reservation.usingPurpose}</p>
+          <hr></hr>
           <h3>[대표자]</h3>
           <p>대표자 이름: {reservation.mainName}</p>
           <p>대표자 학번: {reservation.mainStudentId}</p>
           <p>대표자 이메일: {reservation.mainEmail}</p>
           <p>대표자 전화번호: {reservation.mainPhoneNumber}</p>
+          <hr></hr>
           <h3>[참가자]</h3>
           {participants.map((participant, index) => (
             <div key={index}>
               <p>참가자 이름: {participant.name}</p>
               <p>참가자 학번: {participant.studentId}</p>
               <p>참가자 학과: {participant.department}</p>
+              <hr></hr>
             </div>
           ))}
+          </div>
       </div>
       </div>
     );
   };
+
+  const ReservationModal = ({ isOpen, onClose, onSubmit }) => {
+    if (!isOpen) return null;
+
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setNewReservation(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSubmit(newReservation);
+      setNewReservation({ studentId: '', name: '', email: '', roomName: '', date: '', startTime: '', endTime: '' }); // Reset form
+    };
+
+    return (
+      <div className="modal-backdrop">
+        <div className="modal-content">
+          <span className="close-button" onClick={onClose}>&times;</span>
+          <h2>강의실 예약 추가</h2>
+          <hr></hr>
+          <form onSubmit={handleSubmit}>
+            <label>학번: <input type="text" name="studentId" value={newReservation.studentId} onChange={handleChange} /></label>
+            <label>이름: <input type="text" name="name" value={newReservation.name} onChange={handleChange} /></label>
+            <label>이메일: <input type="email" name="email" value={newReservation.email} onChange={handleChange} /></label>
+            <label>강의실 이름: <input type="text" name="roomName" value={newReservation.roomName} onChange={handleChange} /></label>
+            <label>날짜: <input type="date" name="date" value={newReservation.date} onChange={handleChange} /></label>
+            <label>시작 시간: <input type="time" name="startTime" value={newReservation.startTime} onChange={handleChange} /></label>
+            <label>종료 시간: <input type="time" name="endTime" value={newReservation.endTime} onChange={handleChange} /></label>
+            <button type="submit">예약 추가</button>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
 
   return (
     <div className="main-container">
@@ -235,7 +351,13 @@ const Room = () => {
             <div className='classRoom'>
               <div className='classRoom_box'>
                 <div className='classRoom_box_inner'>
-                  <p className='classRoom_title'>승인 강의실 예약내역</p> <button className='classRoom_add_button'>강의실 예약 추가하기</button>
+                  <p className='classRoom_title'>승인 강의실 예약내역</p>
+                  <button className="add-reservation-button" onClick={handleOpenReservationModal}>+강의실 예약 추가하기</button>
+                  <ReservationModal
+                  isOpen={isReservationModalOpen}
+                  onClose={handleCloseReservationModal}
+                  onSubmit={handleAddReservation}
+                  />
                 </div>
                 <div className='classRoom_table'>
                   <ApprovedTable reservations={approvedReservations}/>
