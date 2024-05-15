@@ -7,8 +7,8 @@ import 'package:frontend/sign_in.dart';
 import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/myPage.dart';
-import 'lent_conference.dart';
-import 'package:frontend/lent_conference.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'return.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -185,7 +185,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://172.16.101.160:3000/reserveclub/main_lentroom/:uid';
+    const url = 'http://192.168.200.103:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -221,7 +221,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
     const url =
-        'http://172.16.101.160:3000/reserveclub/main_conference_room/:uid';
+        'http://192.168.200.103:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

@@ -28,6 +28,9 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses the camera to take photos for uploading user profile pictures.</string>
+	<key>NSMicrophoneUsageDescription</key>
+<string>your usage description here</string>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

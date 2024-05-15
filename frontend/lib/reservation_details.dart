@@ -53,7 +53,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://172.16.101.160:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://192.168.200.103:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -116,7 +116,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://172.16.101.160:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://192.168.200.103:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));

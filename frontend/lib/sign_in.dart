@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -189,11 +190,13 @@ class _SignInState extends State<SignIn> {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
-
-    const url = 'http://172.16.101.160:3000/auth/signin';
+    // String? _fcmToken = await FirebaseMessaging.instance.getToken();
+    // debugPrint('fcmToken: $_fcmToken');
+    const url = 'http://192.168.200.103:3000/auth/signin';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
+      // 'fcmToken': _fcmToken ?? '',
     };
 
     debugPrint('$data');
