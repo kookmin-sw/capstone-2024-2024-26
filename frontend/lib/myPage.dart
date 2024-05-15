@@ -25,12 +25,96 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   String name = '';
   String club = '';
+  bool isAgreed = false;
   String? studentId;
   String? penalty;
   @override
   void initState() {
     super.initState();
     _checkUidStatus();
+  }
+
+  void _showGuidanceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        bool isChecked = false; // 체크박스 상태 관리용 변수
+        return Dialog(
+          backgroundColor: Colors.transparent, // Dialog 배경을 투명하게 설정
+          child: Container(
+            width: 1500, // 다이얼로그의 너비 설정
+            height: 700, // 다이얼로그의 높이 설정
+            decoration: BoxDecoration(
+                color: Colors.white, // 다이얼로그의 배경색 지정
+                borderRadius: BorderRadius.circular(4) // 모서리를 직각으로 설정
+                ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    "이용안내",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      "\n* 공유공간은 학생들이 그룹 스터디, 토론,\n 조별과제 등의 팀 단위 학업 수행을 위해 마련된 \n공간으로 팀 단위 당 하루 최대 4시간을 예약하여 \n이용하실 수 있습니다.\n\n* 강의실 신청자는 학생증(신분증)을 필히 지참하여 당직근무자가 확인을 위하여 학생증\n 제시를 요구할 시 이에 응하여야 하며, 당직근무자의 지시에 순응하여야 한다.\n* 화재 및 안전사고 예방에 주의해야 하며 전열기 및 위험물질의 사용을 금합니다.\n* 강의실 사용 목적 이외의 행위(취사 및 음주)를 금합니다.\n* 강의실 사용 중에 비품 및 기자재의 파손 및 망실에 대한 책임은 \n[교내 물품 관리 규정] 제14조에 의거합니다.\n* 강의실 내에 설치된 비품 및 기자재 보존과 청결을 유지할 것을 약속합니다.\n* 강의실 사용 시 음식물 반입을 금지합니다.\n* 대여 가능한 기간은 최장 5일입니다(주말 제외).\n\n주의사항\n\n1.예약 신청 후 사전 취소 없이 2회 공간 미이용 시 \n시설 이용 페널티가 발생합니다.\n2.페널티 2회 이상 부여 받을 시에는 60일의 \n시설 이용이 정지됩니다. \n3.예약 신청 시간 이후 10분 내에 입실하지 않을 시에 \n예약 취소되며 다음 대기자에게 자동 예약됩니다.\n 4.음식물 취식 가능 여부 등은 해당 공간의 \n규칙에 따라 상이합니다.\n 5.사용 후 정리 정돈 및 사진 촬영은 필수이며 이행하지 \n않을 시에는 페널티가 부여됩니다. \n6.정리 정돈 사진은 AI에 의해 통과 여부가 판단됩니다. ",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      activeColor: const Color(0xFF004F9E),
+                      value: isChecked,
+                      onChanged: (bool? value) {
+                        // 체크박스 상태를 업데이트하고 다이얼로그를 닫음
+                        setState(() {
+                          isChecked = value!;
+                        });
+                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                      },
+                    ),
+                    Text(
+                      "이해했습니다.",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0XFF004F9E),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
+                if (isAgreed) // 체크박스가 체크되면 버튼 표시
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    },
+                    child: Text("확인"),
+                  )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   File? _image;
@@ -226,7 +310,7 @@ class _MyPageState extends State<MyPage> {
               children: [
                 TextButton(
                   onPressed: () => {
-                    //
+                    _showGuidanceDialog(context),
                   },
                   style: ElevatedButton.styleFrom(
                     shadowColor: Colors.transparent, // Remove shadow color

@@ -107,7 +107,7 @@ class _select extends State<Select_reserve> {
     super.initState();
 
     _checkUidStatus();
-    print(designImage);
+
     _checkFirstVisit();
 
     selectedDate = DateTime.now();
@@ -207,6 +207,7 @@ class _select extends State<Select_reserve> {
         reservations = json.decode(response.body);
 
         _checkReservation(reservations);
+        _showGuidanceDialog();
       } else {
         // 서버 에러 처리
         print('Failed to send date. Status code: ${response.statusCode}');
