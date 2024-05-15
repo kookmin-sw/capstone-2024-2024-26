@@ -1,46 +1,113 @@
-.main-content {
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* 메인 컨테이너 설정 */
+.main-container {
     display: flex;
-    flex-direction: row;
-    width: 90vw;
-    height: 92vh;
-    background-color: rgb(208, 208, 208);
+    flex-direction: column;
+    height: 100vh;
+}
+
+.sidebar-and-content {
+    display: flex;
+    flex: 1;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .calendar_box {
-    margin-top: 15vh;
-    width: 45vw;
-    height: 50vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center; /* 달력을 세로 중앙에 배치 */
+    align-items: center;
 }
 
-.calendar_show {
-    width: 40vw;
-    background-color: #f4f4f4;
-    padding: 20px;
-    border: 1px solid gray;
-}
-
-/* 달력 컴포넌트에 대한 스타일 추가 */
 .react-calendar {
     width: 100%;
-    height: 100%; /* 부모 컨테이너에 맞춰서 크기 조정 */
-    /*max-width: none; /* 필요한 경우 최대 너비 제한 해제 */
+    height: 100%;
+    max-width: 90vw;
+    max-height: 90vh;
+    border: none;
+    font-size: 1.2em;
 }
-.calendar_show table {
+
+/* 팝업 스타일 설정 */
+.react-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.react-modal-content {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    outline: none;
+}
+
+.react-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+/* 테이블 스타일 설정 */
+table {
     width: 100%;
-    table-layout: fixed; /* 고정된 테이블 레이아웃을 사용 */
+    border-collapse: collapse;
+    margin-top: 20px;
 }
-.reserve-room{
-    width: 5vw;
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
-.reserve-time{
-    width: 6vw;
+
+th {
+    background-color: #f4f4f4;
 }
-.reserve-name{
-    width: 4vw;
+
+tr:hover {
+    background-color: #f1f1f1;
 }
-.reserve-email{
-    width: 10vw;
+
+.reserve-type, .reserve-room, .reserve-time, .reserve-name, .reserve-email {
+    width: 20%;
+}
+
+.react-modal-close {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.react-modal-close:hover {
+    background-color: #0056b3;
 }
