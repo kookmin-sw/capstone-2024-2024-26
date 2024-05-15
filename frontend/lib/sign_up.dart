@@ -239,7 +239,8 @@ class _SignUpState extends State<SignUp> {
               buildInputField('휴대폰 번호를 입력하세요', controller: phoneController),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
+                padding:
+                    const EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
                 child: Row(
                   children: [
                     Checkbox(
@@ -438,7 +439,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> registerUser() async {
-    const url = 'http://localhost:3000/auth/signup';
+    const url = 'http://172.16.101.160:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,

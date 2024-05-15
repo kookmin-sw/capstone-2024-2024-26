@@ -466,7 +466,7 @@ class _MyPageState extends State<MyPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://localhost:3000/auth/profile/:uid';
+    const url = 'http://172.16.101.160:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

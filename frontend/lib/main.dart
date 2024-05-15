@@ -185,7 +185,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://localhost:3000/reserveclub/main_lentroom/:uid';
+    const url = 'http://172.16.101.160:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -220,7 +220,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     setState(() {
       isLoading = true; // 로딩 시작
     });
-    const url = 'http://localhost:3000/reserveclub/main_conference_room/:uid';
+    const url =
+        'http://172.16.101.160:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

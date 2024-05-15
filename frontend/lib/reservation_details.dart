@@ -53,7 +53,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://localhost:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://172.16.101.160:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -65,6 +65,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         setState(() {
           isLoading = false;
           reservations = data['reservations'];
+          List<dynamic> mergedReservations =
+              mergeConsecutiveReservations(reservations);
+          reservations = mergedReservations;
         });
 
         return data['reservations'];
@@ -75,6 +78,29 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     } catch (e) {
       throw Exception('Failed to load reservations: $e');
     }
+  }
+
+  List<dynamic> mergeConsecutiveReservations(List<dynamic> reservations) {
+    if (reservations.isEmpty) return [];
+
+    reservations.sort((a, b) => a['startTime'].compareTo(b['startTime']));
+    List<dynamic> merged = [];
+
+    var current = reservations.first;
+
+    for (var i = 1; i < reservations.length; i++) {
+      var next = reservations[i];
+      if (current['date'] == next['date'] &&
+          current['endTime'] == next['startTime']) {
+        current['endTime'] = next['endTime'];
+      } else {
+        merged.add(current);
+        current = next;
+      }
+    }
+
+    merged.add(current);
+    return merged;
   }
 
   Future<List<dynamic>> done_Reservations(
@@ -90,7 +116,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://localhost:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://172.16.101.160:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -102,6 +128,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         setState(() {
           isLoading = false;
           done_reservations = data['reservations'];
+          List<dynamic> mergedReservations =
+              mergeConsecutiveReservations(done_reservations);
+          done_reservations = mergedReservations;
         });
 
         return data['reservations'];
@@ -192,32 +221,41 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
               ),
               const Padding(padding: EdgeInsets.only(bottom: 10)),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: reservations.length,
-                itemBuilder: (context, index) {
-                  if (reservations[index]['tableData']['status'] ==
-                      'previous') {
-                    // 이용 예정인 예약만 표시
-                    Map<String, dynamic> reservation = reservations[index];
-
-                    return Column(
-                      children: [
-                        _buildReservationItem(
-                          reservation['roomName'],
-                          reservation['date'],
-                          reservation['startTime'],
-                          reservation['endTime'],
-                          getKeyWithTrueValue(reservation['tableData']),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
+              reservations.isNotEmpty
+                  ? ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: reservations.length,
+                      itemBuilder: (context, index) {
+                        if (reservations[index]['tableData']['status'] ==
+                            'previous') {
+                          Map<String, dynamic> reservation =
+                              reservations[index];
+                          return Column(
+                            children: [
+                              _buildReservationItem(
+                                reservation['roomName'],
+                                reservation['date'],
+                                reservation['startTime'],
+                                reservation['endTime'],
+                                getKeyWithTrueValue(reservation['tableData']),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const SizedBox.shrink(); // 아무 것도 표시하지 않음
+                        }
+                      },
+                    )
+                  : const Center(
+                      child: Text(
+                        '예약 내역이 없습니다.',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey),
+                      ),
+                    ),
               const SizedBox(height: 20),
               const DottedLine(
                 direction: Axis.horizontal,
@@ -247,33 +285,45 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
               ),
               const Padding(padding: EdgeInsets.only(bottom: 10)),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: done_reservations.length,
-                itemBuilder: (context, index) {
-                  if (done_reservations[index]['tableData']['status'] ==
-                      'done') {
-                    // 이용 완료인 예약만 표시
-                    Map<String, dynamic> done_reservation =
-                        done_reservations[index];
-
-                    return Column(
-                      children: [
-                        _buildUsageHistoryItem(
-                          done_reservation['roomName'],
-                          done_reservation['date'],
-                          done_reservation['startTime'],
-                          done_reservation['endTime'],
-                          getKeyWithTrueValue(done_reservation['tableData']),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
+              if (done_reservations.isNotEmpty &&
+                  done_reservations
+                      .any((res) => res['tableData']['status'] == 'done'))
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: done_reservations.length,
+                  itemBuilder: (context, index) {
+                    if (done_reservations[index]['tableData']['status'] ==
+                        'done') {
+                      // 이용 완료인 예약만 표시
+                      Map<String, dynamic> done_reservation =
+                          done_reservations[index];
+                      return Column(
+                        children: [
+                          _buildUsageHistoryItem(
+                            done_reservation['roomName'],
+                            done_reservation['date'],
+                            done_reservation['startTime'],
+                            done_reservation['endTime'],
+                            getKeyWithTrueValue(done_reservation['tableData']),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const SizedBox.shrink(); // 아무 것도 표시하지 않음
+                    }
+                  },
+                )
+              else
+                const Center(
+                  child: Text(
+                    '완료된 예약 내역이 없습니다.',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
+                  ),
+                ),
             ],
           ),
         ),
@@ -360,7 +410,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 80),
+                const SizedBox(width: 100),
                 Text(
                   '공유공간',
                   style: TextStyle(
@@ -528,7 +578,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 80),
+                const SizedBox(width: 100),
                 const Text(
                   '공유공간',
                   style: TextStyle(

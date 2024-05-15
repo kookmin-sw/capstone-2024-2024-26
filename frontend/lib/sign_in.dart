@@ -190,7 +190,7 @@ class _SignInState extends State<SignIn> {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
-    const url = 'http://localhost:3000/auth/signin';
+    const url = 'http://172.16.101.160:3000/auth/signin';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,

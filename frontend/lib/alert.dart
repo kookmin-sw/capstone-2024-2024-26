@@ -52,7 +52,7 @@ class AlertPage extends StatelessWidget {
             label: '대여하기',
           ),
           BottomNavigationBarItem(
-             icon: SvgPicture.asset('assets/icons/reserved.svg'),
+            icon: SvgPicture.asset('assets/icons/reserved.svg'),
             label: '예약 내역',
           ),
           BottomNavigationBarItem(

@@ -141,7 +141,7 @@ class _Complete extends State<Complete> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        ' ${startTime}:00 ~ ${endTime}:00  | 좌석 ${table_number}',
+                        ' ${startTime}:00 ~ ${endTime}:00  | 좌석 T${table_number}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
