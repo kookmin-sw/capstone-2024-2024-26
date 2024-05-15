@@ -2,7 +2,7 @@ import React,{ useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
-import '../styles/notification.css';
+import '../styles/club.css';
 
 //구현 기능 : 동아리방 예약 조회 + 반납 사진 받아야함
 const Club = () => {
@@ -47,12 +47,12 @@ const RenderTable = () => {
     <table className="reservations-table">
       <thead>
         <tr>
-          <th>날짜</th>
-          <th>방 이름</th>
-          <th>사용시간</th>
-          <th>테이블 번호</th>
-          <th>학번</th>
-          <th>반납사진</th>
+          <th className='club_date'>날짜</th>
+          <th className='club_room'>방 이름</th>
+          <th className='club_time'>사용시간</th>
+          <th className='club_table'>테이블 번호</th>
+          <th className='club_id'>학번</th>
+          <th className='club_return'>반납사진</th>
         </tr>
       </thead>
       <tbody>
@@ -85,10 +85,11 @@ const RenderTable = () => {
                 <div className='member_box'>
                   <div className='member_button'>
                     <p className='member_title'>공유공간 예약 관리</p>
-                    <button className='search_button'>검색</button>
                   </div>
                   <hr></hr>
+                  <div className='club_table_box'>
                   <RenderTable/>
+                  </div>
                 </div>
               </div>
             </div>

@@ -434,14 +434,11 @@ adminRoom.delete("/delete", async (req, res) => {
 // 강의실 예약
 adminRoom.post("/reserve", async (req, res) => {
   const {
-    studentId,
     roomName,
     date,
     startTime,
     endTime,
-    usingPurpose,
-    studentIds, // studentIds 리스트 형태로!(대표자 학번 뺴고)
-    numberOfPeople,
+    usingPurpose
   } = req.body;
   try {
     // 사용자 정보 가져오기
@@ -519,17 +516,20 @@ adminRoom.post("/reserve", async (req, res) => {
           }
 
           await setDoc(reservationDocRef, {
-            mainName: userData.name, // 누가 대표로 예약을 했는지(책임 문제)
-            mainFaculty: userData.faculty, // 대표자 소속
-            mainStudentId: userData.studentId, // 대표자 학번
-            mainPhoneNumber: userData.phone, // 대표자 전화번호
-            mainEmail: userData.email, // 대표자 이메일
-            studentName: studentNames,
-            studentId: studentIds,
-            studentDepartment: studentDepartments,
+            roomName: roomName,
+            date: date,
+            startTime: startTime,
+            endTime: endTime,
+            mainName: "관리자", // 누가 대표로 예약을 했는지(책임 문제)
+            mainFaculty: "", // 대표자 소속
+            mainStudentId: "", // 대표자 학번
+            mainPhoneNumber: "", // 대표자 전화번호
+            mainEmail: "", // 대표자 이메일
+            participants: "",
+            numberOfPeople: "",
             usingPurpose: usingPurpose,
             boolAgree: true,
-            signImagesEncode: [],
+            signature: "",
           });
         }
       }
