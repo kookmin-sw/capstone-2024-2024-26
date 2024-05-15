@@ -14,12 +14,17 @@ import 'notice.dart';
 class Select_reserve extends StatefulWidget {
   final String roomName;
   final String time;
-  Select_reserve({Key? key, required this.roomName, required this.time})
+  final String designImage;
+  Select_reserve(
+      {Key? key,
+      required this.roomName,
+      required this.time,
+      required this.designImage})
       : super(key: key);
 
   @override
   State<Select_reserve> createState() =>
-      _select(roomName: roomName, time: time);
+      _select(roomName: roomName, time: time, designImage: designImage);
 }
 
 class _select extends State<Select_reserve> {
@@ -29,11 +34,12 @@ class _select extends State<Select_reserve> {
   final ScrollController _scrollController = ScrollController();
 
   Map<String, dynamic> reservations = {}; // 예약 정보를 불러와서 비활성화할거임 .
-
+  String designImage;
   String roomName;
   _select({
     required this.roomName,
     required this.time,
+    required this.designImage,
   });
 
   final double intervalWidth = 50.0;
@@ -101,7 +107,7 @@ class _select extends State<Select_reserve> {
     super.initState();
 
     _checkUidStatus();
-
+    print(designImage);
     _checkFirstVisit();
 
     selectedDate = DateTime.now();
@@ -388,6 +394,8 @@ class _select extends State<Select_reserve> {
                         thickness: 0.5,
                         height: 20,
                       ),
+                      Image.memory(base64Decode(designImage),
+                          width: 313, height: 150, fit: BoxFit.fill),
 
                       TableCalendar(
                         // 이슈 등록 해야함 멈춤 증상 , locale: 'ko_KR',

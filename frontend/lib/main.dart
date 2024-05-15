@@ -156,7 +156,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   String time = '';
   String people = '';
   String roomName = '';
-
+  String roomImage = '';
+  String designImage = '';
   @override
   void initState() {
     super.initState();
@@ -204,6 +205,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
           spaceData.add(responseData['share_room_data']);
+
           isLoading = false; // 로딩 끝
         });
       } else {}
@@ -391,6 +393,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     final data = is_tap
                         ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
                         : (spaceData.isNotEmpty ? spaceData[0][index] : null);
+
                     return Column(
                       children: [
                         SizedBox(height: 10), // Add spacing here
@@ -400,6 +403,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                 time: data['time']!,
                                 people: data['people']!,
                                 roomName: data['roomName']!,
+                                roomImage: data['clubRoomImage'] ??
+                                    data['conferenceImage'],
+                                designImage: data['clubRoomDesignImage'] ?? '',
                                 istap: is_tap,
                               )
                             : Container(), // Return empty container if data is null
@@ -475,12 +481,17 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String time;
   final String people;
   final String roomName;
+  final String roomImage;
+  final String designImage;
   final bool istap;
+
   const _CustomScrollViewWidget({
     Key? key,
     required this.time,
     required this.people,
     required this.roomName,
+    required this.roomImage,
+    required this.designImage,
     required this.istap,
   }) : super(key: key);
 
@@ -509,10 +520,11 @@ class _CustomScrollViewWidget extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 5),
-                child: Image.asset(
-                  'assets/images.png',
+                child: Image.memory(
+                  base64Decode(roomImage),
                   width: 340.63,
                   height: 164.03,
+                  fit: BoxFit.cover,
                 ),
               ),
               Positioned(
@@ -625,7 +637,11 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         ? Select_reserve_cf(
                             roomName: roomName,
                           )
-                        : Select_reserve(roomName: roomName, time: time)),
+                        : Select_reserve(
+                            roomName: roomName,
+                            time: time,
+                            designImage: designImage,
+                          )),
               );
             },
             style: ElevatedButton.styleFrom(
