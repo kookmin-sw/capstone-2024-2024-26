@@ -157,3 +157,29 @@
   .delete-button:hover{
     background-color: rgb(250, 226, 226);
   }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-label {
+    display: inline-block;
+    width: 120px; /* 레이블의 고정 너비를 설정 */
+    font-weight: bold;
+  }
+  
+  input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: calc(100% - 140px); /* 레이블 너비를 뺀 나머지 공간을 채움 */
+  }
+  .admin_reservation_button{
+    background-color: transparent;
+    border-radius: 10px;
+    border: 1px solid #004F9E;
+    width: 10vw;
+    margin-left: 15vw;
+  }
+  .admin_reservation_button:hover{
+    background-color: #004f9e3a;
+  }

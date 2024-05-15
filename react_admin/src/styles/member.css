@@ -70,8 +70,9 @@ td {
     border-radius: 5px;
     border: solid 0.2px black;
     position: absolute;
+    width: 10vw;
     right: 4vw;
-    height: 5vh;
+    height: 4vh;
     
 }
 .member_noitfy_button{

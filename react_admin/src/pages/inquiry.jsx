@@ -28,6 +28,7 @@ const Inquiry = () => {
         console.log('Data fetched successfully:', response.data);
         if (response.data && response.data.inquiries) {
           setInquiries(response.data.inquiries);
+          localStorage.setItem('inquiryCount', response.data.inquiries.length);
         }
       } catch (error) {
         console.error('Failed to fetch inquiries:', error);
