@@ -1,27 +1,8 @@
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
 }
 
 /* 메인 컨테이너 설정 */
-.main-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-.sidebar-and-content {
-    display: flex;
-    flex: 1;
-}
-
-.main-content {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .calendar_box {
     width: 100%;
     height: 100%;
@@ -73,7 +54,7 @@ body {
 }
 
 /* 테이블 스타일 설정 */
-table {
+.calendar_table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -81,7 +62,6 @@ table {
 
 th, td {
     padding: 10px;
-    text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
