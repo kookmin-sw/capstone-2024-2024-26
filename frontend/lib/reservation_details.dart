@@ -28,7 +28,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       DateTime.now().subtract(Duration(days: 14)); // 현재로부터 14일 전
   List<dynamic> reservations = [];
   List<dynamic> done_reservations = [];
-
+  bool is_tap = false;
   String userId = '';
   bool isLoading = false;
 
@@ -205,6 +205,89 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              Row(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            is_tap = !is_tap;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          textStyle: TextStyle(
+                            fontSize: 15, // Set the button text size
+                            fontWeight:
+                                FontWeight.bold, // Set the button text weight
+                            color: Color(0XFF004F9E),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            side: BorderSide(
+                                width: 0.50,
+                                color: is_tap
+                                    ? Color(0xFFD6D6D6)
+                                    : const Color(0xFF004F9E)),
+                          ),
+                          minimumSize:
+                              Size(193.7, 50), // Set the button minimum size
+                          backgroundColor:
+                              is_tap ? Colors.white : Color(0X0C004F9E),
+
+                          elevation:
+                              0, // Set the elevation for the button shadow
+                          shadowColor: Colors.white.withOpacity(
+                              0.5), // Set the color of the button shadow
+                        ),
+                        child: Text('공유공간 예약내역',
+                            style: TextStyle(
+                                color: is_tap
+                                    ? Color(0XFF7C7C7C)
+                                    : Color(0xFF004F9E))),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            is_tap = !is_tap;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          textStyle: TextStyle(
+                            fontSize: 15, // Set the button text size
+                            fontWeight:
+                                FontWeight.bold, // Set the button text weight
+                            color: Color(0XFF004F9E),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            side: BorderSide(
+                                width: 0.50,
+                                color: is_tap
+                                    ? const Color(0xFF004F9E)
+                                    : Color(0xFFD6D6D6)),
+                          ),
+                          minimumSize:
+                              Size(193.7, 50), // Set the button minimum size
+                          backgroundColor:
+                              is_tap ? Color(0X0C004F9E) : Colors.white,
+
+                          elevation:
+                              0, // Set the elevation for the button shadow
+                          shadowColor: Colors.white.withOpacity(
+                              0.5), // Set the color of the button shadow
+                        ),
+                        child: Text('강의실 예약내역',
+                            style: TextStyle(
+                                color: is_tap
+                                    ? Color(0xFF004F9E)
+                                    : Color(0XFF7C7C7C))),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
               const Padding(padding: EdgeInsets.only(top: 20)),
               const Align(
                 alignment: Alignment.centerLeft,

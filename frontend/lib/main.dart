@@ -536,7 +536,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(0),
                     ),
                   ),
                   child: TextButton(
@@ -578,8 +578,8 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   onTap: () {},
                   child: Row(
                     children: [
-                      Image.asset(
-                        'assets/group-fill.png',
+                      SvgPicture.asset(
+                        'assets/icons/group-fill.svg',
                         width: 14,
                         height: 14,
                       ),
@@ -607,8 +607,8 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      Image.asset(
-                        'assets/time-fill.png',
+                      SvgPicture.asset(
+                        'assets/icons/time-fill.svg',
                         width: 14,
                         height: 14,
                       ),

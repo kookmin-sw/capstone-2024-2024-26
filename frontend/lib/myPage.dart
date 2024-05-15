@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/question.dart';
 import 'package:frontend/sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -14,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'congestion.dart';
 import 'notice.dart';
+import 'question.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -236,11 +238,7 @@ class _MyPageState extends State<MyPage> {
                           ),
                           IconButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const SettingsPage()),
-                              );
+                              _flutterDialog(context, '수정이 제한되었습니다.', '확인');
                             },
                             icon: SvgPicture.asset(
                               'assets/icons/settings.svg',
@@ -328,7 +326,10 @@ class _MyPageState extends State<MyPage> {
                 _buildDivider(),
                 TextButton(
                   onPressed: () => {
-                    //
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => QuestionPage()),
+                    )
                   },
                   style: ElevatedButton.styleFrom(
                     shadowColor: Colors.transparent, // Remove shadow color
@@ -506,15 +507,19 @@ class _MyPageState extends State<MyPage> {
                               fontWeight: FontWeight.bold,
                             )),
                         onPressed: () {
-                          Navigator.pop(context);
-                          SharedPreferences.getInstance().then((prefs) {
-                            prefs.remove('uid');
-                            prefs.setString('token', 'false');
-                          });
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SignIn()),
-                          );
+                          if (text2 == '로그아웃') {
+                            Navigator.pop(context);
+                            SharedPreferences.getInstance().then((prefs) {
+                              prefs.remove('uid');
+                              prefs.setString('token', 'false');
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignIn()),
+                            );
+                          } else {
+                            Navigator.pop(context);
+                          }
                         },
                       ),
                     ],
