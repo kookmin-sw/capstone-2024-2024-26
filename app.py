@@ -120,6 +120,9 @@ def classi():
     user = data['user'] #유저(문서 id)
     #여기서 user 문서 아이디 받아오기
 
+    #시간이 ex) 10-12이런식이면
+    #10-11, 11-12로 쪼개서 다시 저장
+
     if myclass=='0':
         a = "소프트웨어융합대학_Classroom_queue"
         b = 'conferenceImage'
@@ -157,43 +160,51 @@ def classi():
         }, merge=True)
 
 
-
+    #여기서는 class에 저장
     if myclass=='0':
-        #여기서는 class에 저장
-        doc_ref = db.collection(c).document(location)
-        date_doc_ref = doc_ref.collection(date).document(time)
-        date_doc_ref.set({
-            'image': base64_image,  # 원하는 필드 이름과 값을 설정
-        }, merge=True)
+        doc_ref = db.collection(c).document(location)  
+        start_time = int(time[:2])
+        end_time = int(time[-2:])
+        for i in range(start_time, end_time):
+            new_time = str(i) + "-"  + str(i+1)
+            date_doc_ref = doc_ref.collection(date).document(new_time)
+            date_doc_ref.set({
+                'image': base64_image,  # 원하는 필드 이름과 값을 설정
+            }, merge=True)
+    
+    #여기서는 club에 저장
     else:
-        #여기서는 club에 저장
         doc_ref = db.collection(a).document(location)
-        date_doc_ref = doc_ref.collection(date).document(time)
-        doc = date_doc_ref.get()
-        if doc.exists:
-            current_data = doc.to_dict()
-            if current_data:
-                tableData = current_data.get('tableData', [])
+        start_time = int(time[:2])
+        end_time = int(time[-2:])
+        for i in range(start_time, end_time):
+            new_time = str(i) + "-"  + str(i+1)
+            date_doc_ref = doc_ref.collection(date).document(new_time)
+            doc = date_doc_ref.get()
+            if doc.exists:
+                current_data = doc.to_dict()
+                if current_data:
+                    tableData = current_data.get('tableData', [])
 
 
-                # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
+                    # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
 
-                if len(tableData) > table:
-                    if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
-                        tableData[table]['image'] = base64_image
+                    if len(tableData) > table:
+                        if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
+                            tableData[table]['image'] = base64_image
+                        else:
+                            # table번 인덱스가 사전이 아니면 새로운 사전을 추가
+                            tableData[table] = {'image': base64_image}
                     else:
-                        # table번 인덱스가 사전이 아니면 새로운 사전을 추가
-                        tableData[table] = {'image': base64_image}
-                else:
-                    # 0번 인덱스가 없으면 새로운 사전을 추가
-                    tableData.append({'image': base64_image})
+                        # 0번 인덱스가 없으면 새로운 사전을 추가
+                        tableData.append({'image': base64_image})
 
-                # 수정된 배열을 다시 Firestore 문서에 저장
-                date_doc_ref.update({
-                    'tableData': tableData
-                })
-        else:
-            print("Document does not exist.")
+                    # 수정된 배열을 다시 Firestore 문서에 저장
+                    date_doc_ref.update({
+                        'tableData': tableData
+                    })
+            else:
+                print("Document does not exist.")
 
 
     return jsonify(result)
