@@ -14,6 +14,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  getDocs
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -89,7 +90,7 @@ router.post("/signup", async (req, res) => {
 
 // 로그인
 router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password ,fcmToken } = req.body;
 
   try {
     // Firebase를 이용하여 이메일과 비밀번호로 로그인
@@ -99,6 +100,8 @@ router.post("/signin", async (req, res) => {
       password
     );
     const user = userCredential.user;
+
+    await updateDoc(doc(db,"users",user.uid), {fcmToken: fcmToken});
 
     // 로그인 성공 시 사용자 정보 반환
     res.status(200).json({
