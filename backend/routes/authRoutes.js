@@ -75,6 +75,7 @@ router.post("/signup", async (req, res) => {
       club: club,
       phone: phone,
       agreeForm: agreeForm,
+      penalty: 0,
     });
 
     // 회원가입 성공 시 응답
@@ -176,7 +177,6 @@ router.post("/profile/update/:uid", async (req, res) => {
 // 프로필 조회
 router.post("/profile/:uid", async (req, res) => {
   const { uid } = req.body;
-  console.log(req.body);
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴

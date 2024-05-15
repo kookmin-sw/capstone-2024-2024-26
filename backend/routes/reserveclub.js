@@ -142,13 +142,12 @@ reserveClub.post("/", async (req, res) => {
   }
 });
 
-// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
+// 사용자별 예약 내역 반환
 reserveClub.get(
-  "/reservationclubs/:userId/:startDate/:endDate",
+  "/reservationclubs/:userId/:startDate",
   async (req, res) => {
     const userId = req.params.userId;
     const startDate = new Date(req.params.startDate);
-    const endDate = new Date(req.params.endDate);
 
     try {
       // 사용자 정보 가져오기
@@ -163,7 +162,11 @@ reserveClub.get(
       const collectionName = `${userData.faculty}_Club`;
 
       // 사용자 예약 내역
+      // 사용한 예약 내역
       const userReservations = [];
+
+      // 이용 예정 예약 내역(이용 중 포함)
+      const userReservations1 = [];
 
       // 동아리방 컬렉션 참조
       const facultyClubCollectionRef = collection(db, collectionName);
@@ -174,41 +177,154 @@ reserveClub.get(
       await Promise.all(
         querySnapshot.docs.map(async (roomDoc) => {
           const roomName = roomDoc.id;
+          const offset = 1000 * 60 * 60 * 9;
+          const koreaNow = new Date(new Date().getTime() + offset);
+          const todayDateString = koreaNow.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+
+          // 사용한 예약 내역
           for (
             let currentDate = new Date(startDate);
-            currentDate <= new Date(endDate);
+            currentDate <= koreaNow;
             currentDate.setDate(currentDate.getDate() + 1)
           ) {
             const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
-            const dateCollectionRef = collection(
-              db,
-              `${collectionName}/${roomName}/${dateString}`
-            ); // 컬렉션 참조 생성
+            if (todayDateString == dateString) {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
 
-            // 해당 날짜별 시간 대 예약 내역 조회
-            const timeDocSnapshot = await getDocs(dateCollectionRef);
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
 
-            timeDocSnapshot.forEach((docSnapshot) => {
-              const reservationData = docSnapshot.data();
-              if (reservationData && reservationData.tableData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+                  const timeString = koreaNow
+                    .toISOString()
+                    .split("T")[1]
+                    .substring(0, 2);
 
-                console.log(reservationData.tableData);
-                // 예약된 테이블 정보 조회
-                reservationData.tableData.forEach((table) => {
-                  if (table.studentId === userData.studentId) {
-                    userReservations.push({
-                      roomName: roomName,
-                      date: dateString,
-                      startTime: startTime,
-                      endTime: endTime,
-                      tableData: table,
+                  if (parseInt(endTime) < parseInt(timeString)) {
+                    // 예약된 테이블 정보 조회
+                    reservationData.tableData.forEach((table) => {
+                      if (table.studentId === userData.studentId) {
+                        userReservations.push({
+                          roomName: roomName,
+                          date: dateString,
+                          startTime: startTime,
+                          endTime: endTime,
+                          tableData: table,
+                        });
+                      }
                     });
                   }
-                });
-              }
-            });
+                }
+              });
+            } else {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+
+                  // 예약된 테이블 정보 조회
+                  reservationData.tableData.forEach((table) => {
+                    if (table.studentId === userData.studentId) {
+                      userReservations.push({
+                        roomName: roomName,
+                        date: dateString,
+                        startTime: startTime,
+                        endTime: endTime,
+                        tableData: table,
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          }
+          // 이용 예정(이용 중 포함)
+          const endDate = new Date();
+          endDate.setDate(koreaNow.getDate() + 7);
+
+          for (; koreaNow <= endDate; koreaNow.setDate(koreaNow.getDate() + 1)){
+            const dateString = koreaNow.toISOString().split("T")[0];
+
+            if (todayDateString == dateString) {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+  
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+  
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+                  const timeString = koreaNow
+                    .toISOString()
+                    .split("T")[1]
+                    .substring(0, 2);
+                  if (parseInt(startTime) >= parseInt(timeString)) { // 이용 중일 때도 이용 예정에 들어가게함
+                    // 예약된 테이블 정보 조회
+                    reservationData.tableData.forEach((table) => {
+                      if (table.studentId === userData.studentId) {
+                        userReservations1.push({
+                          roomName: roomName,
+                          date: dateString,
+                          startTime: startTime,
+                          endTime: endTime,
+                          tableData: table,
+                        });
+                      }
+                    });
+                  }
+                }
+              });
+            } else {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+  
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+  
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+  
+                  // 예약된 테이블 정보 조회
+                  reservationData.tableData.forEach((table) => {
+                    if (table.studentId === userData.studentId) {
+                      userReservations1.push({
+                        roomName: roomName,
+                        date: dateString,
+                        startTime: startTime,
+                        endTime: endTime,
+                        tableData: table,
+                      });
+                    }
+                  });
+                }
+              });
+            }
           }
         })
       );
@@ -217,6 +333,7 @@ reserveClub.get(
       res.status(200).json({
         message: "User reservations fetched successfully",
         reservations: userReservations,
+        reservationsFuture: userReservations1
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
@@ -298,121 +415,6 @@ reserveClub.post("/delete", async (req, res) => {
   }
 });
 
-// 이용 예정 내역
-reserveClub.get("/future/reservations/:userId", async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
-
-    // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_Club`;
-
-    // 사용자 예약 내역
-    const userReservations = [];
-
-    // 동아리방 컬렉션 참조
-    const facultyClubCollectionRef = collection(db, collectionName);
-
-    const querySnapshot = await getDocs(facultyClubCollectionRef);
-
-    // 비동기 처리를 위해 Promise.all 사용
-    await Promise.all(
-      querySnapshot.docs.map(async (roomDoc) => {
-        const roomName = roomDoc.id;
-        const offset = 1000 * 60 * 60 * 9;
-        const koreaNow = new Date(new Date().getTime() + offset);
-
-        let endDate = new Date();
-        endDate.setDate(koreaNow.getDate() + 3);
-
-        const currentDate = koreaNow.toISOString().split("T")[0];
-        for (; koreaNow <= endDate; koreaNow.setDate(koreaNow.getDate() + 1)) {
-          const dateString = koreaNow.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
-
-          if (currentDate == dateString) {
-            const dateCollectionRef = collection(
-              db,
-              `${collectionName}/${roomName}/${dateString}`
-            ); // 컬렉션 참조 생성
-
-            // 해당 날짜별 시간 대 예약 내역 조회
-            const timeDocSnapshot = await getDocs(dateCollectionRef);
-
-            timeDocSnapshot.forEach((docSnapshot) => {
-              const reservationData = docSnapshot.data();
-              if (reservationData && reservationData.tableData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
-                const timeString = koreaNow.toISOString().split("T")[1].substring(0,2); 
-
-                if (parseInt(startTime) > parseInt(timeString)) {
-                  // 예약된 테이블 정보 조회
-                  reservationData.tableData.forEach((table) => {
-                    if (table.studentId === userData.studentId) {
-                      userReservations.push({
-                        roomName: roomName,
-                        date: dateString,
-                        startTime: startTime,
-                        endTime: endTime,
-                        tableData: table,
-                      });
-                    }
-                  });
-                }
-              }
-            });
-          } else {
-            const dateCollectionRef = collection(
-              db,
-              `${collectionName}/${roomName}/${dateString}`
-            ); // 컬렉션 참조 생성
-
-            // 해당 날짜별 시간 대 예약 내역 조회
-            const timeDocSnapshot = await getDocs(dateCollectionRef);
-
-            timeDocSnapshot.forEach((docSnapshot) => {
-              const reservationData = docSnapshot.data();
-              if (reservationData && reservationData.tableData) {
-                const startTime = docSnapshot.id.split("-")[0];
-                const endTime = docSnapshot.id.split("-")[1];
-
-                // 예약된 테이블 정보 조회
-                reservationData.tableData.forEach((table) => {
-                  if (table.studentId === userData.studentId) {
-                    userReservations.push({
-                      roomName: roomName,
-                      date: dateString,
-                      startTime: startTime,
-                      endTime: endTime,
-                      tableData: table,
-                    });
-                  }
-                });
-              }
-            });
-          }
-        }
-      })
-    );
-
-    // 사용자 예약 내역 반환
-    res.status(200).json({
-      message: "User future reservations fetched successfully",
-      reservations: userReservations,
-    });
-  } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error fetching user future reservations", error);
-    res.status(500).json({ error: "Failed to fetch user future reservations" });
-  }
-});
 
 // 입장하기
 reserveClub.post("/entrance", async (req, res) => {
@@ -484,7 +486,7 @@ reserveClub.post("/entrance", async (req, res) => {
       }
     }
     res.status(200).json({
-      message: "Entrancing club room successfully"
+      message: "Entrancing club room successfully",
     });
   } catch (error) {
     console.error("Error entrancing reservation club room");
@@ -551,7 +553,10 @@ reserveClub.post("/return", async (req, res) => {
         // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
         // 특정 테이블 번호를 true로 설정합니다.
         const index = parseInt(tableNumber) - 1;
-        if (reservationData.tableData[index][`T${tableNumber}`] === true && reservationData.tableData[index].status == "using") {
+        if (
+          reservationData.tableData[index][`T${tableNumber}`] === true &&
+          reservationData.tableData[index].status == "using"
+        ) {
           // 해당 테이블에 대해 name과 studentId도 업데이트
           reservationData.tableData[index].status = "done";
 
@@ -562,7 +567,7 @@ reserveClub.post("/return", async (req, res) => {
       }
     }
     res.status(200).json({
-      message: "return club room successfully"
+      message: "return club room successfully",
     });
   } catch (error) {
     console.error("Error returning reservation club room");
