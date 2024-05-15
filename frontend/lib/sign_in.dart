@@ -44,7 +44,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 50,
                 ),
                 const Padding(
                   padding: EdgeInsets.only(right: 220),

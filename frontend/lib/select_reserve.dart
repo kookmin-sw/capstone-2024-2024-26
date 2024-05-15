@@ -46,15 +46,13 @@ class _select extends State<Select_reserve> {
   String room_name = '';
   int table_number = 0; // server
 
-  Map<int, List<bool>> timeTableStatus = {};
-
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
   String? uid = '';
   int setting = 0;
 
   int st = 0;
   int ed = 0;
-
+  Map<int, List<bool>> timeTableStatus = {};
   List<bool> isButtonPressedList =
       List.generate(16, (index) => false); // 버튼마다 눌림 여부를 저장하는 리스트
 
@@ -523,7 +521,7 @@ class _select extends State<Select_reserve> {
                             16,
                             (index) {
                               int hour = index + 9;
-                              //sendSelectedDateToServer(selectedDate);
+
                               if (updatedIsButtonPressedList[index] == true) {
                                 return Padding(
                                   padding: EdgeInsets.zero,
