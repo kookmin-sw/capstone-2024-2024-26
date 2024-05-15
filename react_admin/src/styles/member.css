@@ -12,6 +12,7 @@
     width: 86vw;
     height: 88vh;
     background-color: rgb(255, 255, 255);
+    border-radius: 20px;
 }
 .member_button{
     height: 8vh;
@@ -22,7 +23,7 @@
 .member_title{
     font-weight: bolder;
     font-size: larger;
-    margin: 0 20px;
+    margin: 0 40px;
 }
 .member_chart{
     height: 72vh;
@@ -54,13 +55,13 @@ td {
     width: 5vw;
 }
 .faculty-header{
-    width: 8vw;
+    width: 13vw;
 }
 .mail-header{
     width: 12vw;
 }
 .contact-header{
-    width: 20vw;
+    width: 15vw;
 }
 .alert-header{
     width: 24vw;
@@ -70,19 +71,16 @@ td {
     border: solid 0.2px black;
     position: absolute;
     right: 4vw;
-    height: 4vh;
+    height: 5vh;
+    
 }
-.search_button{
-    position: absolute;
-    right: 16vw;
-    height: 4vh;
-    width: 5vw;
-    border: solid 1px black;
+.member_noitfy_button{
+    width: 10vw;
+    height: 5vh;
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #004F9E;
-    color: white;
-    font-weight: bold;
+    border: 1px solid black;
+    background-color: transparent;
+}
+.member_noitfy_button:hover{
+    background-color: rgb(238, 238, 238);;
 }

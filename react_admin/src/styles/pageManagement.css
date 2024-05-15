@@ -7,10 +7,12 @@
     justify-content: center;
     background-color: rgb(208, 208, 208);
 }
+
 .addition_box{
     width: 40vw;
     height: 88vh;
     background-color: white;
+    border-radius: 20px;
 }
 .addition_banner{
     height: 8vh;
@@ -23,6 +25,18 @@
     font-size: larger;
     margin: 0 20px;
 }
+.addition_room_button,
+.addition_club_button{  
+    height: 6vh;
+    width: 8vw;
+    margin-left: 20vw;
+    border-radius: 10px;
+    background-color: transparent;
+}
+.addition_room_button:hover,
+.addition_club_button:hover{
+    background-color: rgb(238, 238, 238);
+}
 .blank{
     width: 3vw;
 }
@@ -30,39 +44,8 @@
     width: 40vw;
     height: 75vh;
     overflow-y: auto;
-    background-color: rgb(141, 141, 141);
+    background-color: transparent;
 }
-.popup_class {
-    position: fixed; /* 고정된 위치 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 중앙 정렬 */
-    background-color: rgb(218, 218, 218);
-    width: 20vw;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border-radius: 20px;
-    border: solid 1px black;
-    padding: 10px;
-
-}
-.popup_room {
-    position: fixed; /* 고정된 위치 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 중앙 정렬 */
-    background-color: rgb(218, 218, 218);
-    width: 40vw;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border-radius: 20px;
-    border: solid 1px black;
-    padding: 10px;
-
-}
-
 .popup-inner {
     background-color: white;
     padding: 20px;
@@ -73,11 +56,6 @@
 .popup_inner_banner{
     display: flex;
     flex-direction: row ;
-}
-.popup_inner_banner_back{
-    background-color: transparent;
-    border: none;
-    margin-left: 9vw;
 }
 .popup_inner_box{
     display: flex;
@@ -123,14 +101,108 @@
     margin: 5px 0; /* 각 문단 사이의 마진 조정 */
 }
 .addition_chart_element{
-    width: 40vw;
-    height: 35vh;
+    width: 38vw;
+    height: 32vh;
     display: flex;
     flex-direction: row;
-    background-color: beige;
+    background-color: transparent;
+    border-radius: 10px;
+    border: 1px solid black;
 }
 .chart_element_data{
     width: 20vw;
     height: 35vh;
     padding: 1vw;
+}
+.club_delete_button{
+    margin-top: 4vh;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid red;
+    height: 4vh;
+    width: 10vw;
+    color: red;
+    font-weight: bold;
+}
+.club_delete_button:hover{
+    background-color: rgb(254, 214, 214);
+}
+.room_delete_button{
+    margin-top: 6vh;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid red;
+    height: 4vh;
+    width: 10vw;
+    color: red;
+    font-weight: bold;
+}
+.room_delete_button:hover{
+    background-color: rgb(254, 214, 214);
+}
+/*공유공간 팝업 관련 CSS*/
+.popup_room {
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(239, 239, 239);
+    width: 40vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: 1px solid black;
+    padding: 10px;
+}
+.popup_club_banner_title{
+    margin-left: 16vw;
+}
+.popup_club_banner_back{
+    font-size: larger;
+    background-color: transparent;
+    border: none;   
+    color: black;
+    margin-left: 10vw;
+}
+.popup_inner_input_data{
+    margin-left: 5vw;
+}
+.popup_inner_input_image{
+    margin-left: 5vw;
+}
+.popup_createClub_button{
+    position: absolute;
+    bottom: 5vh;
+    margin-top: 5vh;
+    margin-left: 10vw;
+    width: 20vw;
+}
+/*강의실 팝업 관련 CSS*/
+.popup_class {
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(239, 239, 239);
+    width: 20vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: solid 1px black;
+    padding: 10px;
+}
+.popup_room_banner_back{
+    font-size: larger;
+    background-color: transparent;
+    border: none;   
+    color: black;
+    margin-left: 3vw;
+}
+.popup_room_banner_title{
+    margin-left: 5vw;
+}
+.popup_inner_Club{
+    margin-left: 2vw;
 }

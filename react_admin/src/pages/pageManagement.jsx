@@ -243,16 +243,17 @@ const handleCloseClubPopup = () => {
                 <div className='addition_box'>
                   <div className='addition_banner'>
                     <p className='addition_title'>강의실 관리</p>
-                    <button className='addition_room_button' onClick={() => setShowRoomPopup(true)}>강의실 추가</button>
+                    <button className='addition_room_button' onClick={() => setShowRoomPopup(true)}>추가하기</button>
 
                     {showRoomPopup && (
                       <div className='popup_class'>
                         <div className='popup_inner'>
                           <div className='popup_inner_banner'>
-                          <h2>강의실 생성</h2>
-                          <button className='popup_inner_banner_back' onClick={handleCloseRoomPopup}>✖️</button>
+                          <h2 className='popup_room_banner_title'>강의실 생성</h2>
+                          <button className='popup_room_banner_back' onClick={handleCloseRoomPopup}>닫기</button>
                           </div>
                           <hr></hr>
+                          <div className='popup_inner_Club'>
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>단과대학</p>
                           <input
@@ -305,7 +306,8 @@ const handleCloseClubPopup = () => {
                           <input type='file' name='conferenceImage' onChange={handleFileChange} />
                           </div>
                           </div>
-                          <button onClick={handleCreateRoom}>생성하기</button>                          
+                          </div>
+                          <button className='popup_creatRoom_button' onClick={handleCreateRoom}>생성하기</button>                          
                         </div>
 
                     )}
@@ -326,7 +328,7 @@ const handleCloseClubPopup = () => {
                             <p>강의실: {info.roomName}</p>
                             <p>사용가능 시간: {info.available_Time}</p>
                             <p>사용가능 인원: {info.available_People}</p>
-                            <button onClick={() => handleDeleteRoom(info.roomName, info.faculty)}>삭제</button>
+                            <button className='room_delete_button' onClick={() => handleDeleteRoom(info.roomName, info.faculty)}>삭제</button>
                           </div>
                         </div>
                         </li>
@@ -341,13 +343,13 @@ const handleCloseClubPopup = () => {
                 <div className='addition_box'>
                   <div className='addition_banner'>
                     <p className='addition_title'>공유공간 관리</p>
-                    <button className='addition_club_button' onClick={() => setShowClubPopup(true)}>공유공간 추가</button>
+                    <button className='addition_club_button' onClick={() => setShowClubPopup(true)}>추가하기</button>
                     {showClubPopup && (
                       <div className='popup_room'>
                         <div className='popup_inner'>
                           <div className='popup_inner_banner'>
-                          <h2>공유공간 생성</h2>
-                          <button className='popup_inner_banner_back' onClick={handleCloseClubPopup}>✖️</button>
+                          <h2 className='popup_club_banner_title'>공유공간 생성</h2>
+                          <button className='popup_club_banner_back' onClick={handleCloseClubPopup}>닫기</button>
                           </div>
                           <hr></hr>
                           <div className='popup_inner_box'>
@@ -404,7 +406,7 @@ const handleCloseClubPopup = () => {
                           </div>
                           </div>
                           <div className='popup_inner_input_image'>
-                          <div className='popup_inner_input'>
+                          <div className='popup_inner_input_image1'>
                           {roomData.clubRoomImagePreview && (
                                                     <img
                                                         src={roomData.clubRoomImagePreview}
@@ -416,7 +418,7 @@ const handleCloseClubPopup = () => {
                           <input type='file' name="clubRoomImage" onChange={handleFileChange} />
                           </div>
 
-                          <div className='popup_inner_input'>
+                          <div className='popup_inner_input_image2'>
                           {roomData.clubRoomDesignImagePreview && (
                                                     <img
                                                         src={roomData.clubRoomDesignImagePreview}
@@ -429,7 +431,7 @@ const handleCloseClubPopup = () => {
                           <input type='file' name="clubRoomDesignImage" onChange={handleFileChange} />
                           </div>
                           </div>
-                          <button onClick={handleCreateClub}>생성하기</button>                          
+                          <button className='popup_createClub_button' onClick={handleCreateClub}>생성하기</button>                          
                         </div>
                         </div>
 
@@ -456,7 +458,7 @@ const handleCloseClubPopup = () => {
               <p>사용가능 시간: {room.available_Time}</p>
               <p>사용가능 인원: {room.available_People}</p>
               <p>테이블 개수: {room.available_Table}</p>
-              <button onClick={() => handleDeleteClubRoom(room.faculty, room.roomName)}>삭제</button>
+              <button className='club_delete_button' onClick={() => handleDeleteClubRoom(room.faculty, room.roomName)}>삭제하기</button>
             </div>
           </div>
         </li>

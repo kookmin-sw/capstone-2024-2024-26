@@ -60,7 +60,7 @@ const Member = () => {
             <td>{member.faculty}</td>
             <td>{member.email}</td>
             <td>{member.phone}</td>
-            <td><button onClick={() => handleNotify(member)}>알림</button></td>
+            <td><button className='member_noitfy_button' onClick={() => handleNotify(member)}>🔔알림</button></td>
           </tr>
         ))}
       </tbody>
@@ -80,11 +80,10 @@ const Member = () => {
                 <input
                  type='text'
                  className='search_member'
-                 placeholder='학번 또는 이름'
+                 placeholder='학번 또는 이름 검색'
                  value={searchTerm}
                  onChange={e => setSearchTerm(e.target.value)}
                  />
-                 <div className='search_button'>검색하기</div>
               </div>
               <hr></hr>
               <MemberTable members={filteredMembers} />

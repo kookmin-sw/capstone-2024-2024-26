@@ -151,8 +151,8 @@ const updateCameraLocation = async () => {
             <td>{camera.location}</td>
             <td>{camera.status || 'N/A'}</td>
             <td>
-              <button data-location={camera.location} onClick={() => handleEditCameraPopup(camera)}>수정</button>
-              <button data-location={camera.location} onClick={deleteCamera}>삭제</button>
+              <button className='traffic_edit_button' data-location={camera.location} onClick={() => handleEditCameraPopup(camera)}>수정</button>
+              <button className='traffic_delete_button' data-location={camera.location} onClick={deleteCamera}>삭제</button>
             </td>
           </tr>
         ))}
@@ -169,7 +169,7 @@ const updateCameraLocation = async () => {
                     <div className='member_box'>
                         <div className='member_button'>
                         <p className='member_title'>혼잡도 카메라</p>
-                        <button className='search_button' onClick={handleAddCamera}>+추가하기</button>
+                        <button className='traffic_button' onClick={handleAddCamera}>추가하기</button>
                         {showPopup && (
                           <div className='popup_camera'>
                             <div className='popup_inner'>

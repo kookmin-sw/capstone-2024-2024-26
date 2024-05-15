@@ -83,7 +83,7 @@ const Main = () => {
             <div className='todo_container'>
               <div className='todo_name'>
                 <div className='todo_box1'>
-                  <p className='name_todo1'>오늘의 할 일</p> <div className='todo_number1'>14</div>
+                  <p className='name_todo1'>오늘의 할 일</p> <div className='todo_number1'>{latestVisitorCount}</div>
                 </div>
                 <hr></hr>
                 <div className='todo_function'>
@@ -104,13 +104,13 @@ const Main = () => {
             </div>
             <div className='graph_container'>
               <div className='graph1'>
-                <p className='name_todo'>방문자 현황</p>
+                <p className='visitor_graph'>방문자 현황</p>
                 <hr></hr>
                 <Bar data={data} options={options} />
               </div>
 
               <div className='graph2'>
-                <p className='name_todo'>예약 현황</p>
+                <p className='todo_table'>예약 현황</p>
                 <hr></hr>
               </div>
             </div>

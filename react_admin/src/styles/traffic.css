@@ -24,3 +24,38 @@
     border: solid 1px black;
     padding: 10px;
 }
+.traffic_button{
+    position: absolute;
+    right: 6vw;
+    height: 6vh;
+    width: 10vw;
+    border-radius: 8px;
+    border: 1.5px solid black;
+    background-color: transparent;
+}
+.traffic_button:hover {
+    background-color: rgb(238, 238, 238);
+}
+.traffic_edit_button{
+    width: 6vw;
+    height: 4vh;
+    border-radius: 5px;
+    border: 1px solid blue;
+    background-color: transparent;
+    font-weight: bold;
+}
+.traffic_edit_button:hover {
+    background-color: rgb(238, 238, 238);
+}
+.traffic_delete_button{
+    width: 6vw;
+    height: 4vh;
+    margin-left: 60px;
+    border-radius: 5px;
+    border: 1px solid red;
+    background-color: transparent;
+    font-weight: bold;
+}
+.traffic_delete_button:hover {
+    background-color: rgb(238, 238, 238);
+}
