@@ -28,20 +28,20 @@ const messaging = admin.messaging();
 
 const adminNotify = express.Router();
 
-// 관리자 권한 확인 미들웨어
-function isAdmin(req, res, next) {
-  const { email } = req.body;
-  const adminEmail = "react@kookmin.ac.kr"; // 관리자 이메일
+// // 관리자 권한 확인 미들웨어
+// function isAdmin(req, res, next) {
+//   const { email } = req.body;
+//   const adminEmail = "react@kookmin.ac.kr"; // 관리자 이메일
 
-  if (email === adminEmail) {
-    next(); // 관리자인 경우 다음 미들웨어로 진행
-  } else {
-    res.status(403).json({ error: "Unauthorized: You are not an admin " }); // 관리자가 아닌 경우 권한 없음 응답
-  }
-}
+//   if (email === adminEmail) {
+//     next(); // 관리자인 경우 다음 미들웨어로 진행
+//   } else {
+//     res.status(403).json({ error: "Unauthorized: You are not an admin " }); // 관리자가 아닌 경우 권한 없음 응답
+//   }
+// }
 
 // 모든 사용자에게 알림 보내기
-adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
+adminNotify.post("/sendNotificationToAllUsers", async (req, res) => {
   const { title, body } = req.body;
   try {
     // Firestore의 users 컬렉션에서 모든 사용자의 FCM 토큰 가져오기
@@ -95,15 +95,18 @@ adminNotify.post("/sendNotificationToAllUsers", isAdmin, async (req, res) => {
 
 // 개별 사용자에게 알림 보내기
 adminNotify.post("/sendNotificationToUser", async (req, res) => {
-  const { userId, title, body } = req.body;
+  const { studentId, title, body } = req.body;
   try {
     // Firestore에서 사용자 정보 가져오기
-    const userDoc = await db.collection("users").doc(userId).get();
-    if (!userDoc.exists) {
+    const userQuery = db
+      .collection("users")
+      .where("studentId", "==", studentId);
+    const userSnapshot = await userQuery.get();
+    if (userSnapshot.empty) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const userData = userDoc.data();
+    const userData = userSnapshot.docs[0].data();
     if (!userData.fcmToken) {
       return res
         .status(400)
@@ -140,10 +143,12 @@ adminNotify.post("/sendNotificationToUser", async (req, res) => {
     };
 
     // 개별 사용자에게 알림 보내기
-    const response = await messaging.sendEach([{
-      token: userData.fcmToken,
-      message: notificationMessage
-    }]);
+    const response = await messaging.sendEach([
+      {
+        token: userData.fcmToken,
+        message: notificationMessage,
+      },
+    ]);
 
     res.status(200).json({
       message: "Notification sent to the user successfully",
