@@ -67,11 +67,25 @@ def qffdqgaf():
     docs = cameras_ref.stream()
 
     
+    # output = {}
+    # for doc in docs:
+    #     camera = doc.to_dict()
+    #     output[doc.id] = camera['info']
+
+    # return jsonify(output)
     output = {}
+    index = 0  # 문서에 대한 인덱스 초기화
     for doc in docs:
         camera = doc.to_dict()
-        output[doc.id] = camera['info']
-
+        # 카메라 정보에서 'info', 'location', 'state' 필드를 포함
+        camera_data = {
+            'location': doc.id,  # 문서 ID
+            'congestion': camera['info'],  # 'info' 필드
+            'location_detail': camera['location'],  # 'location' 필드
+            'state': camera['state']  # 'state' 필드
+        }
+        output[index] = camera_data
+        index += 1  # 인덱스 증가
     return jsonify(output)
 
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
@@ -89,16 +103,16 @@ def receive_image():
         if doc.exists:
             if result['score'] >=75:
                 #제일혼잡
-                doc_ref.update({'info': "4",
+                doc_ref.update({'info': "매우 혼잡",
                                 'state' : "1"})
             elif result['score'] >= 55:
-                doc_ref.update({'info': "3",
+                doc_ref.update({'info': "혼잡",
                                 'state' : "1"})
             elif result['score'] >= 35:
-                doc_ref.update({'info': "2",
+                doc_ref.update({'info': "보통",
                                 'state' : "1"})
             else:
-                doc_ref.update({'info': "1",
+                doc_ref.update({'info': "여유",
                                 'state' : "1"})
         return result, 200
     else:
