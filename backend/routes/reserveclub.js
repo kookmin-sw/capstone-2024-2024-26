@@ -33,7 +33,7 @@ const reserveClub = express.Router();
 // 관리자가 등록한 예약 가능 공유공간 조회 (메인)
 reserveClub.post("/main_lentroom/:uid", async (req, res) => {
   const { uid } = req.body;
-  console.log(uid);
+  
   try {
     //이 데이터 웹에서 받아와서 디비에 저장해야함 .
     // 사용자 정보 가져오기
@@ -65,7 +65,7 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
       clubRoomDesignImage : existData.clubRoomDesignImage,
     });
   });
-  console.log(share_room_data);
+  
 
     // 사용자의 예약 정보 반환
     res.status(200).json({
@@ -113,7 +113,7 @@ reserveClub.post("/main_conference_room/:uid", async (req, res) => {
       conferenceImage: existData.conferenceImage,
     });
   });
-  console.log(share_room_data);
+
 
 
     // 사용자의 예약 정보 반환
@@ -288,7 +288,7 @@ reserveClub.get(
     const startDate = new Date(req.params.startDate);
     const endDate = new Date(req.params.endDate);
     
-    console.log(userId, startDate, endDate);
+
     try {
       // 사용자 정보 가져오기
       const userDoc = await getDoc(doc(db, "users", userId));
@@ -416,7 +416,7 @@ reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
     const overlappingReservation = existingReservationsSnapshot.docs.find(
       (doc) => {
         const reservation = doc.data();
-        console.log(reservation);
+      
 
         // 기존 예약의 시작 시간과 끝 시간
         const existingStartTime = reservation.startTime;

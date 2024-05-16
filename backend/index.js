@@ -27,6 +27,7 @@ app.use("/adminAuth", adminAuth);
 app.use("/adminClub", adminClub);
 // 관리자 강의실 관리 api
 app.use("/adminRoom", adminRoom);
+
 // 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
