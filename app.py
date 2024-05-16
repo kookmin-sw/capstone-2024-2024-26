@@ -46,23 +46,33 @@ def index():
 #카메라 상태 켜져있으면1, 꺼져있으면 0
 @app.route('/api/state', methods=['POST'])
 def spfolks():
-    doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
-    doc = doc_ref.get()
-    dd = doc.to_dict()
-    output = {'state' : dd['state']}
-    return jsonify(output)
+    cameras_ref = db.collection('Camera')
+    docs = cameras_ref.stream()
+
+    
+    output_state = {}
+    for doc in docs:
+        camera = doc.to_dict()
+        output_state[doc.id] = camera['state']
+
+    return jsonify(output_state)
 
 
 #혼잡도 정보 알려주는곳
 @app.route('/api/info', methods=['POST'])
 def qffdqgaf():
     
-    doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
-    doc = doc_ref.get()
-    dd = doc.to_dict()
-    output = {'info' : dd['info']}
-    return jsonify(output)
+    #하드코딩 해둔거
+    cameras_ref = db.collection('Camera')
+    docs = cameras_ref.stream()
 
+    
+    output = {}
+    for doc in docs:
+        camera = doc.to_dict()
+        output[doc.id] = camera['info']
+
+    return jsonify(output)
 
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
@@ -79,24 +89,24 @@ def receive_image():
         if doc.exists:
             if result['score'] >=75:
                 #제일혼잡
-                doc_ref.update({'info': 4,
-                                'state' : 1})
+                doc_ref.update({'info': "4",
+                                'state' : "1"})
             elif result['score'] >= 55:
-                doc_ref.update({'info': 3,
-                                'state' : 1})
+                doc_ref.update({'info': "3",
+                                'state' : "1"})
             elif result['score'] >= 35:
-                doc_ref.update({'info': 2,
-                                'state' : 1})
+                doc_ref.update({'info': "2",
+                                'state' : "1"})
             else:
-                doc_ref.update({'info': 1,
-                                'state' : 1})
+                doc_ref.update({'info': "1",
+                                'state' : "1"})
         return result, 200
     else:
         #파베에 상태 flase로 변경
         doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
         doc = doc_ref.get()
         if doc.exists:
-            doc_ref.update({'state': 0})
+            doc_ref.update({'state': "0"})
             return jsonify({"success": "Document updated successfully"}), 200
         else:
             return jsonify({"error": "No such document!"}), 404
@@ -130,6 +140,8 @@ def classi():
     else:
         a= "소프트웨어융합대학_Club"
         b = 'clubRoomImage'
+        #이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거
+        c = "image_"+str(table)
 
     get_doc_ref = db.collection(a).document(location)
     get_doc = get_doc_ref.get()
