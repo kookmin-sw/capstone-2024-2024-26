@@ -467,6 +467,13 @@ class _select_cf extends State<Select_reserve_cf> {
                                                     ed = st;
                                                   }
                                                 }
+
+                                                // 시간 선택의 연속성을 확인
+                                                if (!validateContinuousSelection(
+                                                    isButtonPressedList)) {
+                                                  showErrorAndReset(
+                                                      index, '연속적인 시간을 선택하세요.');
+                                                }
                                               });
                                             },
                                             style: ElevatedButton.styleFrom(
@@ -539,18 +546,24 @@ class _select_cf extends State<Select_reserve_cf> {
 
                       ElevatedButton(
                         onPressed: isTimeSelected
-                            ? () async {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FormPage(
-                                      roomName: roomName,
-                                      selectedDate: selectedDate,
-                                      startTime: st,
-                                      endTime: ed,
+                            ? () {
+                                // 연속된 시간이 선택된 경우에만 신청서 작성 페이지로 이동
+                                if (validateContinuousSelection(
+                                    isButtonPressedList)) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FormPage(
+                                        roomName: roomName,
+                                        selectedDate: selectedDate,
+                                        startTime: st,
+                                        endTime: ed,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  showErrorAndReset(-1, '연속적인 시간을 선택하세요.');
+                                }
                               }
                             : null,
                         style: ElevatedButton.styleFrom(

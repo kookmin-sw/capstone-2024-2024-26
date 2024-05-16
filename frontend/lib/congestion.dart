@@ -66,8 +66,16 @@ class _CongestionState extends State<Congestion> {
 
       if (response.statusCode == 200) {
         setState(() {
-          print(jsonDecode(response.body)); // 받는 데이터
-          congestionData = (jsonDecode(response.body)); // 고쳐야할 부분
+          Map<String, dynamic> responseData = jsonDecode(response.body);
+          List<dynamic> dataList = responseData.values.toList();
+          congestionData = dataList.map((item) {
+            return {
+              'color': item['color'] as String,
+              'congestion': item['congestion'] as String,
+              'location': item['location'] as String,
+              'location_detail': item['location_detail'] as String,
+            };
+          }).toList();
         });
       } else {
         print('Failed to load congestion data');
