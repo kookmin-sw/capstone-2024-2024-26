@@ -120,6 +120,12 @@ class _SplashScreenState extends State<SplashScreen> {
           MaterialPageRoute(builder: (context) => const SignIn()),
         );
       });
+    } else {
+      Timer(const Duration(seconds: 2), () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const SignIn()),
+        );
+      });
     }
   }
 
@@ -187,7 +193,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://192.168.200.103:3000/reserveclub/main_lentroom/:uid';
+    const url = 'http://172.30.1.11:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -223,8 +229,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     setState(() {
       isLoading = true; // 로딩 시작
     });
-    const url =
-        'http://192.168.200.103:3000/reserveclub/main_conference_room/:uid';
+    const url = 'http://172.30.1.11:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

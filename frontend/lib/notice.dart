@@ -279,7 +279,7 @@ class _MyNoticeState extends State<MyNotice> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://192.168.200.103:3000/auth/profile/:uid';
+    const url = 'http://172.30.1.11:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

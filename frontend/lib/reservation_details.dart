@@ -28,20 +28,68 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       DateTime.now().subtract(Duration(days: 14)); // 현재로부터 14일 전
   List<dynamic> reservations = [];
   List<dynamic> done_reservations = [];
-  bool is_tap = false;
+
   String userId = '';
   bool isLoading = false;
+  Map<int, bool> isLentMap = {};
+  Map<int, String> remainingTimeMap = {};
+  Map<int, Timer?> timersMap = {};
+  Map<int, DateTime> endTimesMap = {};
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    fetchReservations(userId, startDate, endDate);
-    done_Reservations(userId, previousDate, startDate);
+    fetchReservations(startDate, endDate).then((_) {
+      loadTimerStates();
+    });
+    done_Reservations(previousDate, startDate);
   }
 
-  Future<List<dynamic>> fetchReservations(
-      String userId, DateTime start, DateTime end) async {
+  Future<void> loadTimerStates() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (int i = 0; i < reservations.length; i++) {
+      bool? isLent = prefs.getBool('isLent_$i');
+      String? remainingTime = prefs.getString('remainingTime_$i');
+      String? endTimeStr = prefs.getString('endTime_$i');
+
+      if (isLent != null &&
+          isLent &&
+          remainingTime != null &&
+          endTimeStr != null) {
+        DateTime endTime = DateTime.parse(endTimeStr);
+        DateTime now = DateTime.now();
+        if (now.isBefore(endTime)) {
+          int secondsRemaining = endTime.difference(now).inSeconds;
+          startEntryTimer(i, now, endTime, remainingSeconds: secondsRemaining);
+          setState(() {
+            isLentMap[i] = isLent;
+            remainingTimeMap[i] = remainingTime;
+          });
+        } else {
+          // 만료된 경우 상태 초기화
+          setState(() {
+            isLentMap[i] = false;
+            remainingTimeMap[i] = '00:00:00';
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> saveTimerState(int index) async {
+    if (isLentMap[index] != null &&
+        remainingTimeMap[index] != null &&
+        endTimesMap[index] != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLent_$index', isLentMap[index]!);
+      await prefs.setString('remainingTime_$index', remainingTimeMap[index]!);
+      await prefs.setString(
+          'endTime_$index', endTimesMap[index]!.toIso8601String());
+    }
+  }
+
+  Future<List<dynamic>> fetchReservations(DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -53,7 +101,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://192.168.200.103:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://172.30.1.11:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -103,8 +151,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     return merged;
   }
 
-  Future<List<dynamic>> done_Reservations(
-      String userId, DateTime start, DateTime end) async {
+  Future<List<dynamic>> done_Reservations(DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -116,7 +163,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://192.168.200.103:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://172.30.1.11:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -158,8 +205,6 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
     return 'No key with true value found'; // true 값을 가진 키가 없을 경우
   }
-
-  bool isLent = false;
 
   @override
   Widget build(BuildContext context) {
@@ -205,89 +250,6 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            is_tap = !is_tap;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(
-                            fontSize: 15, // Set the button text size
-                            fontWeight:
-                                FontWeight.bold, // Set the button text weight
-                            color: Color(0XFF004F9E),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            side: BorderSide(
-                                width: 0.50,
-                                color: is_tap
-                                    ? Color(0xFFD6D6D6)
-                                    : const Color(0xFF004F9E)),
-                          ),
-                          minimumSize:
-                              Size(193.7, 50), // Set the button minimum size
-                          backgroundColor:
-                              is_tap ? Colors.white : Color(0X0C004F9E),
-
-                          elevation:
-                              0, // Set the elevation for the button shadow
-                          shadowColor: Colors.white.withOpacity(
-                              0.5), // Set the color of the button shadow
-                        ),
-                        child: Text('공유공간 예약내역',
-                            style: TextStyle(
-                                color: is_tap
-                                    ? Color(0XFF7C7C7C)
-                                    : Color(0xFF004F9E))),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            is_tap = !is_tap;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(
-                            fontSize: 15, // Set the button text size
-                            fontWeight:
-                                FontWeight.bold, // Set the button text weight
-                            color: Color(0XFF004F9E),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            side: BorderSide(
-                                width: 0.50,
-                                color: is_tap
-                                    ? const Color(0xFF004F9E)
-                                    : Color(0xFFD6D6D6)),
-                          ),
-                          minimumSize:
-                              Size(193.7, 50), // Set the button minimum size
-                          backgroundColor:
-                              is_tap ? Color(0X0C004F9E) : Colors.white,
-
-                          elevation:
-                              0, // Set the elevation for the button shadow
-                          shadowColor: Colors.white.withOpacity(
-                              0.5), // Set the color of the button shadow
-                        ),
-                        child: Text('강의실 예약내역',
-                            style: TextStyle(
-                                color: is_tap
-                                    ? Color(0xFF004F9E)
-                                    : Color(0XFF7C7C7C))),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
               const Padding(padding: EdgeInsets.only(top: 20)),
               const Align(
                 alignment: Alignment.centerLeft,
@@ -322,6 +284,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                                 reservation['startTime'],
                                 reservation['endTime'],
                                 getKeyWithTrueValue(reservation['tableData']),
+                                index,
                               ),
                             ],
                           );
@@ -467,10 +430,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   }
 
   Widget _buildReservationItem(String roomName, String date, String startTime,
-      String endTime, String table_number) {
-    bool showEntryButton =
-        now.isAfter(startDate.subtract(Duration(minutes: 10))) &&
-            now.isBefore(endDate.add(Duration(minutes: 10)));
+      String endTime, String table_number, int index) {
+    bool isLent = isLentMap[index] ?? false;
+    String remainingTime = remainingTimeMap[index] ?? '00:00:00';
 
     return Stack(
       alignment: Alignment.center,
@@ -484,9 +446,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '[ ${roomName} ]',
+                  '[ $roomName ]',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 15,
                     fontFamily: 'Inter',
@@ -494,7 +456,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(width: 100),
-                Text(
+                const Text(
                   '공유공간',
                   style: TextStyle(
                     color: Color(0XFF484848),
@@ -512,7 +474,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 const SizedBox(width: 10),
                 Text(
                   isLent ? '이용 중' : '이용 예정',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
                     fontFamily: 'Inter',
@@ -536,13 +498,13 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 30),
             Padding(
-              padding: EdgeInsets.only(left: 50),
+              padding: const EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '날짜  ${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
+                  '날짜  $date',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF004F9E),
                     fontSize: 15,
                     fontFamily: 'Inter',
@@ -554,13 +516,13 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 20),
             Padding(
-              padding: EdgeInsets.only(left: 50),
+              padding: const EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '${startTime}:00~${endTime}:00  |  좌석 ${table_number}',
+                  '$startTime:00~$endTime:00  |  좌석 $table_number',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF7C7C7C),
                     fontSize: 12,
                     fontFamily: 'Inter',
@@ -574,8 +536,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             ElevatedButton(
                 onPressed: () {
                   isLent
-                      ? FlutterDialog("반납하시겠습니까?", "반납하기")
-                      : EnterDialog("입장하시겠습니까?", "입장하기");
+                      ? FlutterDialog("반납하시겠습니까?", "반납하기", index)
+                      : EnterDialog("입장하시겠습니까?", "입장하기", index);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF004F9E),
@@ -598,7 +560,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                       ),
                       if (isLent)
                         TextSpan(
-                          text: '남은 이용시간 $_remainingTime', // 남은 시간 변수
+                          text: '남은 이용시간 $remainingTime', // 남은 시간 변수
                           style: const TextStyle(
                             fontSize: 12, // 남은 시간 폰트 크기
                             fontWeight: FontWeight.w500, // 남은 시간 폰트 두께
@@ -618,7 +580,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () => FlutterDialog("예약을 취소하시겠습니까 ?", "예약 취소"),
+                    onPressed: () => cancelReservation(index),
                     child: const Text(
                       '예약 취소',
                       style: TextStyle(
@@ -652,9 +614,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '[ ${roomName} ]',
+                  '[ $roomName ]',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 15,
                     fontFamily: 'Inter',
@@ -704,13 +666,13 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 30),
             Padding(
-              padding: EdgeInsets.only(left: 50),
+              padding: const EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '날짜  ${date}',
+                  '날짜  $date',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF004F9E),
                     fontSize: 15,
                     fontFamily: 'Inter',
@@ -722,13 +684,13 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 20),
             Padding(
-              padding: EdgeInsets.only(left: 50),
+              padding: const EdgeInsets.only(left: 50),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '${startTime}:00~${endTime}:00  |  좌석 ${table_number}',
+                  '$startTime:00~$endTime:00  |  좌석 $table_number',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF7C7C7C),
                     fontSize: 12,
                     fontFamily: 'Inter',
@@ -745,7 +707,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  void FlutterDialog(String text, String text2) {
+  void FlutterDialog(String text, String text2, int index) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -819,10 +781,10 @@ class _Details extends State<Details> with WidgetsBindingObserver {
 
                         if (text2 == '반납하기') {
                           setState(() {
-                            isLent = false;
-                            _timer?.cancel();
+                            isLentMap[index] = false;
+                            timersMap[index]?.cancel();
                           });
-
+                          saveTimerState(index);
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Return()),
@@ -840,7 +802,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  void EnterDialog(String text, String text2) {
+  void EnterDialog(String text, String text2, int index) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -912,9 +874,22 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                       onPressed: () {
                         Navigator.pop(context);
 
-                        isLent = true;
-
-                        startEntryTimer();
+                        setState(() {
+                          isLentMap[index] = true;
+                          DateTime startDateTime = DateTime.parse(
+                              reservations[index]['date'] +
+                                  ' ' +
+                                  reservations[index]['startTime'] +
+                                  ':00');
+                          DateTime endDateTime = DateTime.parse(
+                              reservations[index]['date'] +
+                                  ' ' +
+                                  reservations[index]['endTime'] +
+                                  ':00');
+                          endTimesMap[index] = endDateTime;
+                          startEntryTimer(index, startDateTime, endDateTime);
+                        });
+                        saveTimerState(index);
                       },
                     ),
                   ],
@@ -927,15 +902,104 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  Timer? _timer;
-  String _remainingTime = '00:00:00'; // 시, 분, 초 형태로 초기화
-  DateTime? _endTime;
-  DateTime now = DateTime.now();
+  void cancelReservation(int index) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3.0),
+          ),
+          backgroundColor: Colors.white,
+          content: SizedBox(
+            width: 359.39,
+            height: 45.41,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  "예약을 취소하시겠습니까?",
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 1,
+                  width: 350,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                Row(
+                  children: [
+                    const SizedBox(width: 35),
+                    TextButton(
+                      child: const Text("돌아가기",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          )),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 35),
+                    Container(
+                      height: 34.74,
+                      width: 1,
+                      color: Colors.grey.withOpacity(0.2),
+                    ),
+                    const SizedBox(width: 50),
+                    TextButton(
+                      child: const Text("예약 취소",
+                          style: TextStyle(
+                            color: Color(0XFF004F9E),
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                          )),
+                      onPressed: () {
+                        Navigator.pop(context);
+
+                        setState(() {
+                          reservations.removeAt(index);
+                        });
+
+                        // 타이머 상태 제거
+                        isLentMap.remove(index);
+                        remainingTimeMap.remove(index);
+                        timersMap[index]?.cancel();
+                        timersMap.remove(index);
+                        endTimesMap.remove(index);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();
+    timersMap.forEach((key, timer) => timer?.cancel());
     super.dispose();
   }
 
@@ -943,26 +1007,47 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // 앱이 다시 활성화될 때 타이머 재시작
-      startEntryTimer();
+      timersMap.keys.forEach((index) {
+        if (isLentMap[index] == true && endTimesMap[index] != null) {
+          DateTime endDateTime = endTimesMap[index]!;
+          DateTime now = DateTime.now();
+          if (now.isBefore(endDateTime)) {
+            int secondsRemaining = endDateTime.difference(now).inSeconds;
+            startEntryTimer(index, now, endDateTime,
+                remainingSeconds: secondsRemaining);
+          } else {
+            // 예약 시간이 이미 종료된 경우
+            setState(() {
+              isLentMap[index] = false;
+              remainingTimeMap[index] = '00:00:00';
+            });
+          }
+        }
+      });
     }
   }
 
-  void startEntryTimer() {
-    DateTime endTime =
-        DateTime.now().add(Duration(hours: 2)); // 예약 종료 시간, 예시로 2시간 후 설정
-    int seconds = endTime.difference(DateTime.now()).inSeconds;
+  void startEntryTimer(int index, DateTime startDateTime, DateTime endDateTime,
+      {int? remainingSeconds}) {
+    int seconds =
+        remainingSeconds ?? endDateTime.difference(startDateTime).inSeconds;
 
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timersMap[index]?.cancel(); // 기존 타이머가 있으면 취소
+
+    timersMap[index] = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (seconds > 0) {
           seconds--;
           int hours = seconds ~/ 3600;
           int minutes = (seconds % 3600) ~/ 60;
           int second = seconds % 60;
-          _remainingTime =
+          remainingTimeMap[index] =
               '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${second.toString().padLeft(2, '0')}';
+          saveTimerState(index);
         } else {
           timer.cancel();
+          isLentMap[index] = false;
+          remainingTimeMap[index] = '00:00:00';
         }
       });
     });

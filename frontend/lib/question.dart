@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // 추가: jsonEncode를 사용하기 위해 추가
+import 'dart:convert';
 import 'notice.dart';
 import 'loading.dart';
 
@@ -16,14 +16,14 @@ class _QuestionPageState extends State<QuestionPage> {
   TextEditingController dateController = TextEditingController();
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
-  bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+  bool isLoading = false;
   String userId = '';
 
   @override
   void initState() {
     super.initState();
     // 현재 날짜와 시간을 'yyyy-MM-dd HH:mm' 형식으로 설정
-    dateController.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+    dateController.text = DateFormat('yyyy-MM-dd ').format(DateTime.now());
   }
 
   Future<void> sendContent() async {
@@ -34,13 +34,13 @@ class _QuestionPageState extends State<QuestionPage> {
     userId = prefs.getString('uid')!;
 
     final Map<String, String> data = {
-      'userId': userId!,
+      'userId': userId,
       'date': dateController.text,
       'title': titleController.text,
       'content': contentController.text,
     };
 
-    const url = 'http://192.168.200.103:3000/inquiry/';
+    const url = 'http://172.30.1.11:3000/inquiry/';
 
     final response = await http.post(
       Uri.parse(url),
@@ -48,22 +48,23 @@ class _QuestionPageState extends State<QuestionPage> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
 
     if (response.statusCode == 200) {
       // 요청 성공 시 처리
       print('전송 성공');
     } else {
-      Error();
       print('전송 실패');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading == true) {
+    if (isLoading) {
       return const LoadingScreen();
     } else {
       return Scaffold(
@@ -165,13 +166,22 @@ class _QuestionPageState extends State<QuestionPage> {
                       // 포커스 시 테두리 색상
                       borderSide: BorderSide(color: Color(0XFF004F9E)),
                     )),
-                cursorColor: Colors.black, // 커
+                cursorColor: Colors.black, // 커서 색깔 변경
                 maxLines: 10,
               ),
               SizedBox(height: 50),
               ElevatedButton(
                 onPressed: () async {
-                  sendContent();
+                  await sendContent();
+                  if (mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('문의 내역이 전송되었습니다.'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF004F9E),

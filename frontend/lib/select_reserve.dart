@@ -184,7 +184,7 @@ class _select extends State<Select_reserve> {
   // 선택된 날짜를 서버로 전송하는 함수
   sendSelectedDateToServer(DateTime selectedDate) async {
     try {
-      const url = 'http://192.168.200.103:3000/reserveclub/selectdate';
+      const url = 'http://172.30.1.11:3000/reserveclub/selectdate';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       uid = prefs.getString('uid');
       final Map<String, String> data = {
@@ -938,7 +938,7 @@ class _select extends State<Select_reserve> {
       return;
     }
 
-    const url = 'http://192.168.200.103:3000/reserveclub/';
+    const url = 'http://172.30.1.11:3000/reserveclub/';
     final Map<String, String> data = {
       'userId': uid!,
       'roomName': roomName,
