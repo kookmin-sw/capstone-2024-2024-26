@@ -199,7 +199,7 @@ const handleCloseClubPopup = () => {
   
             if (response.status === 200) {
               alert('공유공간이 성공적으로 등록되었습니다.');
-              setClubRoomInfo(prev => [...prev, response.data.newClubRoom]);
+              setClubRoomInfo(prev => [...prev, response.data]);
               resetRoomData();
               setShowClubPopup(false);
             }
