@@ -330,23 +330,23 @@ const handleDeleteReservation = async (reservation) => {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <div className="form-label">강의실 이름:</div>
-              <input type="text" name="roomName" value={formData.roomName} onChange={handleChange} />
+              <input className='amdin_reserve_input' type="text" name="roomName" value={formData.roomName} onChange={handleChange} />
             </div>
             <div className="form-group">
               <div className="form-label">날짜:</div>
-              <input type="date" name="date" value={formData.date} onChange={handleChange} />
+              <input className='amdin_reserve_input' type="date" name="date" value={formData.date} onChange={handleChange} />
             </div>
             <div className="form-group">
               <div className="form-label">시작 시간:</div>
-              <input type="text" name="startTime" placeholder="HH:MM" value={formData.startTime} onChange={handleChange} />
+              <input className='amdin_reserve_input' type="text" name="startTime" placeholder="HH:MM" value={formData.startTime} onChange={handleChange} />
             </div>
             <div className="form-group">
               <div className="form-label">종료 시간:</div>
-              <input type="text" name="endTime" placeholder="HH:MM" value={formData.endTime} onChange={handleChange} />
+              <input className='amdin_reserve_input' type="text" name="endTime" placeholder="HH:MM" value={formData.endTime} onChange={handleChange} />
             </div>
             <div className="form-group">
               <div className="form-label">사용 목적:</div>
-              <input type="text" name="usingPurpose" value={formData.usingPurpose} onChange={handleChange} />
+              <input className='amdin_reserve_input' type="text" name="usingPurpose" value={formData.usingPurpose} onChange={handleChange} />
             </div>
             <button className='admin_reservation_button' type="submit">예약 추가</button>
           </form>

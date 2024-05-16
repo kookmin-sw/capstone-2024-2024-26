@@ -36,6 +36,21 @@ const Traffic = () => {
     fetchCameras();
   }, []);
 
+  const fetchServerData = async () => {
+    try {
+      const response = await axios.post('http://3.39.102.188:5000/api/state');
+      console.log("Data received from 3.39.102.188:5000/api/state:", response.data);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      console.log("Error details:", error.response || error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchCameras();
+    fetchServerData();  // 컴포넌트가 마운트될 때 fetchServerData 함수 호출
+  }, []);
+
 
   //서버를 통해서 DB에 새로운 카메라 위치 정보를 등록하는 이벤트 핸들러 함수
   const registerNewCamera = async () => {
@@ -133,6 +148,7 @@ const updateCameraLocation = async () => {
     alert('Failed to update camera location');
   }
 };
+
 
   const CameraTable = (
     <table>

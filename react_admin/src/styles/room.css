@@ -168,7 +168,7 @@
     font-weight: bold;
   }
   
-  input {
+.admin_reserve_input{
     padding: 0.5rem;
     font-size: 1rem;
     width: calc(100% - 140px); /* 레이블 너비를 뺀 나머지 공간을 채움 */

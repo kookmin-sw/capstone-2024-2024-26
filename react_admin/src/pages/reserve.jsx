@@ -75,7 +75,7 @@ const Reserve = () => {
             >
                 <h2>예약 내역: {formatDate(date)}</h2>
                 <button className="react-modal-close" onClick={() => setModalIsOpen(false)}>닫기</button>
-                <table>
+                <table className='calendar_table'>
                     <thead>
                         <tr>
                             <th className='reserve-type'>구분</th>
