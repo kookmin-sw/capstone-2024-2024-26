@@ -77,7 +77,8 @@ adminInquiry.post("/", async (req, res) => {
     const formattedDate = koreaNow
       .toISOString()
       .replace("T", " ")
-      .replace(/\.\d+Z$/, "");
+      .replace(/\.\d+Z$/, "")
+      .slice(0, -3);
 
     await updateDoc(timeDocRef, {
       response: response,
