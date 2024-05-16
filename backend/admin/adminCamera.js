@@ -39,7 +39,11 @@
   
       const cameras = [];
       cameraDocs.forEach((doc) => {
-        cameras.push(doc.data());
+        // cameras.push(doc.data());
+        const cameraData = doc.data();
+        cameraData.id = doc.id; // 데이터 객체에 id 속성 추가
+
+        cameras.push(cameraData);
       });
   
       res.status(200).json({
