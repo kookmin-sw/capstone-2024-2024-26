@@ -52,24 +52,23 @@ const Inquiry = () => {
   const getCurrentTimeFormatted = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더해줍니다.
     const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}-${hours}-${minutes}`;
-  };
+    // 반환되는 문자열 형식을 "YYYY-MM-DD HH:MM"으로 조정합니다.
+    return `${year}-${month}-${day}`;
+};
 
   const handleResponseSubmit = async () => {
     const currentTime = getCurrentTimeFormatted();
     console.log('Student ID:', currentInquiry.studentId);
-    console.log('Date:', currentInquiry.date);
-    console.log('Time:', currentTime);
+    console.log('Date:', currentTime);
+    console.log('Time:', currentInquiry.date);
     console.log('Response:', responseText);
     try {
       const response = await axios.post('http://localhost:3000/adminInquiry/', {
         studentId: currentInquiry.studentId,
-        date: currentInquiry.date,
-        time: currentTime,
+        date: currentTime,
+        time: currentInquiry.date,
         response: responseText
       });
 
@@ -152,9 +151,7 @@ const Inquiry = () => {
       </div>
     );
   };
-
   
-
   return (
     <div className="main-container">
       <Banner />

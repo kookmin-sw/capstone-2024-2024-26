@@ -8,6 +8,7 @@ import {
   where,
   deleteDoc,
   updateDoc,
+  query
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -61,7 +62,6 @@ adminInquiry.post("/", async (req, res) => {
 
     const userDoc = userDocSnapshot.docs[0];
     const userData = userDoc.data();
-
     const collectionName = `${userData.faculty}_Inquiry`;
 
     // 학번을 문서 ID로 사용하여 문의 문서 참조 생성
@@ -74,18 +74,16 @@ adminInquiry.post("/", async (req, res) => {
 
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
-
-    const year = koreaNow.getFullYear();
-    const month = String(koreaNow.getMonth() + 1).padStart(2, "0");
-    const day = String(koreaNow.getDate()).padStart(2, "0");
-    const hours = String(koreaNow.getHours()).padStart(2, "0");
-    const minutes = String(koreaNow.getMinutes()).padStart(2, "0");
-
-    const responseDate = `${year}-${month}-${day}-${hours}-${minutes}`;
+    // YY-MM-DD HH:MM 형식
+    const formattedDate = koreaNow
+      .toISOString()
+      .replace("T", " ")
+      .replace(/\.\d+Z$/, "")
+      .slice(0, -3);
 
     await updateDoc(timeDocRef, {
       response: response,
-      responseDate: responseDate,
+      responseDate: formattedDate,
       responseStatus: true,
     });
     res.status(200).json({
