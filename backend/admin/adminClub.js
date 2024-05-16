@@ -50,6 +50,7 @@ adminClub.post("/create/room", async (req, res) => {
     faculty,
     roomName,
     available_Table,
+    tableList,// 테이블 정보
     available_People,
     available_Time,
     clubRoomImage, // 인코딩된 이미지 값(강의실 사진)
@@ -67,6 +68,7 @@ adminClub.post("/create/room", async (req, res) => {
       faculty: faculty,
       roomName: roomName,
       available_Table: available_Table,
+      tableList: tableList,
       available_People: available_People,
       available_Time: available_Time,
       clubRoomImage: clubRoomImage,
@@ -82,6 +84,7 @@ adminClub.post("/create/room", async (req, res) => {
     res.status(500).json({ error: "Failed to register Club Room" });
   }
 });
+
 
 // 동아리방 정보 불러오기
 adminClub.get("/clubRoomInfo/:faculty", async (req, res) => {
@@ -107,6 +110,7 @@ adminClub.get("/clubRoomInfo/:faculty", async (req, res) => {
         faculty: clubRoomInfo.faculty,
         roomName: clubRoomInfo.roomName,
         available_Table: clubRoomInfo.available_Table,
+        tableList: clubRoomInfo.tableList,
         available_Time: clubRoomInfo.available_Time,
         available_People: clubRoomInfo.available_People,
         clubRoomImage: clubRoomInfo.clubRoomImage,
