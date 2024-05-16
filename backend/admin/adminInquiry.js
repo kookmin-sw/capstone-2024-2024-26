@@ -74,18 +74,14 @@ adminInquiry.post("/", async (req, res) => {
 
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
-
-    const year = koreaNow.getFullYear();
-    const month = String(koreaNow.getMonth() + 1).padStart(2, "0");
-    const day = String(koreaNow.getDate()).padStart(2, "0");
-    const hours = String(koreaNow.getHours()).padStart(2, "0");
-    const minutes = String(koreaNow.getMinutes()).padStart(2, "0");
-
-    const responseDate = `${year}-${month}-${day}-${hours}-${minutes}`;
+    const formattedDate = koreaNow
+      .toISOString()
+      .replace("T", " ")
+      .replace(/\.\d+Z$/, "");
 
     await updateDoc(timeDocRef, {
       response: response,
-      responseDate: responseDate,
+      responseDate: formattedDate,
       responseStatus: true,
     });
     res.status(200).json({
