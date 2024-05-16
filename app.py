@@ -61,13 +61,13 @@ def spfolks():
 #혼잡도 정보 알려주는곳
 @app.route('/api/info', methods=['POST'])
 def qffdqgaf():
-    
+    print("Request received for /api/info")
     #하드코딩 해둔거
     cameras_ref = db.collection('Camera')
     docs = cameras_ref.stream()
     colors = ['0XFF0081B9', '0XFFD30000', '0XFF00A61B', '0XFFEF7300']
     
-    output = []  # 배열로 초기화
+    output = {}  # 배열로 초기화
     index = 0
     for doc in docs:
         camera = doc.to_dict()
@@ -78,9 +78,9 @@ def qffdqgaf():
             'location_detail': camera.get('location', 'Default location'),  # 'location' 필드
             'color' : colors[index],
         }
-        output.append(camera_data)  # 생성된 딕셔너리를 배열에 추가
+        output[index] = camera_data  # 생성된 딕셔너리를 배열에 추가
         index+=1
-    return output   #jsonify(output)  # 배열을 JSON으로 변환하여 반환
+    return jsonify(output)   #jsonify(output)  # 배열을 JSON으로 변환하여 반환
 
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
