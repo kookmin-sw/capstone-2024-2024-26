@@ -52,25 +52,21 @@ inquiry.post("/", async (req, res) => {
 
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
-
-    const year = koreaNow.getFullYear();
-    const month = String(koreaNow.getMonth() + 1).padStart(2, "0");
-    const day = String(koreaNow.getDate()).padStart(2, "0");
-    const hours = String(koreaNow.getHours()).padStart(2, "0");
-    const minutes = String(koreaNow.getMinutes()).padStart(2, "0");
-
-    const time = `${year}-${month}-${day}-${hours}-${minutes}`;
+    const formattedDate = koreaNow
+      .toISOString()
+      .replace("T", " ")
+      .replace(/\.\d+Z$/, "");
 
     const dateCollectionRef = collection(studentIdDocRef, date);
 
-    const timeDocRef = doc(dateCollectionRef, time);
+    const timeDocRef = doc(dateCollectionRef, formattedDate);
 
     // 문의 정보 추가
     await setDoc(timeDocRef, {
       faculty: userData.faculty,
       name: userData.name,
       studentId: userData.studentId,
-      date: time,
+      date: formattedDate,
       title: title,
       content: content,
       response: "",
