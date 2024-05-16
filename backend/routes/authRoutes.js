@@ -90,7 +90,9 @@ router.post("/signup", async (req, res) => {
 
 // 로그인
 router.post("/signin", async (req, res) => {
-  const { email, password ,fcmToken } = req.body;
+
+  const { email, password, } = req.body;
+
 
   try {
     // Firebase를 이용하여 이메일과 비밀번호로 로그인
@@ -180,6 +182,7 @@ router.post("/profile/update/:uid", async (req, res) => {
 // 프로필 조회
 router.post("/profile/:uid", async (req, res) => {
   const { uid } = req.body;
+
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴

@@ -1,4 +1,5 @@
 import {
+
   addDoc,
   collection,
   getFirestore,
@@ -142,3 +143,4 @@ inquiry.get("/list/:userId/:startDate/:endDate", async (req, res) => {
 });
 
 export default inquiry;
+

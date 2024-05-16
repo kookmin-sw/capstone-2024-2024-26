@@ -15,6 +15,7 @@ import notify from "./routes/notify.js";
 
 const port = 3000;
 
+
 const app = express();
 
 app.use(express.json({limit: '100mb'}));
@@ -32,6 +33,7 @@ app.use("/adminAuth", adminAuth);
 app.use("/adminClub", adminClub);
 // 관리자 강의실 관리 api
 app.use("/adminRoom", adminRoom);
+
 // 카메라 관리 api
 app.use("/adminCamera", adminCamera);
 // 문의 관리 api
@@ -42,6 +44,7 @@ app.use("/adminInquiry", adminInquiry);
 app.use("/adminNotify", adminNotify);
 // 백그라운드 설정
 app.use("/notify", notify);
+
 // 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

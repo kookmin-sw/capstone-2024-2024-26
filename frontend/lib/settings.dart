@@ -47,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget buildInputField(String labelText, {TextEditingController? controller}) {
+  Widget buildInputField(String labelText,
+      {TextEditingController? controller}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(

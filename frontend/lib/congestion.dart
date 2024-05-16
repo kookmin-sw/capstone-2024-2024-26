@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'myPage.dart';
+import 'notice.dart';
 
 enum MenuType { first, second, third }
 
@@ -48,8 +49,16 @@ class _CongestionState extends State<Congestion> {
       'congestion': '혼잡',
       'color': '0XFFEF7300'
     },
+
     // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
   ];
+
+  final Map<String, int> congestionWeights = {
+    '매우 혼잡': 4,
+    '혼잡': 3,
+    '보통': 2,
+    '여유': 1
+  };
 
   final _values = [
     '전체',
@@ -76,6 +85,25 @@ class _CongestionState extends State<Congestion> {
     });
   }
 
+  List<Map<String, dynamic>> get filteredAndSortedData {
+    List<Map<String, String>> filteredData = congestionData
+        .where((data) =>
+            _selectedValue == '전체' ||
+            data['location_detail']!.contains(_selectedValue))
+        .toList();
+
+    // 'filteredData'를 사용하여 'sorted' 리스트 생성
+    List<Map<String, dynamic>> sorted = List.from(filteredData);
+    sorted.sort((a, b) {
+      return _selectedSortValue == '혼잡도 높은 순'
+          ? congestionWeights[b['congestion']]!
+              .compareTo(congestionWeights[a['congestion']]!)
+          : congestionWeights[a['congestion']]!
+              .compareTo(congestionWeights[b['congestion']]!);
+    });
+    return sorted;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,8 +121,14 @@ class _CongestionState extends State<Congestion> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset('assets/icons/notice_none.svg'))
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyNotice()),
+              );
+            },
+            icon: SvgPicture.asset('assets/icons/notice_none.svg'),
+          ),
         ],
         backgroundColor: Colors.transparent, // 상단바 배경색
         foregroundColor: Colors.black, //상단바 아이콘색
@@ -209,11 +243,10 @@ class _CongestionState extends State<Congestion> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: congestionData.length,
+              itemCount: filteredAndSortedData.length,
               itemBuilder: (context, index) {
-                print(index); // Add this line to print the index to the console
-                final data = congestionData[index];
-                print(data);
+                final data = filteredAndSortedData[index];
+
                 return Column(
                   children: [
                     SizedBox(height: 10), // Add spacing here
