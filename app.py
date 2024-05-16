@@ -65,8 +65,13 @@ def qffdqgaf():
     #하드코딩 해둔거
     cameras_ref = db.collection('Camera')
     docs = cameras_ref.stream()
-    colors = ['0XFF0081B9', '0XFFD30000', '0XFF00A61B', '0XFFEF7300']
-    
+    #colors = ['0XFF0081B9', '0XFFD30000', '0XFF00A61B', '0XFFEF7300']
+    colors = {
+        '매우 혼잡' : '0XFF0081B9',
+        '혼잡' : '0XFFEF7300',
+        '보통' : '0XFFD30000',
+        '여유' : '0XFF00A61B'
+    }
     output = {}  # 배열로 초기화
     index = 0
     for doc in docs:
@@ -76,7 +81,7 @@ def qffdqgaf():
             'location': doc.id,  # 문서 ID를 'location' 필드에 저장
             'congestion': camera.get('info', 'Default info'),  # 'info' 필드
             'location_detail': camera.get('location', 'Default location'),  # 'location' 필드
-            'color' : colors[index],
+            'color' : colors[camera['info']],
         }
         output[index] = camera_data  # 생성된 딕셔너리를 배열에 추가
         index+=1
@@ -128,6 +133,8 @@ def classi():
     data = request.get_json()
     if not data or 'image' not in data:
         return jsonify({"error": "Invalid data"}), 400
+    else:
+        print('good')
     
     base64_image = data['image']# 이미지 인코딩된거
     myclass = data['class']  #강의실 0, club 1
