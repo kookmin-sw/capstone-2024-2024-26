@@ -67,10 +67,10 @@ def qffdqgaf():
     docs = cameras_ref.stream()
     #colors = ['0XFF0081B9', '0XFFD30000', '0XFF00A61B', '0XFFEF7300']
     colors = {
-        '매우 혼잡' : '0XFF0081B9',
+        '매우 혼잡' : '0XFFD30000',
         '혼잡' : '0XFFEF7300',
-        '보통' : '0XFFD30000',
-        '여유' : '0XFF00A61B'
+        '보통' : '0XFF00A61B',
+        '여유' : '0XFF0081B9',
     }
     output = {}  # 배열로 초기화
     index = 0
