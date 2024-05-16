@@ -65,28 +65,22 @@ def qffdqgaf():
     #하드코딩 해둔거
     cameras_ref = db.collection('Camera')
     docs = cameras_ref.stream()
-
+    colors = ['0XFF0081B9', '0XFFD30000', '0XFF00A61B', '0XFFEF7300']
     
-    # output = {}
-    # for doc in docs:
-    #     camera = doc.to_dict()
-    #     output[doc.id] = camera['info']
-
-    # return jsonify(output)
-    output = {}
-    index = 0  # 문서에 대한 인덱스 초기화
+    output = []  # 배열로 초기화
+    index = 0
     for doc in docs:
         camera = doc.to_dict()
-        # 카메라 정보에서 'info', 'location', 'state' 필드를 포함
+        # 카메라 정보를 딕셔너리로 생성
         camera_data = {
-            'location': doc.id,  # 문서 ID
-            'congestion': camera['info'],  # 'info' 필드
-            'location_detail': camera['location'],  # 'location' 필드
-            'state': camera['state']  # 'state' 필드
+            'location': doc.id,  # 문서 ID를 'location' 필드에 저장
+            'congestion': camera.get('info', 'Default info'),  # 'info' 필드
+            'location_detail': camera.get('location', 'Default location'),  # 'location' 필드
+            'color' : colors[index],
         }
-        output[index] = camera_data
-        index += 1  # 인덱스 증가
-    return jsonify(output)
+        output.append(camera_data)  # 생성된 딕셔너리를 배열에 추가
+        index+=1
+    return jsonify(output)  # 배열을 JSON으로 변환하여 반환
 
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
