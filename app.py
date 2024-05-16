@@ -10,7 +10,7 @@ from count import count
 from image_class import classification
 from waitress import serve
 from dotenv import load_dotenv
-
+from flask_cors import CORS
 
 load_dotenv() 
 
@@ -32,7 +32,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def gogo():
