@@ -80,7 +80,7 @@ def qffdqgaf():
         }
         output.append(camera_data)  # 생성된 딕셔너리를 배열에 추가
         index+=1
-    return jsonify(output)  # 배열을 JSON으로 변환하여 반환
+    return output   #jsonify(output)  # 배열을 JSON으로 변환하여 반환
 
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
