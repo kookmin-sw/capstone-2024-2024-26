@@ -30,8 +30,9 @@ const db = getFirestore(app);
 
 const reserveClub = express.Router();
 
+// 동아리방 예약
 reserveClub.post("/", async (req, res) => {
-  const { userId, roomId, date, startTime, endTime, tableNumber } = req.body;
+  const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -43,166 +44,110 @@ reserveClub.post("/", async (req, res) => {
 
     const collectionName = `${userData.faculty}_Club`;
 
-    // 문서 ID에 roomId와 같은 문자열이 포함되어 있는지 확인
-    const existingReservationSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("roomId", "==", roomId)
-    );
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
 
-    const existingReservation = existingReservationSnapshot.docs.find((doc) =>
-      doc.id.includes(roomId)
-    );
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists" });
+    }
+    const facultyClubCollection = collection(db, collectionName);
+    const clubRoomDoc = doc(facultyClubCollection, roomName);
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
 
-    // roomId와 같은 문자열이 포함되어 있는 경우 예약 진행
-    if (existingReservation) {
-      // 예약된 시간대와 좌석 확인
-      const existingReservationsSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("date", "==", date),
-        where("roomId", "==", roomId),
-        where("tableNumber", "==", tableNumber)
-      );
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
+    }
 
-      // 겹치는 예약이 있는지 확인
-      const overlappingReservation = existingReservationsSnapshot.docs.find(
-        (doc) => {
-          const reservation = doc.data();
-          // 기존 예약의 시작 시간과 끝 시간
-          const existingStartTime = reservation.startTime;
-          const existingEndTime = reservation.endTime;
-          const existingDate = reservation.date;
-          const existingRoomId = reservation.roomId;
-          const startTimeClub = startTime;
-          const endTimeClub = endTime;
+    const dateCollection = collection(clubRoomDoc, date);
+    const availableTable = parseInt(clubRoomDocSnap.data().available_Table);
 
-          // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-          if (
-            (existingDate == date &&
-              startTimeClub == existingStartTime &&
-              endTimeClub == existingEndTime &&
-              roomId == existingRoomId) ||
-            (existingDate == date &&
-              roomId == existingRoomId &&
-              startTimeClub < existingEndTime &&
-              endTimeClub > existingStartTime)
-          ) {
-            return true;
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+
+      if (reservationDocSnap.exists()) {
+        const reservationData = reservationDocSnap.data();
+
+        // 이미 예약된 테이블이 있는지 확인
+        const index = parseInt(tableNumber) - 1;
+        if (reservationData.tableData[index][`T${tableNumber}`]) {
+          // 이미 예약된 테이블이 있는 경우 예약을 중단하고 다음 시간대로 넘어갑니다.
+          return res.status(400).json({
+            error: `Table ${tableNumber} is already reserved from ${i}-${
+              i + 1
+            }`,
+          });
+        }
+      }
+    }
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        const tableData = new Array();
+        for (let j = 1; j <= availableTable; j++) {
+          const tableInfo = {
+            [`T${j}`]: j === parseInt(tableNumber) ? true : false,
+          };
+          // name과 studentId를 추가합니다.
+          if (j === parseInt(tableNumber)) {
+            tableInfo.name = userData.name;
+            tableInfo.studentId = userData.studentId;
+            tableInfo.status = "previous";
           }
-          return false;
+          tableData.push(tableInfo);
         }
-      );
-
-      // 겹치는 예약이 있는 경우 에러 반환
-      if (overlappingReservation) {
-        return res
-          .status(401)
-          .json({ error: "The room is already reserved for this time" });
-      }
-
-      // 전에 사용자가 한 예약이 있는지 확인
-      const existingMyReservationSnapshot = await getDocs(
-        collection(db, `${collectionName}`),
-        where("userEmail", "==", userData.email)
-      );
-
-      // 문서 컬렉션에 uid로 구분해주기(덮어쓰이지않게 문서 개수에 따라 번호 부여)
-      const reservationCount = existingMyReservationSnapshot.size;
-
-      // 겹치는 예약이 없으면 예약 추가
-      await setDoc(
-        doc(
-          db,
-          `${collectionName}`,
-          `${roomId}_${userData.studentId}_${reservationCount}`
-        ),
-        {
-          userEmail: userData.email,
-          userName: userData.name,
-          userClub: userData.club,
-          roomId: roomId,
-          date: date,
-          startTime: startTime,
-          endTime: endTime,
-          tableNumber: tableNumber,
-        }
-      );
-
-      // 예약 성공 시 응답
-      res
-        .status(201)
-        .json({ message: "Reservation club created successfully" });
-    } else {
-      // roomId와 같은 문자열이 포함되어 있지 않은 경우 에러 반환
-      return res.status(404).json({ error: "Room not found" });
-    }
-  } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error creating reservation club", error);
-    res.status(500).json({ error: "Failed reservation club" });
-  }
-});
-
-// 사용자별 동아리 예약 내역 조회
-reserveClub.get("/reservationclubs/:userId", async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    // 사용자 정보 가져오기
-    const userDoc = await getDoc(doc(db, "users", userId));
-
-    if (!userDoc.exists()) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    const userData = userDoc.data();
-
-    // 컬렉션 이름 설정
-    const collectionName = `${userData.faculty}_Club`;
-
-    // 사용자의 모든 예약 내역 가져오기
-    const userReservationsSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("userEmail", "==", userData.email)
-    );
-
-    if (userReservationsSnapshot.empty) {
-      return res.status(404).json({ message: "No reservations found" });
-    }
-
-    // 예약 내역 반환
-    const userReservations = [];
-    userReservationsSnapshot.forEach((doc) => {
-      // 문서 ID에 특정 문자열이 포함되어 있는 경우에만 추가
-      if (doc.id.includes(userData.studentId)) {
-        const reservation = doc.data();
-        userReservations.push({
-          id: doc.id, // 예약 문서 ID
-          roomId: reservation.roomId,
-          date: reservation.date,
-          startTime: reservation.startTime,
-          endTime: reservation.endTime,
-          tableNumber: reservation.tableNumber,
+        await setDoc(reservationDocRef, {
+          tableData: tableData,
         });
-      }
-    });
+      } else {
+        // 해당 시간대의 문서가 존재할 때
+        const reservationData = reservationDocSnap.data();
 
-    // 사용자의 예약 정보 반환
-    res.status(200).json({
-      message: "User reservations fetched successfully",
-      reservations: userReservations,
-    });
+        // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
+        // 특정 테이블 번호를 true로 설정합니다.
+        const index = parseInt(tableNumber) - 1;
+        if (reservationData.tableData[index][`T${tableNumber}`] === false) {
+          // 해당 테이블에 대해 name과 studentId도 업데이트
+          reservationData.tableData[index][`T${tableNumber}`] = true;
+          reservationData.tableData[index].name = userData.name;
+          reservationData.tableData[index].studentId = userData.studentId;
+          reservationData.tableData[index].status = "previous";
+
+          await updateDoc(reservationDocRef, {
+            tableData: reservationData.tableData,
+          });
+        }
+      }
+    }
+    res.status(200).json({ message: "Creating reservation club successfully" });
   } catch (error) {
-    // 오류 발생 시 오류 응답
-    console.error("Error fetching user reservations", error);
-    res.status(500).json({ error: "Failed to fetch user reservations" });
+    console.error("Error creating reservation club", error);
+    return res.status(500).json({ error: "Failed reservation club" });
   }
 });
 
-// 해당 날짜에 해당하는 모든 예약 내역 가져오기
+// 사용자별 예약 내역 반환
 reserveClub.get(
-  "/reservationclubs/:userId/:date",
+  "/reservationclubs/:userId/:startDate",
   async (req, res) => {
-    const date = req.params.date;
     const userId = req.params.userId;
+    const startDate = new Date(req.params.startDate);
 
     try {
       // 사용자 정보 가져오기
@@ -216,55 +161,191 @@ reserveClub.get(
       // 컬렉션 이름 설정
       const collectionName = `${userData.faculty}_Club`;
 
-      // 해당 날짜의 모든 예약 내역 가져오기
-    const reservationsSnapshot = await getDocs(
-      query(collection(db, `${collectionName}`), where("date", "==", date))
-    );
+      // 사용자 예약 내역
+      // 사용한 예약 내역
+      const userReservations = [];
 
-      if (reservationsSnapshot.empty) {
-        return res
-          .status(404)
-          .json({ message: "No reservations found for this date" });
-      }
+      // 이용 예정 예약 내역(이용 중 포함)
+      const userReservations1 = [];
 
-      // 예약 내역 반환
-      const reservations = [];
-      reservationsSnapshot.forEach((doc) => {
-        const reservation = doc.data();
-        reservations.push({
-          id: doc.id, // 예약 문서 ID
-          userId: reservation.userId,
-          userName: reservation.userName,
-          userClub: reservation.userClub,
-          roomId: reservation.roomId,
-          date: reservation.date,
-          startTime: reservation.startTime,
-          endTime: reservation.endTime,
-          tableNumber: reservation.tableNumber,
-        });
-      });
+      // 동아리방 컬렉션 참조
+      const facultyClubCollectionRef = collection(db, collectionName);
 
-      // 해당 날짜의 모든 예약 내역 반환
+      const querySnapshot = await getDocs(facultyClubCollectionRef);
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          const offset = 1000 * 60 * 60 * 9;
+          const koreaNow = new Date(new Date().getTime() + offset);
+          const todayDateString = koreaNow.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+
+          // 사용한 예약 내역
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= koreaNow;
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+            if (todayDateString == dateString) {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+                  const timeString = koreaNow
+                    .toISOString()
+                    .split("T")[1]
+                    .substring(0, 2);
+
+                  if (parseInt(endTime) < parseInt(timeString)) {
+                    // 예약된 테이블 정보 조회
+                    reservationData.tableData.forEach((table) => {
+                      if (table.studentId === userData.studentId) {
+                        userReservations.push({
+                          roomName: roomName,
+                          date: dateString,
+                          startTime: startTime,
+                          endTime: endTime,
+                          tableData: table,
+                        });
+                      }
+                    });
+                  }
+                }
+              });
+            } else {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+
+                  // 예약된 테이블 정보 조회
+                  reservationData.tableData.forEach((table) => {
+                    if (table.studentId === userData.studentId) {
+                      userReservations.push({
+                        roomName: roomName,
+                        date: dateString,
+                        startTime: startTime,
+                        endTime: endTime,
+                        tableData: table,
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          }
+          // 이용 예정(이용 중 포함)
+          const endDate = new Date();
+          endDate.setDate(koreaNow.getDate() + 7);
+
+          for (; koreaNow <= endDate; koreaNow.setDate(koreaNow.getDate() + 1)){
+            const dateString = koreaNow.toISOString().split("T")[0];
+
+            if (todayDateString == dateString) {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+  
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+  
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+                  const timeString = koreaNow
+                    .toISOString()
+                    .split("T")[1]
+                    .substring(0, 2);
+                  if (parseInt(startTime) >= parseInt(timeString)) { // 이용 중일 때도 이용 예정에 들어가게함
+                    // 예약된 테이블 정보 조회
+                    reservationData.tableData.forEach((table) => {
+                      if (table.studentId === userData.studentId) {
+                        userReservations1.push({
+                          roomName: roomName,
+                          date: dateString,
+                          startTime: startTime,
+                          endTime: endTime,
+                          tableData: table,
+                        });
+                      }
+                    });
+                  }
+                }
+              });
+            } else {
+              const dateCollectionRef = collection(
+                db,
+                `${collectionName}/${roomName}/${dateString}`
+              ); // 컬렉션 참조 생성
+  
+              // 해당 날짜별 시간 대 예약 내역 조회
+              const timeDocSnapshot = await getDocs(dateCollectionRef);
+  
+              timeDocSnapshot.forEach((docSnapshot) => {
+                const reservationData = docSnapshot.data();
+                if (reservationData && reservationData.tableData) {
+                  const startTime = docSnapshot.id.split("-")[0];
+                  const endTime = docSnapshot.id.split("-")[1];
+  
+                  // 예약된 테이블 정보 조회
+                  reservationData.tableData.forEach((table) => {
+                    if (table.studentId === userData.studentId) {
+                      userReservations1.push({
+                        roomName: roomName,
+                        date: dateString,
+                        startTime: startTime,
+                        endTime: endTime,
+                        tableData: table,
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          }
+        })
+      );
+
+      // 사용자 예약 내역 반환
       res.status(200).json({
-        message: "Reservations for the date fetched successfully",
-        reservations,
+        message: "User reservations fetched successfully",
+        reservations: userReservations,
+        reservationsFuture: userReservations1
       });
     } catch (error) {
       // 오류 발생 시 오류 응답
-      console.error("Error fetching reservations for the date", error);
-      res
-        .status(500)
-        .json({ error: "Failed to fetch reservations for the date" });
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
     }
   }
 );
 
-// 동아리방 예약 수정
-reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
-  const userId = req.params.userId;
-  const reserveclubUID = req.params.reserveclubUID;
-  const { roomId, date, startTime, endTime, tableNumber } = req.body;
-
+// 동아리방 예약 취소
+reserveClub.post("/delete", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -274,88 +355,71 @@ reserveClub.post("/update/:userId/:reserveclubUID", async (req, res) => {
     }
     const userData = userDoc.data();
 
-    // 컬렉션 이름 설정
     const collectionName = `${userData.faculty}_Club`;
 
-    // Firestore reservationClub에서 해당 예약 문서를 가져옴
-    const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
-    if (!reserveClubDoc.exists()) {
-      // 예약 문서가 존재하지 않는 경우 오류 응답
-      return res.status(404).json({ error: "Reservation not found" });
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists" });
+    }
+    const facultyClubCollection = collection(db, collectionName);
+    const clubRoomDoc = doc(facultyClubCollection, roomName);
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
     }
 
-    // 변경된 필드만 업데이트
-    const updateFields = {};
-    if (roomId) updateFields.roomId = roomId;
-    if (date) updateFields.date = date;
-    if (startTime) updateFields.startTime = startTime;
-    if (endTime) updateFields.endTime = endTime;
-    if (tableNumber) updateFields.tableNumber = tableNumber;
+    const dateCollection = collection(clubRoomDoc, date);
 
-    // 겹치는 예약이 있는지 확인
-    const existingReservationsSnapshot = await getDocs(
-      collection(db, `${collectionName}`),
-      where("date", "==", date),
-      where("roomId", "==", roomId),
-      where("tableNumber", "==", tableNumber),
-      where("reserveclubUID", "!=", reserveclubUID) // 현재 예약을 제외하고 조회
-    );
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
 
-    // 겹치는 예약이 있는지 확인
-    const overlappingReservation = existingReservationsSnapshot.docs.find(
-      (doc) => {
-        const reservation = doc.data();
-        console.log(reservation);
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
 
-        // 기존 예약의 시작 시간과 끝 시간
-        const existingStartTime = reservation.startTime;
-        const existingEndTime = reservation.endTime;
-        const existingDate = reservation.date;
-        const existingRoomId = reservation.roomId;
-        const startTimeClub = updateFields.startTime;
-        const endTimeClub = updateFields.endTime;
+    // 시작 시간부터 종료 시간까지 각 시간대에 대해 예약 문서를 업데이트합니다.
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
 
-        // 예약 시간이 같은 경우 또는 기존 예약과 겹치는 경우 확인
-        if (
-          (existingDate == date &&
-            startTimeClub == existingStartTime &&
-            endTimeClub == existingEndTime &&
-            roomId == existingRoomId) ||
-          (existingDate == date &&
-            roomId == existingRoomId &&
-            startTimeClub < existingEndTime &&
-            endTimeClub > existingStartTime)
-        ) {
-          return true;
+      // 해당 시간대 예약 문서가 있는지 확인
+      if (reservationDocSnap.exists()) {
+        const reservationData = reservationDocSnap.data();
+
+        // 해당 테이블 번호의 예약을 취소하고 상태를 false로 변경합니다.
+        const index = parseInt(tableNumber) - 1;
+        if (reservationData.tableData[index][`T${tableNumber}`]) {
+          console.log(reservationData.tableData[index]);
+          // 예약 취소 및 테이블 상태 변경
+          reservationData.tableData[index][`T${tableNumber}`] = false;
+          delete reservationData.tableData[index].name;
+          delete reservationData.tableData[index].studentId;
+          delete reservationData.tableData[index].status;
+
+          await updateDoc(reservationDocRef, {
+            tableData: reservationData.tableData,
+          });
         }
-
-        return false;
       }
-    );
-
-    if (overlappingReservation) {
-      return res
-        .status(400)
-        .json({ error: "The room is already reserved for this time" });
     }
 
-    // 겹치는 예약이 없으면 예약 업데이트
-    await updateDoc(doc(db, `${collectionName}`, reserveclubUID), updateFields);
-
-    // 업데이트 된 동아리방 예약 정보 반환
-    res.status(200).json({ message: "Reservationclub updated successfully" });
+    res.status(200).json({ message: "Reservation canceled successfully" });
   } catch (error) {
-    console.error("Error updating reservationclub");
-    res.status(500).json({ error: "Failed to update reservationclub" });
+    console.error("Error canceling reservation", error);
+    return res.status(500).json({ error: "Failed to cancel reservation" });
   }
 });
 
-// 동아리방 예약 취소
-reserveClub.delete("/delete/:userId/:reserveclubUID", async(req, res) => {
-  const userId = req.params.userId;
-  const reserveclubUID = req.params.reserveclubUID;
 
-  try{
+// 입장하기
+reserveClub.post("/entrance", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
+  try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
 
@@ -364,24 +428,180 @@ reserveClub.delete("/delete/:userId/:reserveclubUID", async(req, res) => {
     }
     const userData = userDoc.data();
 
-    // 컬렉션 이름 설정
     const collectionName = `${userData.faculty}_Club`;
 
-    // Firestore reservationClub에서 해당 예약 문서를 가져옴
-    const reserveClubDoc = await getDoc(doc(db, `${collectionName}`, reserveclubUID));
-    if (!reserveClubDoc.exists()) {
-      // 예약 문서가 존재하지 않는 경우 오류 응답
-      return res.status(404).json({ error: "Reservation not found" });
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists" });
+    }
+    const facultyClubCollection = collection(db, collectionName);
+    const clubRoomDoc = doc(facultyClubCollection, roomName);
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
     }
 
-    // 동아리방 예약 내역 삭제
-    await deleteDoc(doc(db, `${collectionName}`, reserveclubUID));
+    const dateCollection = collection(clubRoomDoc, date);
 
-    res.status(200).json({ message: "Reservation club deleted success"})
-  } catch(error) {
-    console.error("Error deleting reservation club", error);
-    res.status(500).json({ error: "Failed to delete reservation club"});
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        return res
+          .status(400)
+          .json({ error: "The reservation club room does not exist" });
+      } else {
+        // 해당 시간대의 문서가 존재할 때
+        const reservationData = reservationDocSnap.data();
+
+        // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
+        // 특정 테이블 번호를 true로 설정합니다.
+        const index = parseInt(tableNumber) - 1;
+        if (reservationData.tableData[index][`T${tableNumber}`] === true) {
+          // 해당 테이블에 대해 name과 studentId도 업데이트
+          reservationData.tableData[index].status = "using";
+
+          await updateDoc(reservationDocRef, {
+            tableData: reservationData.tableData,
+          });
+        }
+      }
+    }
+    res.status(200).json({
+      message: "Entrancing club room successfully",
+    });
+  } catch (error) {
+    console.error("Error entrancing reservation club room");
+    res.status(500).json({ error: "Failed to entrance reservation club room" });
   }
 });
+
+// 반납하기
+reserveClub.post("/return", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+
+    const collectionName = `${userData.faculty}_Club`;
+
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exists" });
+    }
+    const facultyClubCollection = collection(db, collectionName);
+    const clubRoomDoc = doc(facultyClubCollection, roomName);
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
+    }
+
+    const dateCollection = collection(clubRoomDoc, date);
+
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    const timeDiff = endTimeHour - startTimeHour;
+
+    if (timeDiff < 1) {
+      return res.status(402).json({ error: "Unvaild startTime and endTime" });
+    }
+
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocSnap = await getDoc(reservationDocRef);
+      if (!reservationDocSnap.exists()) {
+        return res
+          .status(400)
+          .json({ error: "The reservation club room does not exist" });
+      } else {
+        // 해당 시간대의 문서가 존재할 때
+        const reservationData = reservationDocSnap.data();
+
+        // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
+        // 특정 테이블 번호를 true로 설정합니다.
+        const index = parseInt(tableNumber) - 1;
+        if (
+          reservationData.tableData[index][`T${tableNumber}`] === true &&
+          reservationData.tableData[index].status == "using"
+        ) {
+          // 해당 테이블에 대해 name과 studentId도 업데이트
+          reservationData.tableData[index].status = "done";
+
+          await updateDoc(reservationDocRef, {
+            tableData: reservationData.tableData,
+          });
+        }
+      }
+    }
+    res.status(200).json({
+      message: "return club room successfully",
+    });
+  } catch (error) {
+    console.error("Error returning reservation club room");
+    res.status(500).json({ error: "Failed to return reservation club room" });
+  }
+});
+
+// 동아리방 테이블 정보 불러오기
+reserveClub.get("/clubRoomInfo/:faculty/:roomName", async (req, res) => {
+  const faculty = req.params.faculty;
+  const roomName = req.params.roomName;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Club`;
+
+    const clubRoomDoc = await getDoc(doc(db, collectionName, roomName));
+
+    if (clubRoomDoc.empty) {
+      return res.status(401).json({ error: "ClubRoom Info does not exist" });
+    }
+
+    const tableList = clubRoomDoc.data().tableList;
+
+    res.status(200).json({
+      message: "fetch clubRoom tableList info successfully",
+      tableList: tableList,
+    });
+  } catch (error) {
+    //오류 발생 시 오류 응답
+    console.error("Error fetching clubRoom tableList info", error);
+    res.status(500).json({ error: "Failed to fetch clubRoom tableList info" });
+  }
+});
+
 
 export default reserveClub;
