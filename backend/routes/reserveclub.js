@@ -575,4 +575,33 @@ reserveClub.post("/return", async (req, res) => {
   }
 });
 
+// 동아리방 테이블 정보 불러오기
+reserveClub.get("/clubRoomInfo/:faculty/:roomName", async (req, res) => {
+  const faculty = req.params.faculty;
+  const roomName = req.params.roomName;
+
+  try {
+    // 컬렉션 이름 설정
+    const collectionName = `${faculty}_Club`;
+
+    const clubRoomDoc = await getDoc(doc(db, collectionName, roomName));
+
+    if (clubRoomDoc.empty) {
+      return res.status(401).json({ error: "ClubRoom Info does not exist" });
+    }
+
+    const tableList = clubRoomDoc.data().tableList;
+
+    res.status(200).json({
+      message: "fetch clubRoom tableList info successfully",
+      tableList: tableList,
+    });
+  } catch (error) {
+    //오류 발생 시 오류 응답
+    console.error("Error fetching clubRoom tableList info", error);
+    res.status(500).json({ error: "Failed to fetch clubRoom tableList info" });
+  }
+});
+
+
 export default reserveClub;
