@@ -52,10 +52,8 @@ inquiry.post("/", async (req, res) => {
 
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
-    const formattedDate = koreaNow
-      .toISOString()
-      .replace("T", " ")
-      .replace(/\.\d+Z$/, "");
+    const formattedDate = koreaNow.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '').slice(0, -3); 
+    
 
     const dateCollectionRef = collection(studentIdDocRef, date);
 
