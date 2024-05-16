@@ -1,14 +1,17 @@
 .cameraTable_num{
     width: 8vw;
 }
+.cameraTable_building{
+    width: 15vw;
+}
 .cameraTable_location{
-    width: 20vw;
+    width: 15vw;
 }
 .cameraTable_status{
     width: 8vw;
 }
 .cameraTable_manage{
-    width: 40vw;
+    width: 35vw;
 }
 .popup_camera{
     position: fixed; /* 고정된 위치 */

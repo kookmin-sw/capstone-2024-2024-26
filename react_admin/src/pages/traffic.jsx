@@ -22,8 +22,9 @@ const Traffic = () => {
       if (response.data.cameras) {
         setCameras(response.data.cameras.map((camera, index) => ({
           id: index + 1,
+          building: camera.building,
           location: camera.location,
-          status: null
+          state: camera.state,
         })));
       }
     } catch (error) {
@@ -47,7 +48,6 @@ const Traffic = () => {
   };
 
   useEffect(() => {
-    fetchCameras();
     fetchServerData();  // 컴포넌트가 마운트될 때 fetchServerData 함수 호출
   }, []);
 
@@ -155,6 +155,7 @@ const updateCameraLocation = async () => {
       <thead>
         <tr>
           <th className='cameraTable_num'>카메라 번호</th>
+          <th className='cameraTable_building'>건물</th>
           <th className='cameraTable_location'>카메라 위치</th>
           <th className='cameraTable_status'>작동 여부</th>
           <th className='cameraTable_manage'>관리</th>
@@ -165,7 +166,8 @@ const updateCameraLocation = async () => {
           <tr key={camera.id}>
             <td>{camera.id}</td>
             <td>{camera.location}</td>
-            <td>{camera.status || 'N/A'}</td>
+            <td>{camera.building}</td>
+            <td>{camera.state === "1" ? '작동 중' : '미작동 중'}</td>
             <td>
               <button className='traffic_edit_button' data-location={camera.location} onClick={() => handleEditCameraPopup(camera)}>수정</button>
               <button className='traffic_delete_button' data-location={camera.location} onClick={deleteCamera}>삭제</button>
