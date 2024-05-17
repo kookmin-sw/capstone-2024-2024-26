@@ -193,7 +193,7 @@ const updateCameraLocation = async () => {
                             <div className='popup_inner'>
                               <div className='popup_inner_banner'>
                                 <h2>카메라 등록</h2>
-                                <button className='popup_inner_banner_back' onClick={handleClosePopup}>✖️</button>
+                                <button className='popup_traffic_banner_back' onClick={handleClosePopup}>닫기</button>
                               </div>
                               <hr></hr>
                               <div className='popup_inner_input'>
@@ -216,7 +216,7 @@ const updateCameraLocation = async () => {
                                   onChange={handleInputChange}
                                 />
                               </div>
-                              <button onClick={handleButtonClick}>생성하기</button>
+                              <button className='traffic_add_button' onClick={handleButtonClick}>생성하기</button>
                             </div>
                           </div>
                         )}
@@ -228,7 +228,7 @@ const updateCameraLocation = async () => {
                             <div className='popup_inner'>
                             <div className='popup_inner_banner'>
                               <h2>카메라 등록</h2>
-                              <button className='popup_inner_banner_back' onClick={handleClosePopup}>✖️</button>
+                              <button className='popup_traffic_banner_back' onClick={handleClosePopup}>닫기</button>
                               </div>
                               <hr></hr>
                               <div className='popup_inner_input'>
@@ -241,7 +241,7 @@ const updateCameraLocation = async () => {
                                   onChange={(e) => setNewLocation(e.target.value)}
                                 />
                               </div>
-                              <button onClick={updateCameraLocation}>수정하기</button>
+                              <button className='traffic_add_button' onClick={updateCameraLocation}>수정하기</button>
                             </div>
                           </div>
                         )}

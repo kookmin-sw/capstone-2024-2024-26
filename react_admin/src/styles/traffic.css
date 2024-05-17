@@ -18,7 +18,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* 중앙 정렬 */
-    background-color: rgb(218, 218, 218);
+    background-color: rgb(242, 242, 242);
     width: 20vw;
     height: 45vh;
     display: flex;
@@ -49,6 +49,23 @@
 }
 .traffic_edit_button:hover {
     background-color: rgb(238, 238, 238);
+}
+.traffic_add_button{
+    margin-top: 10px;
+    width: 20vw ;
+    height: 5vh;
+    background-color: transparent;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+.traffic_add_button:hover{
+    background-color: #004f9e74;
+}
+.popup_traffic_banner_back{
+    background-color: transparent;
+    border: none;
+    margin-left: 8vw;
+    font-weight: bolder;
 }
 .traffic_delete_button{
     width: 6vw;
