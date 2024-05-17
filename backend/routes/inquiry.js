@@ -47,14 +47,17 @@ inquiry.post("/", async (req, res) => {
     const collectionName = `${userData.faculty}_Inquiry`;
 
     // Inquiry 컬렉션 생성
+    await setDoc(doc(db, collectionName, userData.studentId), {});
+
+    const studentIdDocRef = doc(db, collectionName, userData.studentId);
+
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
     const formattedDate = koreaNow.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '').slice(0, -3); 
     
-    const dateCollectionRef = collection(
-      db,
-      `${collectionName}/${userData.studentId}/${date}`
-    ); 
+
+    const dateCollectionRef = collection(studentIdDocRef, date);
+
     const timeDocRef = doc(dateCollectionRef, formattedDate);
 
     // 문의 정보 추가
