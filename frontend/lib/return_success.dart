@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import 'loading.dart';
 import 'reservation_details.dart';
 
-class DisplayPictureScreen extends StatefulWidget {
+class ReturnSuccess extends StatefulWidget {
   final String imagePath;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
+  const ReturnSuccess({Key? key, required this.imagePath}) : super(key: key);
 
   @override
-  _DisplayPictureScreenState createState() => _DisplayPictureScreenState();
+  _ReturnSuccessState createState() => _ReturnSuccessState();
 }
 
-class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
+class _ReturnSuccessState extends State<ReturnSuccess> {
   bool isLoading = true;
 
   @override

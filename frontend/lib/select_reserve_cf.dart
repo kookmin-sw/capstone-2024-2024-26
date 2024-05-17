@@ -72,7 +72,7 @@ class _select_cf extends State<Select_reserve_cf> {
   // 선택된 날짜를 서버로 전송하는 함수
   sendSelectedDateToServer(DateTime selectedDate) async {
     try {
-      const url = 'http://10.223.126.119:3000/reserveroom/selectdate';
+      const url = 'http://10.30.97.246:3000/reserveroom/selectdate';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       uid = prefs.getString('uid');
       final Map<String, String> data = {

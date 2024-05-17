@@ -23,7 +23,7 @@ class _QuestionPageState extends State<QuestionPage> {
   void initState() {
     super.initState();
     // 현재 날짜와 시간을 'yyyy-MM-dd HH:mm' 형식으로 설정
-    dateController.text = DateFormat('yyyy-MM-dd ').format(DateTime.now());
+    dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   Future<void> sendContent() async {
@@ -35,12 +35,12 @@ class _QuestionPageState extends State<QuestionPage> {
 
     final Map<String, String> data = {
       'userId': userId,
-      'date': dateController.text,
-      'title': titleController.text,
-      'content': contentController.text,
+      'date': dateController.text.toString(),
+      'title': titleController.text.toString(),
+      'content': contentController.text.toString(),
     };
 
-    const url = 'http://10.223.126.119:3000/inquiry/';
+    const url = 'http://10.30.97.246:3000/inquiry/';
 
     final response = await http.post(
       Uri.parse(url),

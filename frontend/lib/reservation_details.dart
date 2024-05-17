@@ -1,6 +1,5 @@
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
-import 'package:test/expect.dart';
 import 'main.dart';
 import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -114,7 +113,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.223.126.119:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.30.97.246:3000/reserveclub/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -148,7 +147,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.223.126.119:3000/reserveroom/reservations/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.30.97.246:3000/reserveroom/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -158,9 +157,11 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         if (mounted) {
           setState(() {
             classroomReservations =
-                mergeConsecutiveReservations(data['classroomReservations']);
+                mergeConsecutiveReservations(data['previousReservation']);
+
             isLoading = false;
           });
+          print(classroomReservations);
         }
       } else {
         throw Exception('Failed to load classroom reservations');
@@ -209,7 +210,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.223.126.119:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.30.97.246:3000/reserveclub/reservationDone/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -243,7 +244,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.223.126.119:3000/reserveroom/reservations/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.30.97.246:3000/reserveroom/reservationsDone/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -253,7 +254,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         if (mounted) {
           setState(() {
             classroomDoneReservations =
-                mergeConsecutiveReservations(data['classroomReservations']);
+                mergeConsecutiveReservations(data['doneReservation']);
             isLoading = false;
           });
         }
@@ -272,13 +273,15 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   final String table_number = '';
 
   // tableData 내부에서 true 값을 가진 키 찾기
-  String getKeyWithTrueValue(Map<String, dynamic> tableData) {
-    for (String key in tableData.keys) {
-      if (tableData[key] == true) {
-        return key; // true 값을 가진 첫 번째 키를 반환
+  String getKeyWithTrueValue(Map<String, dynamic>? tableData) {
+    if (tableData != null) {
+      for (String key in tableData.keys) {
+        if (tableData[key] == true) {
+          return key; // true 값을 가진 첫 번째 키를 반환
+        }
       }
     }
-    return 'No key with true value found'; // true 값을 가진 키가 없을 경우
+    return 'N/A'; // true 값을 가진 키가 없을 경우 또는 tableData가 null일 경우
   }
 
   @override
@@ -430,16 +433,18 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                         Map<String, dynamic> reservation = is_tap
                             ? classroomReservations[index]
                             : reservations[index];
+                        bool? boolAgree =
+                            is_tap ? reservation['boolAgree'] as bool? : null;
                         return Column(
                           children: [
                             _buildReservationItem(
-                              reservation['roomName'],
-                              reservation['date'],
-                              reservation['startTime'],
-                              reservation['endTime'],
-                              getKeyWithTrueValue(reservation['tableData']),
-                              index,
-                            ),
+                                reservation['roomName'],
+                                reservation['date'],
+                                reservation['startTime'],
+                                reservation['endTime'],
+                                getKeyWithTrueValue(reservation['tableData']),
+                                index,
+                                boolAgree),
                           ],
                         );
                       },
@@ -576,8 +581,15 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
-  Widget _buildReservationItem(String roomName, String date, String startTime,
-      String endTime, String table_number, int index) {
+  Widget _buildReservationItem(
+    String roomName,
+    String date,
+    String startTime,
+    String endTime,
+    String table_number,
+    int index,
+    bool? boolAgree,
+  ) {
     bool isLent = isLentMap[index] ?? false;
     String remainingTime = remainingTimeMap[index] ?? '00:00:00';
 
@@ -604,7 +616,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
                 const SizedBox(width: 100),
                 const Text(
-                  '공유공간',
+                  '강의실',
                   style: TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
@@ -620,7 +632,11 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  isLent ? '이용 중' : '이용 예정',
+                  isLent
+                      ? '이용 중'
+                      : (boolAgree == null
+                          ? '이용 예정'
+                          : (boolAgree ? '이용 예정' : '승인 대기')),
                   style: const TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
@@ -693,6 +709,12 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                     isLent
                         ? FlutterDialog("반납하시겠습니까?", "반납하기", index)
                         : EnterDialog("입장하시겠습니까?", "입장하기", index);
+                  } else if (boolAgree == false) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('승인 대기 중인 예약입니다.'),
+                      ),
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -1136,26 +1158,41 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                             fontWeight: FontWeight.bold,
                           )),
                       onPressed: () async {
-                        final url =
-                            'http://10.223.126.119:3000/reserveclub/delete';
+                        final url = is_tap
+                            ? 'http://10.30.97.246:3000/reserveroom/delete'
+                            : 'http://10.30.97.246:3000/reserveclub/delete';
                         final response = await http.post(
                           Uri.parse(url),
                           headers: {'Content-Type': 'application/json'},
                           body: json.encode({
                             'userId': userId,
-                            'roomName': reservations[index]['roomName'],
-                            'date': reservations[index]['date'],
-                            'startTime': reservations[index]['startTime'],
-                            'endTime': reservations[index]['endTime'],
-                            'tableNumber': getKeyWithTrueValue(
-                                reservations[index]['tableData']),
+                            'roomName': is_tap
+                                ? classroomReservations[index]['roomName']
+                                : reservations[index]['roomName'],
+                            'date': is_tap
+                                ? classroomReservations[index]['date']
+                                : reservations[index]['date'],
+                            'startTime': is_tap
+                                ? classroomReservations[index]['startTime']
+                                : reservations[index]['startTime'],
+                            'endTime': is_tap
+                                ? classroomReservations[index]['endTime']
+                                : reservations[index]['endTime'],
+                            'tableNumber': is_tap
+                                ? 'N/A'
+                                : getKeyWithTrueValue(
+                                    reservations[index]['tableData']),
                           }),
                         );
 
                         if (response.statusCode == 200) {
                           if (mounted) {
                             setState(() {
-                              reservations.removeAt(index);
+                              if (is_tap) {
+                                classroomReservations.removeAt(index);
+                              } else {
+                                reservations.removeAt(index);
+                              }
                               Navigator.pop(context);
                             });
                             ScaffoldMessenger.of(context).showSnackBar(

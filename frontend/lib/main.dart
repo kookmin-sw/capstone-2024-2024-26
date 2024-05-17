@@ -193,7 +193,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    final url = 'http://10.223.126.119:3000/reserveclub/main_lentroom/:uid';
+    final url = 'http://10.30.97.246:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -230,7 +230,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
     const url =
-        'http://10.223.126.119:3000/reserveclub/main_conference_room/:uid';
+        'http://10.30.97.246:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -570,24 +570,6 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 12,
-                right: 18,
-                child: GestureDetector(
-                  onTap: () {
-                    // 맵 버튼 눌렀을 때 이동할 화면
-                  },
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/map.png',
-                        width: 22,
-                        height: 22,
-                      ),
-                    ],
                   ),
                 ),
               ),
