@@ -91,7 +91,7 @@ router.post("/signup", async (req, res) => {
 // 로그인
 router.post("/signin", async (req, res) => {
 
-  const { email, password, } = req.body;
+  const { email, password,fcmToken } = req.body;
 
 
   try {

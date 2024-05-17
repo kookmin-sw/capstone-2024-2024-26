@@ -11,7 +11,7 @@ import adminCamera from "./admin/adminCamera.js";
 import adminNotify from "./admin/adminNotify.js";
 import inquiry from "./routes/inquiry.js";
 import adminInquiry from "./admin/adminInquiry.js";
-import notify from "./routes/notify.js";
+// import notify from "./routes/notify.js";
 
 const port = 3000;
 
@@ -43,7 +43,7 @@ app.use("/adminInquiry", adminInquiry);
 // 관리자 알림 관리 api
 app.use("/adminNotify", adminNotify);
 // 백그라운드 설정
-app.use("/notify", notify);
+// app.use("/notify", notify);
 
 // 서버 시작
 app.listen(port, () => {
