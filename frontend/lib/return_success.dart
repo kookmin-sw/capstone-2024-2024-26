@@ -53,22 +53,26 @@ class _ReturnSuccessState extends State<ReturnSuccess> {
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    '공간 반납이 완료되었습니다',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  '   공간 반납이 \n완료되었습니다',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Expanded(
+                const SizedBox(height: 40),
+                Container(
                   child: Center(
                     child: Image.file(File(widget.imagePath),
-                        width: 271, height: 218, fit: BoxFit.cover),
+                        width: 300, height: 300, fit: BoxFit.cover),
                   ),
                 ),
+                const SizedBox(height: 150),
+                Text('*공간을 정돈하지 않고 반납시, 패널티가 부여될 수 있습니다',
+                    style: TextStyle(
+                      color: Color(0XFF676767),
+                      fontSize: 12,
+                    )),
               ],
             ),
     );

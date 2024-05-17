@@ -40,7 +40,7 @@ class _QuestionPageState extends State<QuestionPage> {
       'content': contentController.text.toString(),
     };
 
-    const url = 'http://10.30.97.246:3000/inquiry/';
+    const url = 'http://13.209.184.71:3000/inquiry/';
 
     final response = await http.post(
       Uri.parse(url),

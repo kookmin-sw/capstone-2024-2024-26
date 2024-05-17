@@ -113,7 +113,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.30.97.246:3000/reserveclub/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
+        'http://13.209.184.71:3000/reserveclub/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -147,7 +147,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.30.97.246:3000/reserveroom/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
+        'http://13.209.184.71:3000/reserveroom/reservationPrevious/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -210,7 +210,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.30.97.246:3000/reserveclub/reservationDone/$userId/$formattedStartDate/$formattedEndDate';
+        'http://13.209.184.71:3000/reserveclub/reservationDone/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -244,7 +244,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://10.30.97.246:3000/reserveroom/reservationsDone/$userId/$formattedStartDate/$formattedEndDate';
+        'http://13.209.184.71:3000/reserveroom/reservationsDone/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -1159,8 +1159,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                           )),
                       onPressed: () async {
                         final url = is_tap
-                            ? 'http://10.30.97.246:3000/reserveroom/delete'
-                            : 'http://10.30.97.246:3000/reserveclub/delete';
+                            ? 'http://13.209.184.71:3000/reserveroom/delete'
+                            : 'http://13.209.184.71:3000/reserveclub/delete';
                         final response = await http.post(
                           Uri.parse(url),
                           headers: {'Content-Type': 'application/json'},

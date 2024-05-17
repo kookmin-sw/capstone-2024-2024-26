@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/signup_sucess.dart';
@@ -11,7 +10,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'loading.dart';
 import 'return_success.dart';
 
@@ -354,6 +352,48 @@ class DisplayPictureScreen extends StatelessWidget {
   const DisplayPictureScreen({Key? key, required this.imagePath})
       : super(key: key);
 
+  Future<void> _submitImage(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('uid')!;
+    String location = "미래관 101호"; // 적절한 위치 정보로 교체
+    String date = "2024-05-17"; // 적절한 날짜 정보로 교체
+    String time = "10-11"; // 적절한 시간 정보로 교체
+    String classType = "1"; // 0일때는 classroom, 1일때는 club
+
+    File imageFile = File(imagePath);
+    List<int> imageBytes = await imageFile.readAsBytes();
+    String imgStr = base64Encode(imageBytes);
+
+    final Map<String, dynamic> data = {
+      'image': imgStr,
+      'class': classType,
+      'table': '2',
+      'location': location,
+      'date': date,
+      'time': time,
+      'user': userId,
+    };
+
+    final url = 'http://3.39.102.188:5000/api/class';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(data),
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ReturnSuccess(imagePath: imagePath)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이미지 제출에 실패했습니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -379,14 +419,7 @@ class DisplayPictureScreen extends StatelessWidget {
           children: [
             Image.file(File(imagePath), width: 300, height: 500),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          DisplayPictureScreen(imagePath: imagePath)),
-                );
-              },
+              onPressed: () => _submitImage(context),
               child: Text(
                 '제출하기',
                 style: TextStyle(

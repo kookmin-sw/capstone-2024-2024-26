@@ -77,7 +77,7 @@ class _FormPageState extends State<FormPage> {
     final signatureBytes = await main_controller.toPngBytes();
     String base64Signature = base64Encode(signatureBytes!);
 
-    const url = 'http://10.30.97.246:3000/reserveroom/';
+    const url = 'http://13.209.184.71:3000/reserveroom/';
     final Map<String, String> data = {
       'userId': uid!,
       'roomName': roomName,
@@ -131,7 +131,7 @@ class _FormPageState extends State<FormPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://10.30.97.246:3000/auth/profile/:uid';
+    const url = 'http://13.209.184.71:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
