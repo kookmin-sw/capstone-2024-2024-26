@@ -139,7 +139,10 @@ adminRoom.post("/agree", async (req, res) => {
   const { studentId, roomName, date, startTime, endTime } = req.body;
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const user = query(
+      collection(db, "users"),
+      where("studentId", "==", studentId)
+    );
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -216,8 +219,6 @@ adminRoom.post("/agree", async (req, res) => {
           // 해당 시간대의 데이터를 컬렉션에 저장
 
           await setDoc(reservationDocRef, reservationDataLast);
-
-          await deleteDoc(reservationDocRefQueue);
         }
       }
     }
@@ -271,8 +272,6 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -350,8 +349,6 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -394,7 +391,10 @@ adminRoom.delete("/delete", async (req, res) => {
 
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const user = query(
+      collection(db, "users"),
+      where("studentId", "==", studentId)
+    );
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -435,16 +435,13 @@ adminRoom.delete("/delete", async (req, res) => {
 
 // 강의실 예약
 adminRoom.post("/reserve", async (req, res) => {
-  const {
-    roomName,
-    date,
-    startTime,
-    endTime,
-    usingPurpose
-  } = req.body;
+  const { roomName, date, startTime, endTime, usingPurpose } = req.body;
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const user = query(
+      collection(db, "users"),
+      where("studentId", "==", studentId)
+    );
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {

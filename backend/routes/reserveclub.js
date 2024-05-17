@@ -329,7 +329,10 @@ reserveClub.get(
 
                 // 예약된 테이블 정보 조회
                 reservationData.tableData.forEach((table) => {
-                  if (table.studentId === userData.studentId && table.status === "previous") {
+                  if (
+                    table.studentId === userData.studentId &&
+                    table.status === "previous"
+                  ) {
                     userReservations.push({
                       roomName: roomName,
                       date: dateString,
@@ -415,7 +418,10 @@ reserveClub.get(
 
                 // 예약된 테이블 정보 조회
                 reservationData.tableData.forEach((table) => {
-                  if (table.studentId === userData.studentId && table.status === "done") {
+                  if (
+                    table.studentId === userData.studentId &&
+                    table.status === "done"
+                  ) {
                     userReservations.push({
                       roomName: roomName,
                       date: dateString,
@@ -495,30 +501,33 @@ reserveClub.post("/delete", async (req, res) => {
 
         // 해당 테이블 번호의 예약을 취소하고 상태를 false로 변경합니다.
         const index = parseInt(tableNumber) - 1;
-       
-        // Debugging: 예약 데이터 출력
-        console.log(`Before update: ${JSON.stringify(reservationData.tableData)}`);
 
-        if (reservationData.tableData && reservationData.tableData[index] && reservationData.tableData[index][`T${tableNumber}`]) {
-         
+        // Debugging: 예약 데이터 출력
+        console.log(
+          `Before update: ${JSON.stringify(reservationData.tableData)}`
+        );
+
+        if (
+          reservationData.tableData &&
+          reservationData.tableData[index] &&
+          reservationData.tableData[index][`T${tableNumber}`]
+        ) {
           // 예약 취소 및 테이블 상태 변경
           reservationData.tableData[index][`T${tableNumber}`] = false;
           delete reservationData.tableData[index].name;
           delete reservationData.tableData[index].studentId;
           delete reservationData.tableData[index].status;
 
-          
-
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
           });
         } else {
           // Debugging: 테이블 데이터가 없거나 상태가 false인 경우
-          console.log('Table data not found or already false');
+          console.log("Table data not found or already false");
         }
       } else {
         // Debugging: 예약 문서가 존재하지 않는 경우
-        console.log('Reservation document not found');
+        console.log("Reservation document not found");
       }
     }
 
@@ -588,8 +597,7 @@ reserveClub.post("/return", async (req, res) => {
         // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
         // 특정 테이블 번호를 true로 설정합니다.
         const index = parseInt(tableNumber) - 1;
-        if (
-          reservationData.tableData[index][`T${tableNumber}`] === true) {
+        if (reservationData.tableData[index][`T${tableNumber}`] === true) {
           // 해당 테이블에 대해 name과 studentId도 업데이트
           reservationData.tableData[index].status = "done";
 

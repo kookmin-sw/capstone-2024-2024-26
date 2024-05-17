@@ -342,7 +342,6 @@ reserveroom.get(
   }
 );
 
-
 // 사용자별 강의실 예약 내역 조회
 reserveroom.get(
   "/reservationDone/:userId/:startDate/:endDate",
@@ -481,7 +480,6 @@ reserveroom.get(
         })
       );
 
-
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
@@ -568,6 +566,91 @@ reserveroom.post("/return", async (req, res) => {
   } catch (error) {
     console.error("Error entrancing reservation conference room");
     res.status(500).json({ error: "Failed to entrance reservation club room" });
+  }
+});
+
+// 동아리방 예약 취소
+reserveroom.post("/delete", async (req, res) => {
+  const { userId, roomName, date, startTime, endTime } = req.body;
+  try {
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
+    const collectionName = `${userData.faculty}_Classroom_queue`;
+
+    const collectionName1 = `${userData.faculty}_Classroom`;
+
+    const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
+    const existDocSnapShot1 = await getDoc(doc(db, collectionName1, roomName));
+
+    if (!existDocSnapShot.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exist" });
+    }
+
+    if (!existDocSnapShot1.exists()) {
+      // 해당 문서가 존재하지 않는 경우
+      return res.status(404).json({ error: "This Club room does not exist" });
+    }
+
+    const clubRoomDoc = doc(collection(db, collectionName), roomName);
+
+    const clubRoomDoc1 = doc(collection(db, collectionName1), roomName);
+
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+
+    const clubRoomDocSnap1 = await getDoc(clubRoomDoc1);
+
+    // 해당 동아리방이 있는지 확인
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName} collection`,
+      });
+    }
+
+    if (!clubRoomDocSnap1.exists()) {
+      return res.status(404).json({
+        error: `${roomName} does not exist in ${collectionName1} collection`,
+      });
+    }
+
+    const dateCollection = collection(clubRoomDoc, date);
+
+    const dateCollection1 = collection(clubRoomDoc1, date);
+
+    const startTimeParts = startTime.split(":");
+    const startTimeHour = parseInt(startTimeParts[0]);
+
+    const endTimeParts = endTime.split(":");
+    const endTimeHour = parseInt(endTimeParts[0]);
+
+    // 시작 시간부터 종료 시간까지 각 시간대에 대해 예약 문서를 업데이트합니다.
+    for (let i = startTimeHour; i < endTimeHour; i++) {
+      const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
+      const reservationDocRef1 = doc(dateCollection1, `${i}-${i + 1}`);
+
+      const reservationDocSnap = await getDoc(reservationDocRef);
+
+      const reservationDocSnap1 = await getDoc(reservationDocRef1);
+
+      // 해당 시간대 예약 문서가 있는지 확인
+      if (reservationDocSnap.exists()) {
+        await deleteDoc(reservationDocRef);
+      }
+      if (reservationDocSnap1.exists()) {
+        await deleteDoc(reservationDocRef1);
+      }
+    }
+
+    res.status(200).json({ message: "Reservation canceled successfully" });
+  } catch (error) {
+    console.error("Error canceling reservation", error);
+    return res.status(500).json({ error: "Failed to cancel reservation" });
   }
 });
 export default reserveroom;

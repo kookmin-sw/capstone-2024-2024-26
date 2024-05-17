@@ -97,12 +97,12 @@ adminAuth.get("/profile", isAdmin, async (req, res) => {
   }
 });
 
-adminAuth.get('/login-data', async (req, res) => {
+adminAuth.get("/login-data", async (req, res) => {
   const docRef = doc(db, "login", "count");
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {
-    return res.status(404).send({ error: 'No login data available.' });
+    return res.status(404).send({ error: "No login data available." });
   }
 
   const data = docSnap.data();
@@ -110,7 +110,7 @@ adminAuth.get('/login-data', async (req, res) => {
   const result = {};
 
   for (let i = 0; i < 7; i++) {
-    const dateString = today.toISOString().split('T')[0];
+    const dateString = today.toISOString().split("T")[0];
     result[dateString] = data[dateString] || 0;
     today.setDate(today.getDate() - 1);
   }

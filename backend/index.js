@@ -11,15 +11,14 @@ import adminCamera from "./admin/adminCamera.js";
 import adminNotify from "./admin/adminNotify.js";
 import inquiry from "./routes/inquiry.js";
 import adminInquiry from "./admin/adminInquiry.js";
-import notify from "./routes/notify.js";
+// import notify from "./routes/notify.js";
 
 const port = 3000;
 
-
 const app = express();
 
-app.use(express.json({limit: '100mb'}));
-app.use(express.urlencoded({limit: '100mb', extended: false}));
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ limit: "100mb", extended: false }));
 app.use(bodyParser.json());
 // 회원가입, 로그인, 로그아웃
 app.use("/auth", router);
@@ -43,7 +42,7 @@ app.use("/adminInquiry", adminInquiry);
 // 관리자 알림 관리 api
 app.use("/adminNotify", adminNotify);
 // 백그라운드 설정
-app.use("/notify", notify);
+// app.use("/notify", notify);
 
 // 서버 시작
 app.listen(port, () => {

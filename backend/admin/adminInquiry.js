@@ -8,7 +8,7 @@ import {
   where,
   deleteDoc,
   updateDoc,
-  query
+  query,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
