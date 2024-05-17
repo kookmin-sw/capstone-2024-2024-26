@@ -22,7 +22,8 @@
 반납 확인|반납 승인|채팅||
 <img src="./read.me_image/Group%2026.png" height="340" width="200px;">|<img src="./read.me_image/Group%2027.png" height="340" width="200px;">|<img src="./read.me_image/Group%2027%20(1).png" height="340" width="200px;">|
 
- ## 🔍Abstract
+## 🔍Abstract
+
 #### 1️⃣Problem
  This application targets Kookmin Univ’s lack of space problem. In our university there are no tools to make a reservation of share space. It makes our colleagues hard to have a group activity. So our team made a application that helps our colleagues easy to make a reservation. And from the university's perspective, it is difficult to rent out a classroom due to management issues such as loss, theft, and safety issues.
 
@@ -63,7 +64,7 @@
 
 🛠 Role :
     - Backend
-    - AI-Server 제작 및 공간 대여 Server 제작
+    - Web-Server 제작 및 App-Server 제작
      
 ```
 
@@ -76,7 +77,7 @@
 
 🛠 Role :
     - Frontend
-    - 디자인 및 앱 개발 
+    - 디자인 및 웹 개발 
 
 ```
 
@@ -110,19 +111,27 @@
  <img src="./read.me_image/아키텍처.png" height="510" width="800px;">
  
 ## 🔍 사용된 기술 stack
- 
- ✔️Front-end
- <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
- 
- ✔️Back-end
- <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"><img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white">
 
- ✔️AI
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"><img src="https://img.shields.io/badge/PyTorch-3776AB?style=for-the-badge&logo=Python&logoColor=white">
+### ✔️ <span style="font-size: 1.5em;">Front-end</span>
 
- ✔️협업 도구 및 디자인
- <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"><img src="https://img.shields.io/badge/Notion-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white">
- ## 추가적인 내용
+<img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" style="margin-right: 10px;">
+<img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white" style="margin-right: 10px;">
+<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white" style="margin-right: 10px;">
+ 
+ ### ✔️ <span style="font-size: 1.5em;">Back-end</span>
+ <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" style="margin-right: 10px;">
+ <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white" style="margin-right: 10px;">
+ <img src="https://img.shields.io/badge/Flask-00000?style=for-the-badge&logo=Flask&logoColor=white" style="margin-right: 10px;">
+
+ ### ✔️ <span style="font-size: 1.5em;">AI</span>
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white" style="margin-right: 10px;">
+<img src="https://img.shields.io/badge/PyTorch-3776AB?style=for-the-badge&logo=Python&logoColor=white" style="margin-right: 10px;">
+
+ ### ✔️ <span style="font-size: 1.5em;">협업도구 및 디자인</span>
+ <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white" style="margin-right: 10px;">
+ <img src="https://img.shields.io/badge/Notion-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white" style="margin-right: 10px;">
+ 
+## 추가적인 내용
 [중간발표자료.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/14880364/default.pdf)
 [중간보고서.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/14880368/default.pdf)
         
