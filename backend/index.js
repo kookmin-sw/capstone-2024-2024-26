@@ -13,10 +13,14 @@ import inquiry from "./routes/inquiry.js";
 import adminInquiry from "./admin/adminInquiry.js";
 import notify from "./routes/notify.js";
 
+const cors = require('cors');
+
 const port = 3000;
 
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json({limit: '100mb'}));
 app.use(express.urlencoded({limit: '100mb', extended: false}));
