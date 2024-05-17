@@ -46,12 +46,11 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     fetchReservations(startDate, endDate).then((_) {
       loadTimerStates();
     });
-
     doneReservations(previousDate, startDate);
+
     fetchClassroomReservations(startDate, endDate).then((_) {
       loadTimerStates();
     });
-
     doneClassroomReservations(previousDate, startDate);
   }
 

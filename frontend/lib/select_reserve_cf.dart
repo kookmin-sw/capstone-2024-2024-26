@@ -93,7 +93,6 @@ class _select_cf extends State<Select_reserve_cf> {
         // 서버 응답이 성공적인 경우
 
         reservations = json.decode(response.body);
-
         _checkReservation(reservations);
       } else {
         // 서버 에러 처리

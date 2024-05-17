@@ -15,31 +15,40 @@ class Select_reserve extends StatefulWidget {
   final String roomName;
   final String time;
   final String designImage;
-  Select_reserve(
-      {Key? key,
-      required this.roomName,
-      required this.time,
-      required this.designImage})
-      : super(key: key);
+  final List<dynamic> tableList;
+  Select_reserve({
+    Key? key,
+    required this.roomName,
+    required this.time,
+    required this.designImage,
+    required this.tableList,
+  }) : super(key: key);
 
   @override
-  State<Select_reserve> createState() =>
-      _select(roomName: roomName, time: time, designImage: designImage);
+  State<Select_reserve> createState() => _select(
+        roomName: roomName,
+        time: time,
+        designImage: designImage,
+        tableList: tableList,
+      );
 }
 
 class _select extends State<Select_reserve> {
   bool isFirstVisit = true; // 사용자가 첫 방문인지 여부
   bool isAgreed = false; // 사용자가 안내사항에 동의했는지 여부
+
   String time;
   final ScrollController _scrollController = ScrollController();
 
   Map<String, dynamic> reservations = {}; // 예약 정보를 불러와서 비활성화할거임 .
   String designImage;
   String roomName;
+  List<dynamic> tableList;
   _select({
     required this.roomName,
     required this.time,
     required this.designImage,
+    required this.tableList,
   });
 
   final double intervalWidth = 50.0;
@@ -68,30 +77,6 @@ class _select extends State<Select_reserve> {
   List<bool> updatedIsButtonPressedList =
       List.generate(16, (index) => false); //시간 차있는지 확인
   bool timeslot = false;
-
-// tablelist는 서버에서 받아온 데이터로 대체
-  List<dynamic> tableList = [
-    {
-      'available': '4',
-      'table_name': 'T1',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T2',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T3',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T4',
-      'table_status': 'true',
-    },
-  ];
 
   DateTime selectedDate = DateTime.utc(
     DateTime.now().year,
