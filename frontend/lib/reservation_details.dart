@@ -1,5 +1,6 @@
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:test/expect.dart';
 import 'main.dart';
 import 'myPage.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -28,7 +29,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       DateTime.now().subtract(Duration(days: 14)); // 현재로부터 14일 전
   List<dynamic> reservations = [];
   List<dynamic> done_reservations = [];
-
+  List<dynamic> classroomReservations = [];
+  List<dynamic> classroomDoneReservations = [];
+  bool is_tap = false;
   String userId = '';
   bool isLoading = false;
   Map<int, bool> isLentMap = {};
@@ -40,17 +43,21 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    fetchReservations(userId, startDate, endDate).then((_) {
+    fetchReservations(startDate, endDate).then((_) {
       loadTimerStates();
     });
-    done_Reservations(userId, previousDate, startDate);
+
+    doneReservations(previousDate, startDate);
+    fetchClassroomReservations(startDate, endDate).then((_) {
+      loadTimerStates();
+    });
+
+    doneClassroomReservations(previousDate, startDate);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 조상 위젯을 참조하여 필요한 데이터를 초기화
-    // 예: Theme.of(context) 또는 MediaQuery.of(context) 등
   }
 
   Future<void> loadTimerStates() async {
@@ -96,8 +103,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
-  Future<List<dynamic>> fetchReservations(
-      String userId, DateTime start, DateTime end) async {
+  Future<void> fetchReservations(DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -115,22 +121,14 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
-
         if (mounted) {
           setState(() {
+            reservations = mergeConsecutiveReservations(data['reservations']);
             isLoading = false;
-            reservations = data['reservations'];
-            List<dynamic> mergedReservations =
-                mergeConsecutiveReservations(reservations);
-            reservations = mergedReservations;
           });
         }
-
-        return data['reservations'];
       } else {
-        // 서버로부터 오류 응답을 받았을 때
         throw Exception('Failed to load reservations');
       }
     } catch (e) {
@@ -138,10 +136,49 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> fetchClassroomReservations(DateTime start, DateTime end) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('uid');
+    setState(() {
+      isLoading = true;
+    });
+
+    String formattedStartDate =
+        "${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}";
+    String formattedEndDate =
+        "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
+
+    final url =
+        'http://10.223.126.119:3000/reserveroom/reservations/$userId/$formattedStartDate/$formattedEndDate';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            classroomReservations =
+                mergeConsecutiveReservations(data['classroomReservations']);
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception('Failed to load classroom reservations');
+      }
+    } catch (e) {
+      throw Exception('Failed to load classroom reservations: $e');
+    }
+  }
+
   List<dynamic> mergeConsecutiveReservations(List<dynamic> reservations) {
     if (reservations.isEmpty) return [];
-
-    reservations.sort((a, b) => a['startTime'].compareTo(b['startTime']));
+    reservations.sort((a, b) {
+      if (a['date'] == b['date']) {
+        return a['startTime'].compareTo(b['startTime']);
+      }
+      return a['date'].compareTo(b['date']);
+    });
     List<dynamic> merged = [];
 
     var current = reservations.first;
@@ -161,8 +198,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     return merged;
   }
 
-  Future<List<dynamic>> done_Reservations(
-      String userId, DateTime start, DateTime end) async {
+  Future<void> doneReservations(DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -180,26 +216,53 @@ class _Details extends State<Details> with WidgetsBindingObserver {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
-
         if (mounted) {
           setState(() {
+            done_reservations =
+                mergeConsecutiveReservations(data['reservations']);
             isLoading = false;
-            done_reservations = data['reservations'];
-            List<dynamic> mergedReservations =
-                mergeConsecutiveReservations(done_reservations);
-            done_reservations = mergedReservations;
           });
         }
-
-        return data['reservations'];
       } else {
-        // 서버로부터 오류 응답을 받았을 때
         throw Exception('Failed to load reservations');
       }
     } catch (e) {
       throw Exception('Failed to load reservations: $e');
+    }
+  }
+
+  Future<void> doneClassroomReservations(DateTime start, DateTime end) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('uid');
+    setState(() {
+      isLoading = true;
+    });
+    String formattedStartDate =
+        "${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}";
+    String formattedEndDate =
+        "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
+
+    final url =
+        'http://10.223.126.119:3000/reserveroom/reservations/$userId/$formattedStartDate/$formattedEndDate';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            classroomDoneReservations =
+                mergeConsecutiveReservations(data['classroomReservations']);
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception('Failed to load classroom reservations');
+      }
+    } catch (e) {
+      throw Exception('Failed to load classroom reservations: $e');
     }
   }
 
@@ -263,6 +326,84 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        is_tap = false;
+                        fetchReservations(startDate, endDate);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(
+                        fontSize: 15, // Set the button text size
+                        fontWeight:
+                            FontWeight.bold, // Set the button text weight
+                        color: Color(0XFF004F9E),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        side: BorderSide(
+                            width: 0.50,
+                            color: is_tap
+                                ? Color(0xFFD6D6D6)
+                                : const Color(0xFF004F9E)),
+                      ),
+                      minimumSize:
+                          const Size(195.7, 50), // Set the button minimum size
+                      backgroundColor:
+                          is_tap ? Colors.white : const Color(0X0C004F9E),
+
+                      elevation: 0, // Set the elevation for the button shadow
+                      shadowColor: Colors.white.withOpacity(
+                          0.5), // Set the color of the button shadow
+                    ),
+                    child: Text('공유공간 예약내역',
+                        style: TextStyle(
+                            color: is_tap
+                                ? const Color(0XFF7C7C7C)
+                                : const Color(0xFF004F9E))),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        is_tap = true;
+                        fetchClassroomReservations(startDate, endDate);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(
+                        fontSize: 15, // Set the button text size
+                        fontWeight:
+                            FontWeight.bold, // Set the button text weight
+                        color: Color(0XFF004F9E),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        side: BorderSide(
+                            width: 0.50,
+                            color: is_tap
+                                ? const Color(0xFF004F9E)
+                                : Color(0xFFD6D6D6)),
+                      ),
+                      minimumSize:
+                          const Size(195.7, 50), // Set the button minimum size
+                      backgroundColor:
+                          is_tap ? const Color(0X0C004F9E) : Colors.white,
+
+                      elevation: 0, // Set the elevation for the button shadow
+                      shadowColor: Colors.white.withOpacity(
+                          0.5), // Set the color of the button shadow
+                    ),
+                    child: Text('강의실 예약내역',
+                        style: TextStyle(
+                            color: is_tap
+                                ? const Color(0xFF004F9E)
+                                : const Color(0XFF7C7C7C))),
+                  ),
+                ],
+              ),
               const Padding(padding: EdgeInsets.only(top: 20)),
               const Align(
                 alignment: Alignment.centerLeft,
@@ -279,31 +420,29 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
               ),
               const Padding(padding: EdgeInsets.only(bottom: 10)),
-              reservations.isNotEmpty
+              (is_tap ? classroomReservations : reservations).isNotEmpty
                   ? ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: reservations.length,
+                      itemCount: is_tap
+                          ? classroomReservations.length
+                          : reservations.length,
                       itemBuilder: (context, index) {
-                        if (reservations[index]['tableData']['status'] ==
-                            'previous') {
-                          Map<String, dynamic> reservation =
-                              reservations[index];
-                          return Column(
-                            children: [
-                              _buildReservationItem(
-                                reservation['roomName'],
-                                reservation['date'],
-                                reservation['startTime'],
-                                reservation['endTime'],
-                                getKeyWithTrueValue(reservation['tableData']),
-                                index,
-                              ),
-                            ],
-                          );
-                        } else {
-                          return const SizedBox.shrink(); // 아무 것도 표시하지 않음
-                        }
+                        Map<String, dynamic> reservation = is_tap
+                            ? classroomReservations[index]
+                            : reservations[index];
+                        return Column(
+                          children: [
+                            _buildReservationItem(
+                              reservation['roomName'],
+                              reservation['date'],
+                              reservation['startTime'],
+                              reservation['endTime'],
+                              getKeyWithTrueValue(reservation['tableData']),
+                              index,
+                            ),
+                          ],
+                        );
                       },
                     )
                   : const Center(
@@ -344,33 +483,29 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 ),
               ),
               const Padding(padding: EdgeInsets.only(bottom: 10)),
-              if (done_reservations.isNotEmpty &&
-                  done_reservations
-                      .any((res) => res['tableData']['status'] == 'done'))
+              if ((is_tap ? classroomDoneReservations : done_reservations)
+                  .isNotEmpty)
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: done_reservations.length,
+                  itemCount: is_tap
+                      ? classroomDoneReservations.length
+                      : done_reservations.length,
                   itemBuilder: (context, index) {
-                    if (done_reservations[index]['tableData']['status'] ==
-                        'done') {
-                      // 이용 완료인 예약만 표시
-                      Map<String, dynamic> done_reservation =
-                          done_reservations[index];
-                      return Column(
-                        children: [
-                          _buildUsageHistoryItem(
-                            done_reservation['roomName'],
-                            done_reservation['date'],
-                            done_reservation['startTime'],
-                            done_reservation['endTime'],
-                            getKeyWithTrueValue(done_reservation['tableData']),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return const SizedBox.shrink(); // 아무 것도 표시하지 않음
-                    }
+                    Map<String, dynamic> done_reservation = is_tap
+                        ? classroomDoneReservations[index]
+                        : done_reservations[index];
+                    return Column(
+                      children: [
+                        _buildUsageHistoryItem(
+                          done_reservation['roomName'],
+                          done_reservation['date'],
+                          done_reservation['startTime'],
+                          done_reservation['endTime'],
+                          getKeyWithTrueValue(done_reservation['tableData']),
+                        ),
+                      ],
+                    );
                   },
                 )
               else
@@ -588,7 +723,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                       ),
                       if (isLent)
                         TextSpan(
-                          text: '남은 이용시간 $remainingTime', // 남은 시간 변수
+                          text: '남은 이용시간 $remainingTime', // 반납까지 남은 시간 변수
                           style: const TextStyle(
                             fontSize: 12, // 남은 시간 폰트 크기
                             fontWeight: FontWeight.w500, // 남은 시간 폰트 두께
@@ -1099,7 +1234,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
 
     timersMap[index]?.cancel(); // 기존 타이머가 있으면 취소
 
-    timersMap[index] = Timer.periodic(Duration(seconds: 1), (timer) {
+    timersMap[index] = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (seconds > 0) {

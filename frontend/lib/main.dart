@@ -190,11 +190,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
     setState(() {
-      print(uid);
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://10.223.126.119:3000/reserveclub/main_lentroom/:uid';
+    final url = 'http://10.223.126.119:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',

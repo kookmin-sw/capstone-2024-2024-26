@@ -122,51 +122,33 @@ class _select extends State<Select_reserve> {
   _checkReservation(
     Map<String, dynamic> reservations,
   ) async {
-    if (reservations['reservations'].isEmpty) {
-      updatedIsButtonPressedList =
-          List.generate(16, (index) => false); //시간 차있는지 확인
+    // 초기화
+    updatedIsButtonPressedList = List.generate(16, (index) => false);
+    timeTableStatus = {
+      for (int i = 0; i < 16; i++)
+        i: List.generate(tableList.length, (index) => false)
+    };
 
-      List<bool> updatedIsButtonPressedTable =
-          List.generate(tableList.length, (index) => false); // 테이블 차있는지 확인
-      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
-        timeTableStatus[i] = List.generate(tableList.length, (index) => false);
-      }
+    if (reservations['reservations'].isEmpty) {
       return;
     }
-    for (var reservation in reservations['reservations']) {
-      updatedIsButtonPressedList =
-          List.generate(16, (index) => false); //시간 차있는지 확인
 
-      List<bool> updatedIsButtonPressedTable = List.generate(
-          reservation['tables'].length, (index) => false); // 테이블 차있는지 확인
+    for (var reservation in reservations['reservations']) {
       String timeRange = reservation['timeRange'];
       int startHour = int.parse(timeRange.split('-')[0]);
-
       int startIndex = startHour - 9;
-
       List<dynamic> tables = reservation['tables'];
 
-      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
-        timeTableStatus[i] =
-            List.generate(reservation['tables'].length, (index) => false);
-      }
       for (int i = 0; i < tables.length; i++) {
         var table = tables[i];
-        // 테이블이 예약되어 있으면 해당 테이블 버튼을 비활성화
         if (table['T${i + 1}'] == true) {
-          updatedIsButtonPressedTable[i] = true;
+          timeTableStatus[startIndex]?[i] = true;
         }
       }
 
-      if (updatedIsButtonPressedTable.every((element) => element == true)) {
+      if (timeTableStatus[startIndex]!.every((element) => element == true)) {
         updatedIsButtonPressedList[startIndex] = true;
       }
-
-      if (updatedIsButtonPressedList.every((element) => element == true)) {
-        timeslot = true;
-      }
-
-      timeTableStatus[startIndex] = updatedIsButtonPressedTable;
     }
   }
 
