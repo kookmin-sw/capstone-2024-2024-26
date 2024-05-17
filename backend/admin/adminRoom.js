@@ -286,6 +286,7 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+                  status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
                 });
@@ -364,6 +365,7 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+                  status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
                 });
@@ -529,6 +531,7 @@ adminRoom.post("/reserve", async (req, res) => {
             numberOfPeople: "",
             usingPurpose: usingPurpose,
             boolAgree: true,
+            status: "",
             signature: "",
           });
         }

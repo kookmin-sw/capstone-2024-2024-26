@@ -143,4 +143,3 @@ inquiry.get("/list/:userId/:startDate/:endDate", async (req, res) => {
 });
 
 export default inquiry;
-
