@@ -40,10 +40,17 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    fetchReservations(startDate, endDate).then((_) {
+    fetchReservations(userId, startDate, endDate).then((_) {
       loadTimerStates();
     });
-    done_Reservations(previousDate, startDate);
+    done_Reservations(userId, previousDate, startDate);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 조상 위젯을 참조하여 필요한 데이터를 초기화
+    // 예: Theme.of(context) 또는 MediaQuery.of(context) 등
   }
 
   Future<void> loadTimerStates() async {
@@ -89,7 +96,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
-  Future<List<dynamic>> fetchReservations(DateTime start, DateTime end) async {
+  Future<List<dynamic>> fetchReservations(
+      String userId, DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -101,7 +109,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://172.30.1.11:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.223.126.119:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -110,13 +118,15 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
 
-        setState(() {
-          isLoading = false;
-          reservations = data['reservations'];
-          List<dynamic> mergedReservations =
-              mergeConsecutiveReservations(reservations);
-          reservations = mergedReservations;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            reservations = data['reservations'];
+            List<dynamic> mergedReservations =
+                mergeConsecutiveReservations(reservations);
+            reservations = mergedReservations;
+          });
+        }
 
         return data['reservations'];
       } else {
@@ -151,7 +161,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     return merged;
   }
 
-  Future<List<dynamic>> done_Reservations(DateTime start, DateTime end) async {
+  Future<List<dynamic>> done_Reservations(
+      String userId, DateTime start, DateTime end) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('uid');
     setState(() {
@@ -163,7 +174,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         "${end.year}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}";
 
     final url =
-        'http://172.30.1.11:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
+        'http://10.223.126.119:3000/reserveclub/reservationclubs/$userId/$formattedStartDate/$formattedEndDate';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -172,13 +183,15 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         // 서버로부터 정상적인 응답을 받았을 때
         Map<String, dynamic> data = json.decode(response.body);
 
-        setState(() {
-          isLoading = false;
-          done_reservations = data['reservations'];
-          List<dynamic> mergedReservations =
-              mergeConsecutiveReservations(done_reservations);
-          done_reservations = mergedReservations;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            done_reservations = data['reservations'];
+            List<dynamic> mergedReservations =
+                mergeConsecutiveReservations(done_reservations);
+            done_reservations = mergedReservations;
+          });
+        }
 
         return data['reservations'];
       } else {
@@ -535,9 +548,24 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             const SizedBox(height: 30),
             ElevatedButton(
                 onPressed: () {
-                  isLent
-                      ? FlutterDialog("반납하시겠습니까?", "반납하기", index)
-                      : EnterDialog("입장하시겠습니까?", "입장하기", index);
+                  DateTime startDateTime =
+                      DateTime.parse('$date $startTime:00');
+                  DateTime currentTime = DateTime.now();
+                  Duration difference = startDateTime.difference(currentTime);
+                  bool canEnter =
+                      difference.inMinutes <= 10 && difference.isNegative;
+
+                  if (canEnter) {
+                    isLent
+                        ? FlutterDialog("반납하시겠습니까?", "반납하기", index)
+                        : EnterDialog("입장하시겠습니까?", "입장하기", index);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('예약시간 10분 전부터 입장 가능합니다.'),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF004F9E),
@@ -707,7 +735,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  void FlutterDialog(String text, String text2, int index) {
+  Future<void> FlutterDialog(String text, String text2, int index) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -776,13 +804,14 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                           )),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
 
                         if (text2 == '반납하기') {
                           setState(() {
                             isLentMap[index] = false;
                             timersMap[index]?.cancel();
+                            reservations.removeAt(index);
                           });
                           saveTimerState(index);
                           Navigator.push(
@@ -802,7 +831,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  void EnterDialog(String text, String text2, int index) {
+  Future<void> EnterDialog(String text, String text2, int index) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -871,23 +900,22 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                           )),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
 
                         setState(() {
                           isLentMap[index] = true;
-                          DateTime startDateTime = DateTime.parse(
-                              reservations[index]['date'] +
-                                  ' ' +
-                                  reservations[index]['startTime'] +
-                                  ':00');
                           DateTime endDateTime = DateTime.parse(
                               reservations[index]['date'] +
                                   ' ' +
                                   reservations[index]['endTime'] +
                                   ':00');
+                          DateTime now = DateTime.now();
                           endTimesMap[index] = endDateTime;
-                          startEntryTimer(index, startDateTime, endDateTime);
+                          int secondsRemaining =
+                              endDateTime.difference(now).inSeconds;
+                          startEntryTimer(index, now, endDateTime,
+                              remainingSeconds: secondsRemaining);
                         });
                         saveTimerState(index);
                       },
@@ -902,7 +930,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  void cancelReservation(int index) {
+  Future<void> cancelReservation(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('uid');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -971,19 +1001,52 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                           )),
-                      onPressed: () {
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        final url =
+                            'http://10.223.126.119:3000/reserveclub/delete';
+                        final response = await http.post(
+                          Uri.parse(url),
+                          headers: {'Content-Type': 'application/json'},
+                          body: json.encode({
+                            'userId': userId,
+                            'roomName': reservations[index]['roomName'],
+                            'date': reservations[index]['date'],
+                            'startTime': reservations[index]['startTime'],
+                            'endTime': reservations[index]['endTime'],
+                            'tableNumber': getKeyWithTrueValue(
+                                reservations[index]['tableData']),
+                          }),
+                        );
 
-                        setState(() {
-                          reservations.removeAt(index);
-                        });
+                        if (response.statusCode == 200) {
+                          if (mounted) {
+                            setState(() {
+                              reservations.removeAt(index);
+                              Navigator.pop(context);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('예약이 성공적으로 취소되었습니다 !'),
+                              ),
+                            );
 
-                        // 타이머 상태 제거
-                        isLentMap.remove(index);
-                        remainingTimeMap.remove(index);
-                        timersMap[index]?.cancel();
-                        timersMap.remove(index);
-                        endTimesMap.remove(index);
+                            // 타이머 상태 제거
+                            isLentMap.remove(index);
+                            remainingTimeMap.remove(index);
+                            timersMap[index]?.cancel();
+                            timersMap.remove(index);
+                            endTimesMap.remove(index);
+                          }
+                        } else {
+                          // 서버 오류 처리
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('예약 취소에 실패했습니다.'),
+                              ),
+                            );
+                          }
+                        }
                       },
                     ),
                   ],
@@ -1017,10 +1080,12 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                 remainingSeconds: secondsRemaining);
           } else {
             // 예약 시간이 이미 종료된 경우
-            setState(() {
-              isLentMap[index] = false;
-              remainingTimeMap[index] = '00:00:00';
-            });
+            if (mounted) {
+              setState(() {
+                isLentMap[index] = false;
+                remainingTimeMap[index] = '00:00:00';
+              });
+            }
           }
         }
       });
@@ -1035,6 +1100,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     timersMap[index]?.cancel(); // 기존 타이머가 있으면 취소
 
     timersMap[index] = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!mounted) return;
       setState(() {
         if (seconds > 0) {
           seconds--;
