@@ -94,10 +94,11 @@ def receive_image():
         image_file = request.files['frame']
         image = Image.open(image_file.stream)  # 파일 스트림에서 이미지 로드
         
-        info = request.files['info'].read()
+        # info = request.files['info'].read()
         result = count(image)
         #파베에 혼잡도만 변경하면댐
-        doc_ref = db.collection("camera").document(info)
+        #이거 라즈베리파이 코드보고 info 수정해야됨
+        doc_ref = db.collection("Camera").document("자율주행스튜디오")
         doc = doc_ref.get()
         if doc.exists:
             if result['score'] >=75:
