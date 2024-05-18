@@ -100,7 +100,9 @@ const Member = () => {
                  />
               </div>
               <hr></hr>
+              <div className='memberTable_scroll'>
               <MemberTable members={filteredMembers} />
+              </div>
             </div>
           </div>
         </div>

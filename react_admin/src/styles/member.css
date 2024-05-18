@@ -33,6 +33,10 @@
     width: 86vw;
     background-color: rgb(207, 207, 207);
   }
+  .memberTable_scroll{
+    height: 74vh;
+    overflow-y: auto;
+  }
   
   .table {
     width: 100%; /* 테이블이 부모 컨테이너를 가득 채움 */
