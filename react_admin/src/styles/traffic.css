@@ -1,7 +1,7 @@
 .cameraTable_num{
     width: 8vw;
 }
-.cameraTable_building{
+.cameraTable_locationName{
     width: 15vw;
 }
 .cameraTable_location{
@@ -12,6 +12,18 @@
 }
 .cameraTable_manage{
     width: 35vw;
+}
+.popup_camera_background{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
 }
 .popup_camera{
     position: fixed; /* 고정된 위치 */
@@ -24,8 +36,8 @@
     display: flex;
     flex-direction: column;
     border-radius: 20px;
-    border: solid 1px black;
     padding: 10px;
+    z-index: 1050;
 }
 .traffic_button{
     position: absolute;
@@ -39,23 +51,15 @@
 .traffic_button:hover {
     background-color: rgb(238, 238, 238);
 }
-.traffic_edit_button{
-    width: 6vw;
-    height: 4vh;
-    border-radius: 5px;
-    border: 1px solid blue;
-    background-color: transparent;
-    font-weight: bold;
-}
-.traffic_edit_button:hover {
-    background-color: rgb(238, 238, 238);
-}
 .traffic_add_button{
-    margin-top: 10px;
+    position: absolute;
+    bottom: 3vh;
     width: 20vw ;
     height: 5vh;
-    background-color: transparent;
-    border: 1px solid black;
+    color: white;
+    font-weight: bold;
+    background-color: #004f9e;
+    border: 1px solid #004F9E;
     border-radius: 5px;
 }
 .traffic_add_button:hover{
@@ -68,14 +72,35 @@
     font-weight: bolder;
 }
 .traffic_delete_button{
-    width: 6vw;
+    width: 9vw;
     height: 4vh;
-    margin-left: 60px;
     border-radius: 5px;
     border: 1px solid red;
+    color: red;
     background-color: transparent;
     font-weight: bold;
 }
 .traffic_delete_button:hover {
-    background-color: rgb(238, 238, 238);
+    background-color: rgba(244, 4, 4, 0.108);
+}
+.popup_camera{
+    width: 20vw;
+    height: 60vh;
+    background-color: white;
+}
+.camera_input_data{
+    border: none;
+    width: 15vw;
+    height: 6vh;
+    border-bottom: 1px solid transparent;
+    border-radius: 1px;
+    background-color: rgba(187, 187, 187, 0.165);
+}
+.camera_input_data:focus{
+    outline: none;
+    border: 1px solid #004F9E;
+}
+.camera_input_title{
+    font-size: 2vh;
+    font-weight: bold;
 }
