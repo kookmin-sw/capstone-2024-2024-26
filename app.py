@@ -90,14 +90,16 @@ def qffdqgaf():
 #라즈베리파이에서 이미지 받아서 알아서 파베 수정
 @app.route('/image', methods=['POST'])
 def receive_image():
-    if 'frame' in request.files in request.files:
+    if 'frame' in request.files:
         image_file = request.files['frame']
         image = Image.open(image_file.stream)  # 파일 스트림에서 이미지 로드
         
         info = request.files['info'].read()
         result = count(image)
+
+        print('score : ', result['score'])
         #파베에 혼잡도만 변경하면댐
-        doc_ref = db.collection("camera").document(info)
+        doc_ref = db.collection("Camera").document(info)
         doc = doc_ref.get()
         if doc.exists:
             if result['score'] >=75:
@@ -116,7 +118,7 @@ def receive_image():
         return result, 200
     else:
         #파베에 상태 flase로 변경
-        doc_ref = db.collection("Camera").document('미래관 자율주행스튜디오')
+        doc_ref = db.collection("Camera").document('자율주행스튜디오')
         doc = doc_ref.get()
         if doc.exists:
             doc_ref.update({'state': "0"})
