@@ -85,8 +85,9 @@ const Room = () => {
         const response = await axios.get(`http://localhost:3000/adminRoom/reservationQueues/${faculty}/${startDate}/${endDate}`);
         console.log('Data2 fetched successfully:', response.data);
         if (response.data && response.data.notConfirmReservations) {
-          setPendingReservations(response.data.notConfirmReservations);
-          localStorage.setItem('pendingReservationsCount', response.data.notConfirmReservations.length);
+          const filteredReservations = response.data.notConfirmReservations.filter(reservation => !reservation.boolAgree);
+          setPendingReservations(filteredReservations);
+          localStorage.setItem('pendingReservationsCount', filteredReservations.length);
         }
       } catch (error) {
         console.error('Failed to fetch pending reservations:', error);
@@ -253,51 +254,113 @@ const handleDeleteReservation = async (reservation) => {
     );
   };
 
-  
-  const Modal = ({ reservation, onClose, onApprove}) => {
-    let participants = [];
-    try {
-      participants = JSON.parse(reservation.participants);
-    } catch (e) {
-      console.error("참가자 정보 파싱 오류:", e);
-      participants = [];
-    }
-  
-    return (
-      <div className="modal-backdrop">
-        <div className="modal-content">
-          <span className="close-button" onClick={onClose}>&times;</span>
-          <div className='popup_form'>
-          <h2>강의실 신청서</h2>
-          {showApproveButton && (
-          <button className='confirm_button' onClick={() => onApprove(reservation)}>승인하기</button>
-        )}
+const Modal = ({ reservation, onClose, onApprove }) => {
+  let participants = [];
+  try {
+    participants = JSON.parse(reservation.participants);
+  } catch (e) {
+    console.error("참가자 정보 파싱 오류:", e);
+    participants = [];
+  }
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <span className="close-button" onClick={onClose}>&times;</span>
+        <div className='popup_form'>
+          <h2>{reservation.mainFaculty} 강의실 신청서</h2>
         </div>
-          <hr></hr>
-          <div className='form_box'>
-          <h3>[강의실 신청 목적]</h3>
-          <p>내용: {reservation.usingPurpose}</p>
-          <hr></hr>
-          <h3>[대표자]</h3>
-          <p>대표자 이름: {reservation.mainName}</p>
-          <p>대표자 학번: {reservation.mainStudentId}</p>
-          <p>대표자 이메일: {reservation.mainEmail}</p>
-          <p>대표자 전화번호: {reservation.mainPhoneNumber}</p>
-          <hr></hr>
-          <h3>[참가자]</h3>
+        <div>
+        <div className="form_form">
+      <div className="form-container">
+        <div className="form-row">
+          <div className="form-cell header">구분</div>
+          <div className="form-cell">{reservation.roomName}</div>
+        </div>
+        <div className="form-row">
+          <div className="form-cell header">사용일시</div>
+          <div className="form-cell" colSpan="2">{reservation.date} {reservation.startTime}시 ~ {reservation.endTime}시</div>
+        </div>
+        <div className="form-row">
+          <div className="form-cell header">사용목적</div>
+          <div className="form-cell" colSpan="2">{reservation.usingPurpose}</div>
+        </div>
+        <div className="form-row">
+          <div className="form-cell header" rowSpan="5">대표자<br/>/<br/>책임자</div>
+          <div className="form-sub-container" colSpan="2">
+            <div className="form-sub-row">
+              <div className="form-sub-cell sub-header">학번</div>
+              <div className="form-sub-cell">{reservation.mainStudentId}</div>
+            </div>
+            <div className="form-sub-row">
+              <div className="form-sub-cell sub-header">성명</div>
+              <div className="form-sub-cell">{reservation.mainName}</div>
+            </div>
+            <div className="form-sub-row">
+              <div className="form-sub-cell sub-header">연락처</div>
+              <div className="form-sub-cell">{reservation.mainPhoneNumber}</div>
+            </div>
+            <div className="form-sub-row">
+              <div className="form-sub-cell sub-header">E-Mail</div>
+              <div className="form-sub-cell">{reservation.mainEmail}</div>
+            </div>
+            <div className="form-sub-row">
+              <div className="form-sub-cell sub-header">서명</div>
+              <div className="form-sub-cell">
+              <img
+                src={`data:image/png;base64,${reservation.signature}`}
+                alt="Main Signature"
+                className="signature-image"
+              />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
           {participants.map((participant, index) => (
             <div key={index}>
-              <p>참가자 이름: {participant.name}</p>
-              <p>참가자 학번: {participant.studentId}</p>
-              <p>참가자 학과: {participant.department}</p>
-              <hr></hr>
+              <div className="form_form_form">
+              <div className="form-container">
+              <div className="form-row">
+          <div className="participantform-cell header" rowSpan="3"></div>
+          <div className="participant-sub-container" colSpan="2">
+            <div className="participant-sub-row">
+              <div className="participant-sub-cell sub-header">학번</div>
+              <div className="participant-sub-cell">{participant.studentId}</div>
+            </div>
+            <div className="participant-sub-row">
+              <div className="participant-sub-cell sub-header">소속</div>
+              <div className="participant-sub-cell">{participant.department}</div>
+            </div>
+            <div className="participant-sub-row">
+              <div className="participant-sub-cell sub-header">성명</div>
+              <div className="participant-sub-cell">{participant.name}</div>
+            </div>
+            <div className="participant-sub-row">
+              <div className="participant-sub-cell sub-header">서명</div>
+              <div className="participant-sub-cell">
+              <img
+                    src={`data:image/png;base64,${participant.p_signature}`}
+                    alt="Participant Signature"
+                    className="signature-image"
+                  />
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        </div>
             </div>
           ))}
-          </div>
+          {showApproveButton && (
+            <button className='confirm_button' onClick={() => onApprove(reservation)}>승인하기</button>
+          )}
+        </div>
       </div>
-      </div>
-    );
-  };
+  );
+};
 
   const ReservationModal = ({ isOpen, onClose, onSubmit }) => {
     const [formData, setFormData] = useState({

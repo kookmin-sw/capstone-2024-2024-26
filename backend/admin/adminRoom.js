@@ -217,7 +217,6 @@ adminRoom.post("/agree", async (req, res) => {
 
           await setDoc(reservationDocRef, reservationDataLast);
 
-          await deleteDoc(reservationDocRefQueue);
         }
       }
     }

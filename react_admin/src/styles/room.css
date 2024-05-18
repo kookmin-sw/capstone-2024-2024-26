@@ -1,7 +1,7 @@
 .classRoom_container{
     width: 90vw;
     height: 92vh;
-    background-color: rgb(208, 208, 208);
+    background-color: rgb(245, 244, 244);
 }
 .classRoom{
     display: flex;
@@ -85,15 +85,17 @@
     align-items: center;
   }
   .confirm_button{
-    background-color: transparent;
+    color: white;
+    background-color: #004f9e;
     border: 1px solid blue;
     border-radius: 10px;
-    width: 5vw;
-    height: 4vh;
-    margin-left: 4vw;
+    width: 10vw;
+    height: 8vh;
+    margin-top: 4vh;
+    margin-left: 26vw;
   }
   .confirm_button:hover{
-    background-color: rgb(201, 201, 254);
+    background-color: #004f9e8b;
   }
   /* 대기열 테이블 CSS */
   .confirm_date{
@@ -182,4 +184,67 @@
   }
   .admin_reservation_button:hover{
     background-color: #004f9e3a;
+  }
+
+  .form_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    background-color: #f0f0f0;
+  }
+  .form_form_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25vh;
+    background-color: #f0f0f0;
+  }
+  
+  .form-container {
+    display: table;
+    border-collapse: collapse;
+    width: 600px;
+  }
+  
+  .form-row {
+    display: table-row;
+  }
+  
+  .form-cell, .form-sub-cell, .participant-sub-cell {
+    display: table-cell;
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .header {
+    background-color: #f2f2f2;
+  }
+  
+  .form-sub-container, .participant-sub-container {
+    display: table;
+    width: 100%;
+    height: 100%; /* Add this line to match the height */
+  }
+  
+  .form-sub-row, .participant-sub-row {
+    display: table-row;
+  }
+  
+  .sub-header {
+    background-color: #f9f9f9;
+    width: 100px;
+  }
+  
+  .form-sub-container .form-sub-cell,
+  .participant-sub-container .participant-sub-cell {
+    border: 1px solid #dddddd;
+    padding: 4px;
+  }
+  
+  .signature-image {
+    max-width: 100%;
+    height: auto;
   }
