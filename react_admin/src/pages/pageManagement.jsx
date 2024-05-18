@@ -27,6 +27,7 @@ const PageManagement = () => {
   const [roomData, setRoomData] = useState(initialRoomData);
   const [conferenceInfo, setConferenceInfo] = useState([]);
   const [clubRoomInfo, setClubRoomInfo] = useState([]);
+  const [tableSeats, setTableSeats] = useState([]);
 
   //추가된 강의실 정보 사이드 이펙트 실행 함수 : 리액트 컴포넌트가 랜더링 된 뒤에 작업이 이루어짐
   useEffect(() => {
@@ -169,7 +170,6 @@ const handleCloseClubPopup = () => {
   const handleCreateClub = async () => {
     if (roomData.clubRoomImage && roomData.clubRoomDesignImage) {
       try {
-        // 파일 리더 로직은 파일이 설정되어 있을 때만 실행
         const reader1 = new FileReader();
         const reader2 = new FileReader();
   
@@ -181,14 +181,21 @@ const handleCloseClubPopup = () => {
           reader2.onload = async () => {
             const clubRoomDesignImageEncoded = reader2.result.split(',')[1];
   
+            const tableList = tableSeats.map((seat, index) => ({
+              available: seat,
+              table_name: `T${index + 1}`,
+              table_status: 'true',
+            }));
+  
             const payload = {
               faculty: roomData.faculty,
               roomName: roomData.roomName,
               available_Table: roomData.available_Table,
+              tableList: tableList,
               available_People: roomData.available_People,
               available_Time: roomData.available_Time,
               clubRoomImage: clubRoomImageEncoded,
-              clubRoomDesignImage: clubRoomDesignImageEncoded
+              clubRoomDesignImage: clubRoomDesignImageEncoded,
             };
   
             const response = await axios.post('http://localhost:3000/adminClub/create/room', payload, {
@@ -213,6 +220,29 @@ const handleCloseClubPopup = () => {
       alert('두 이미지 모두 추가해주세요.');
     }
   };
+
+  // 테이블 개수 입력 변경 핸들러
+const handleTableCountChange = (e) => {
+  const { value } = e.target;
+  setRoomData((prevData) => ({ ...prevData, available_Table: value }));
+};
+
+// 입력 버튼 클릭 핸들러
+const handleTableCountSubmit = () => {
+  const count = parseInt(roomData.available_Table, 10);
+  if (!isNaN(count) && count > 0) {
+    setTableSeats(Array(count).fill(''));
+  } else {
+    setTableSeats([]);
+  }
+};
+
+// 테이블 좌석 수 입력 변경 핸들러
+const handleTableSeatChange = (index, value) => {
+  const newSeats = [...tableSeats];
+  newSeats[index] = value;
+  setTableSeats(newSeats);
+};
 
   //공유공간(동아리방)삭제 이벤트 핸들러 함수 : 버튼에 있는 Uid값으로 요청을 보냄
   const handleDeleteClubRoom = async (faculty, roomName) => {
@@ -390,9 +420,22 @@ const handleCloseClubPopup = () => {
                             name='available_Table'
                             placeholder=" '00' "
                             value={roomData.available_Table}
-                            onChange={handleInputChange}
+                            onChange={handleTableCountChange}
                           />
+                          <button onClick={handleTableCountSubmit}>입력</button>
                           </div>
+                          {tableSeats.map((seat, index) => (
+  <div className='popup_inner_input' key={index}>
+    <p className='popup_input_title'>T{index + 1} 좌석 수</p>
+    <input
+      className='room_inputdata'
+      type='text'
+      value={seat}
+      onChange={(e) => handleTableSeatChange(index, e.target.value)}
+      placeholder='좌석 수 입력'
+    />
+  </div>
+))}
                           </div>
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>수용 인원</p>

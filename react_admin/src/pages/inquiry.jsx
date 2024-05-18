@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/inquiry.css';
 
-
 //문의관리 관리자 웹
 const Inquiry = () => {
-
   const [inquiries, setInquiries] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentInquiry, setCurrentInquiry] = useState(null);
-  const [responseText, setResponseText] = useState([]); // 답변 텍스트 상태
+  const [responseText, setResponseText] = useState(''); // 답변 텍스트 상태
 
   useEffect(() => {
     const fetchInquiries = async () => {
@@ -41,22 +39,21 @@ const Inquiry = () => {
   const handleInquiryClick = (inquiry) => {
     setCurrentInquiry(inquiry);
     setModalOpen(true);
-    setResponseText(); // 모달이 열릴 때 입력 필드 초기화
+    setResponseText(''); // 모달이 열릴 때 입력 필드 초기화
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-
   const getCurrentTimeFormatted = () => {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더해줍니다.
     const day = String(now.getDate()).padStart(2, '0');
-    // 반환되는 문자열 형식을 "YYYY-MM-DD HH:MM"으로 조정합니다.
+    // 반환되는 문자열 형식을 "YYYY-MM-DD"으로 조정합니다.
     return `${year}-${month}-${day}`;
-};
+  };
 
   const handleResponseSubmit = async () => {
     const currentTime = getCurrentTimeFormatted();
@@ -81,12 +78,11 @@ const Inquiry = () => {
     }
   };
 
-
   const InquiryTable = ({ inquiries }) => {
     const renderResponseStatus = (status) => {
       return status ? '답변 완료' : '답변 미완료';
     };
-  
+
     return (
       <table>
         <thead>
@@ -115,43 +111,6 @@ const Inquiry = () => {
     );
   };
 
-  const TextAreaComponent = React.memo(({ value, onChange }) => {
-    return (
-      <textarea
-        value={value}
-        onChange={onChange}
-        placeholder="답변 작성"
-        style={{ width: '100%', height: '100px' }}
-      />
-    );
-  });
-
-  const Modal = () => {
-
-    const handleResponseChange = useCallback((event) => {
-      setResponseText(event.target.value);
-    }, []);
-
-    if (!currentInquiry) return null;
-
-
-    return (
-      <div className="modal">
-        <div className="modal-content">
-          <span className="close" onClick={handleCloseModal}>&times;</span>
-          <h2>  제목: {currentInquiry.title}</h2>
-          <h4>문의 내용 </h4>
-          <p className='inquiry_content_box'>{currentInquiry.content}</p>
-          <TextAreaComponent
-          value={responseText}
-          onChange={handleResponseChange}
-        />
-          <button className="reply-button" onClick={handleResponseSubmit}>답변하기</button>
-        </div>
-      </div>
-    );
-  };
-  
   return (
     <div className="main-container">
       <Banner />
@@ -165,13 +124,29 @@ const Inquiry = () => {
               </div>
               <hr></hr>
               <InquiryTable inquiries={inquiries} />
-              {isModalOpen && <Modal />}
+              {isModalOpen && (
+                <div className="modal">
+                  <div className="modal-content">
+                    <span className="close" onClick={handleCloseModal}>&times;</span>
+                    <h2>제목: {currentInquiry?.title}</h2>
+                    <h4>문의 내용 </h4>
+                    <p className='inquiry_content_box'>{currentInquiry?.content}</p>
+                    <textarea
+                      value={responseText}
+                      onChange={e => setResponseText(e.target.value)}
+                      placeholder="답변 작성"
+                      style={{ width: '100%', height: '100px' }}
+                    />
+                    <button className="reply-button" onClick={handleResponseSubmit}>답변하기</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Inquiry;
