@@ -19,6 +19,13 @@ body {
     border: none;
     font-size: 1.2em;
 }
+/* 날짜 셀의 세로 크기를 조절 */
+.react-calendar__tile {
+    height: 100px; /* 원하는 높이 값으로 변경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /* 팝업 스타일 설정 */
 .react-modal-overlay {

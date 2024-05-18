@@ -246,17 +246,19 @@ const handleCloseClubPopup = () => {
                     <button className='addition_room_button' onClick={() => setShowRoomPopup(true)}>추가하기</button>
 
                     {showRoomPopup && (
+                      <div className='popup_class_background'>
                       <div className='popup_class'>
                         <div className='popup_inner'>
                           <div className='popup_inner_banner'>
                           <h2 className='popup_room_banner_title'>강의실 생성</h2>
                           <button className='popup_room_banner_back' onClick={handleCloseRoomPopup}>닫기</button>
                           </div>
-                          <hr></hr>
+                          <hr className='divide_line'></hr>
                           <div className='popup_inner_Club'>
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>단과대학</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='faculty'
                             placeholder='단과대학'
@@ -267,9 +269,10 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>강의실 이름</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='roomName'
-                            placeholder='⬜⬜관 000호'
+                            placeholder='00관 000호'
                             value={roomData.roomName}
                             onChange={handleInputChange}
                           />
@@ -277,6 +280,7 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>사용가능 시간</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='available_Time'
                             placeholder=" '00:00-00:00' "
@@ -287,6 +291,7 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>수용 인원</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='available_People'
                             placeholder='"00"'
@@ -309,11 +314,12 @@ const handleCloseClubPopup = () => {
                           </div>
                           <button className='popup_creatRoom_button' onClick={handleCreateRoom}>생성하기</button>                          
                         </div>
+                        </div>
 
                     )}
 
                   </div>
-                  <hr></hr>
+                  <hr className='divide_line'></hr>
                   <div className='addition_chart'>
                   {conferenceInfo.length > 0 ? (
                   <ul>
@@ -345,18 +351,20 @@ const handleCloseClubPopup = () => {
                     <p className='addition_title'>공유공간 관리</p>
                     <button className='addition_club_button' onClick={() => setShowClubPopup(true)}>추가하기</button>
                     {showClubPopup && (
+                      <div className='popup_room_background'>
                       <div className='popup_room'>
                         <div className='popup_inner'>
                           <div className='popup_inner_banner'>
                           <h2 className='popup_club_banner_title'>공유공간 생성</h2>
                           <button className='popup_club_banner_back' onClick={handleCloseClubPopup}>닫기</button>
                           </div>
-                          <hr></hr>
+                          <hr className='divide_line'></hr>
                           <div className='popup_inner_box'>
                           <div className='popup_inner_input_data'>
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>단과대학</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='faculty'
                             placeholder='단과대학'
@@ -367,15 +375,17 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>강의실 이름</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='roomName'
-                            placeholder='⬜⬜관 000호'
+                            placeholder='00관 000호'
                             value={roomData.roomName}
                             onChange={handleInputChange}
                           />
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>사용가능 테이블</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='available_Table'
                             placeholder=" '00' "
@@ -387,6 +397,7 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>수용 인원</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='available_People'
                             placeholder='"00"'
@@ -397,6 +408,7 @@ const handleCloseClubPopup = () => {
                           <div className='popup_inner_input'>
                           <p className='popup_input_title'>사용가능 시간</p>
                           <input
+                            className='room_inputdata'
                             type='text'
                             name='available_Time'
                             placeholder=" '00:00-00:00' "
@@ -434,11 +446,12 @@ const handleCloseClubPopup = () => {
                           <button className='popup_createClub_button' onClick={handleCreateClub}>생성하기</button>                          
                         </div>
                         </div>
+                        </div>
 
                     )}
 
                   </div>
-                  <hr></hr>
+                  <hr className='divide_line'></hr>
                   <div className='addition_chart'>
                   {clubRoomInfo.length > 0 ? (
           <ul>
