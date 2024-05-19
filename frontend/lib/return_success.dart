@@ -47,7 +47,7 @@ class _ReturnSuccessState extends State<ReturnSuccess> {
 
     if (widget.isTap == '1') {
       // isTap이 true이면 클럽 API 호출
-      url = 'http://13.209.184.71:3000/reserveclub/return';
+      url = 'http://3.35.96.145:3000/reserveclub/return';
       data = {
         'userId': userId,
         'roomName': widget.roomName,
@@ -58,7 +58,7 @@ class _ReturnSuccessState extends State<ReturnSuccess> {
       };
     } else {
       // isTap이 false이면 강의실 API 호출
-      url = 'http://13.209.184.71:3000/reserveroom/return';
+      url = 'http://3.35.96.145:3000/reserveroom/return';
       data = {
         'userId': userId,
         'roomName': widget.roomName,
@@ -75,7 +75,6 @@ class _ReturnSuccessState extends State<ReturnSuccess> {
     );
 
     if (response.statusCode == 200) {
-      print('반납 성공');
     } else {
       print('반납 실패: ${response.body}');
     }

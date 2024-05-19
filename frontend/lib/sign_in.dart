@@ -190,16 +190,14 @@ class _SignInState extends State<SignIn> {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
-    // String? _fcmToken = await FirebaseMessaging.instance.getToken();
-    // debugPrint('fcmToken: $_fcmToken');
-    const url = 'http://13.209.184.71:3000/auth/signin';
+
+    const url = 'http://3.35.96.145:3000/auth/signin';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
       'fcmToken': 'fcmToken',
     };
 
-    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -210,7 +208,6 @@ class _SignInState extends State<SignIn> {
       isLoading = false; // 요청 완료 시 로딩 숨김
     });
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'Signin successful') {

@@ -555,7 +555,7 @@ class _MyPageState extends State<MyPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://13.209.184.71:3000/auth/profile/:uid';
+    const url = 'http://3.35.96.145:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -567,12 +567,10 @@ class _MyPageState extends State<MyPage> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
       if (responseData['message'] == 'User checking success') {
-        print(responseData['userData']);
         setState(() {
           name = responseData['userData']['name'];
           club = responseData['userData']['club'];

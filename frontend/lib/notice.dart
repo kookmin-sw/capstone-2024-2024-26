@@ -39,21 +39,6 @@ class _MyNoticeState extends State<MyNotice> {
     // fetchNotifications(); // 화면 로딩 시 알림 데이터를 가져옵니다.
   }
 
-  // // 서버로부터 알림 데이터를 받아오는 함수
-  // Future<void> fetchNotifications() async {
-  //   var url = 'http://localhost:3000/notifications'; // 서버 URL
-  //   var response = await http.get(Uri.parse(url));
-  //   var data = jsonDecode(response.body);
-  //   if (response.statusCode == 200) {
-  //     setState(() {
-  //       notifications = data; // 받아온 데이터를 notifications 리스트에 저장
-  //     });
-  //   } else {
-  //     // 오류 처리
-  //     print('Failed to fetch notifications');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -279,7 +264,7 @@ class _MyNoticeState extends State<MyNotice> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://13.209.184.71:3000/auth/profile/:uid';
+    const url = 'http://3.35.96.145:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -291,11 +276,9 @@ class _MyNoticeState extends State<MyNotice> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'User checking success') {
-        print(responseData['userData']);
         setState(() {
           name = responseData['userData']['name'];
           club = responseData['userData']['club'];

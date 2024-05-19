@@ -71,8 +71,6 @@ class _ReturnState extends State<Return> {
     WidgetsFlutterBinding.ensureInitialized();
     final cameras = await availableCameras();
     if (cameras.isEmpty) {
-      // 사용 가능한 카메라가 없는 경우에 대한 처리
-      print("No available cameras found.");
       return;
     }
     final firstCamera = cameras.first;

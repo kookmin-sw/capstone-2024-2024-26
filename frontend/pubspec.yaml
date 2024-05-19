@@ -37,6 +37,7 @@ dependencies:
   signature : ^5.4.1
   firebase_messaging: ^14.9.2
   firebase_core: ^2.31.0
+  workmanager: ^0.4.1
 
   
 

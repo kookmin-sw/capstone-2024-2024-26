@@ -40,7 +40,7 @@ class _QuestionPageState extends State<QuestionPage> {
       'content': contentController.text.toString(),
     };
 
-    const url = 'http://13.209.184.71:3000/inquiry/';
+    const url = 'http://3.35.96.145:3000/inquiry/';
 
     final response = await http.post(
       Uri.parse(url),
@@ -55,8 +55,6 @@ class _QuestionPageState extends State<QuestionPage> {
     }
 
     if (response.statusCode == 200) {
-      // 요청 성공 시 처리
-      print('전송 성공');
     } else {
       print('전송 실패');
     }

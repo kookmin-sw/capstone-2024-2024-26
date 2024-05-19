@@ -193,7 +193,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    final url = 'http://13.209.184.71:3000/reserveclub/main_lentroom/:uid';
+    final url = 'http://3.35.96.145:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -205,7 +205,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
@@ -229,8 +228,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     setState(() {
       isLoading = true; // 로딩 시작
     });
-    const url =
-        'http://13.209.184.71:3000/reserveclub/main_conference_room/:uid';
+    const url = 'http://3.35.96.145:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -242,7 +240,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
