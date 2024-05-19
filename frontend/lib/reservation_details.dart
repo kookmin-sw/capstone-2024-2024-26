@@ -720,7 +720,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('예약시간 10분 전부터 입장 가능합니다.'),
+                        content: Text('아직 입장 시간이 아닙니다.'),
                       ),
                     );
                   }

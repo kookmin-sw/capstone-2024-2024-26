@@ -196,7 +196,7 @@ class _SignInState extends State<SignIn> {
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
-      'fcmToken': 'sival a',
+      'fcmToken': 'fcmToken',
     };
 
     debugPrint('$data');
