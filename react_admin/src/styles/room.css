@@ -170,20 +170,58 @@
     font-weight: bold;
   }
   
+/* 폼 테이블 */
+.form-table {
+  width: 100%;
+  display: table;
+  border-collapse: separate;
+  border-spacing: 10px 15px;
+}
+
+/* 폼 행 */
+.form-row {
+  display: table-row;
+}
+
+/* 폼 셀 */
+.form-label, .admin-reserve-input {
+  display: table-cell;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+/* 폼 레이블 */
+.form-label {
+  font-weight: bold;
+  width: 150px; /* 레이블의 고정 너비를 설정 */
+}
+
+/* 폼 입력 */
+.admin-reserve-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* 버튼 */
+.admin-reservation-button {
+  background-color: #004f9e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20vh;
+  font-weight: bold;
+}
+
+.admin-reservation-button:hover {
+  background-color: #004f9eaa;
+}
 .admin_reserve_input{
     padding: 0.5rem;
     font-size: 1rem;
     width: calc(100% - 140px); /* 레이블 너비를 뺀 나머지 공간을 채움 */
-  }
-  .admin_reservation_button{
-    background-color: transparent;
-    border-radius: 10px;
-    border: 1px solid #004F9E;
-    width: 10vw;
-    margin-left: 15vw;
-  }
-  .admin_reservation_button:hover{
-    background-color: #004f9e3a;
   }
 
   .form_form {

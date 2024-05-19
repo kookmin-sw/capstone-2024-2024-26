@@ -362,61 +362,63 @@ const Modal = ({ reservation, onClose, onApprove }) => {
   );
 };
 
-  const ReservationModal = ({ isOpen, onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
-      roomName: '',
-      date: '',
-      startTime: '',
-      endTime: '',
-      usingPurpose: ''
-    });
-  
-    if (!isOpen) return null;
-  
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData(prev => ({ ...prev, [name]: value }));
-    };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSubmit(formData);
-      setFormData({ roomName: '', date: '', startTime: '', endTime: '', usingPurpose: '' }); // Reset form
-    };
-  
-    return (
-      <div className="modal-backdrop">
-        <div className="modal-content">
-          <span className="close-button" onClick={onClose}>&times;</span>
-          <h2>강의실 예약 추가</h2>
-          <hr></hr>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <div className="form-label">강의실 이름:</div>
-              <input className='amdin_reserve_input' type="text" name="roomName" value={formData.roomName} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <div className="form-label">날짜:</div>
-              <input className='amdin_reserve_input' type="date" name="date" value={formData.date} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <div className="form-label">시작 시간:</div>
-              <input className='amdin_reserve_input' type="text" name="startTime" placeholder="HH:MM" value={formData.startTime} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <div className="form-label">종료 시간:</div>
-              <input className='amdin_reserve_input' type="text" name="endTime" placeholder="HH:MM" value={formData.endTime} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <div className="form-label">사용 목적:</div>
-              <input className='amdin_reserve_input' type="text" name="usingPurpose" value={formData.usingPurpose} onChange={handleChange} />
-            </div>
-            <button className='admin_reservation_button' type="submit">예약 추가</button>
-          </form>
-        </div>
-      </div>
-    );
+const ReservationModal = ({ isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    roomName: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+    usingPurpose: ''
+  });
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+    setFormData({ roomName: '', date: '', startTime: '', endTime: '', usingPurpose: '' }); // Reset form
+  };
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <span className="close-button" onClick={onClose}>&times;</span>
+        <h2>강의실 예약 추가</h2>
+        <hr />
+        <form onSubmit={handleSubmit}>
+          <div className="form-table">
+            <div className="form-row">
+              <div className="form-label">강의실 이름:</div>
+              <input className="admin-reserve-input" type="text" name="roomName" value={formData.roomName} onChange={handleChange} />
+            </div>
+            <div className="form-row">
+              <div className="form-label">날짜:</div>
+              <input className="admin-reserve-input" type="date" name="date" value={formData.date} onChange={handleChange} />
+            </div>
+            <div className="form-row">
+              <div className="form-label">시작 시간:</div>
+              <input className="admin-reserve-input" type="text" name="startTime" placeholder="HH:MM" value={formData.startTime} onChange={handleChange} />
+            </div>
+            <div className="form-row">
+              <div className="form-label">종료 시간:</div>
+              <input className="admin-reserve-input" type="text" name="endTime" placeholder="HH:MM" value={formData.endTime} onChange={handleChange} />
+            </div>
+            <div className="form-row">
+              <div className="form-label">사용 목적:</div>
+              <input className="admin-reserve-input" type="text" name="usingPurpose" value={formData.usingPurpose} onChange={handleChange} />
+            </div>
+          </div>
+          <button className="admin-reservation-button" type="submit">예약 추가</button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 
   return (

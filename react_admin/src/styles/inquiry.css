@@ -42,17 +42,18 @@
   
   /* 답변하기 버튼 스타일 */
   .reply-button {
-    background-color: #4CAF50; /* 녹색 배경 */
+    background-color: #004F9E; /* 녹색 배경 */
     color: white;
     padding: 12px 20px;
-    margin: 8px 0;
+    margin-top: 25vh;
     border: none;
     cursor: pointer;
     width: 100%;
+    border-radius: 5px;
   }
   
   .reply-button:hover {
-    background-color: #45a049;
+    background-color: #004f9e5a;
   }
   .inquiry_content_box{
     width: 38vw;

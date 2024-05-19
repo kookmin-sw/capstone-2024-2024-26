@@ -109,7 +109,7 @@ const Notification = () => {
                 />
               </div>
             </div>
-            <button className="modal-send-button" onClick={handleAddNotice}>등록하기</button>
+            <button className="send-button" onClick={handleAddNotice}>등록하기</button>
           </div>
         </div>
       )}
