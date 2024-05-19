@@ -8,7 +8,7 @@ import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/myPage.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'notification.dart';
 import 'return.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -78,14 +78,27 @@ class _SplashScreenState extends State<SplashScreen> {
         const AndroidInitializationSettings("@mipmap/ic_launcher");
 
     DarwinInitializationSettings ios = const DarwinInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
     );
 
     InitializationSettings settings =
         InitializationSettings(android: android, iOS: ios);
     await _local.initialize(settings);
+
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      description:
+          'This channel is used for important notifications.', // description
+      importance: Importance.max,
+    );
+
+    await _local
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
 
     NotificationDetails details = const NotificationDetails(
       iOS: DarwinNotificationDetails(
@@ -101,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    await _local.show(1, "title", "body", details);
+    await _local.show(1, "예약 알림", "입장 10분 전입니다.", details);
   }
 
   _checkLoginStatus() async {
@@ -168,7 +181,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
+    initNotification(context);
     _checkRoomStatus();
   }
 
