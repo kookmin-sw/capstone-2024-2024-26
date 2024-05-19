@@ -120,6 +120,12 @@ class _SplashScreenState extends State<SplashScreen> {
           MaterialPageRoute(builder: (context) => const SignIn()),
         );
       });
+    } else {
+      Timer(const Duration(seconds: 2), () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const SignIn()),
+        );
+      });
     }
   }
 
@@ -187,7 +193,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://192.168.200.103:3000/reserveclub/main_lentroom/:uid';
+    final url = 'http://13.209.184.71:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -224,7 +230,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       isLoading = true; // 로딩 시작
     });
     const url =
-        'http://192.168.200.103:3000/reserveclub/main_conference_room/:uid';
+        'http://13.209.184.71:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -394,6 +400,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
                         : (spaceData.isNotEmpty ? spaceData[0][index] : null);
 
+                    List<dynamic> tableList = [];
+                    if (data != null && data['tableList'] is String) {
+                      try {
+                        tableList = json.decode(data['tableList']);
+                      } catch (e) {
+                        print('Error decoding tableList: $e');
+                      }
+                    } else if (data != null && data['tableList'] is List) {
+                      tableList = data['tableList'];
+                    }
+
                     return Column(
                       children: [
                         SizedBox(height: 10), // Add spacing here
@@ -406,6 +423,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                 roomImage: data['clubRoomImage'] ??
                                     data['conferenceImage'],
                                 designImage: data['clubRoomDesignImage'] ?? '',
+                                tableList: tableList,
                                 istap: is_tap,
                               )
                             : Container(), // Return empty container if data is null
@@ -483,6 +501,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String roomName;
   final String roomImage;
   final String designImage;
+  final List<dynamic> tableList;
   final bool istap;
 
   const _CustomScrollViewWidget({
@@ -492,6 +511,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
     required this.roomName,
     required this.roomImage,
     required this.designImage,
+    required this.tableList,
     required this.istap,
   }) : super(key: key);
 
@@ -550,24 +570,6 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 12,
-                right: 18,
-                child: GestureDetector(
-                  onTap: () {
-                    // 맵 버튼 눌렀을 때 이동할 화면
-                  },
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/map.png',
-                        width: 22,
-                        height: 22,
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -641,6 +643,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                             roomName: roomName,
                             time: time,
                             designImage: designImage,
+                            tableList: tableList,
                           )),
               );
             },

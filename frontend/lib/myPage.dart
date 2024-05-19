@@ -265,7 +265,7 @@ class _MyPageState extends State<MyPage> {
                             padding:
                                 const EdgeInsets.only(left: 10, bottom: 10),
                             child: Text(
-                              '패널티 0회', // 동아리 이름과 패널티 표시
+                              '패널티 ${penalty}회', // 동아리 이름과 패널티 표시
                               style: TextStyle(
                                 color: Colors.grey[600], // 연한 회색으로 지정
                                 fontSize: 12, // 글씨 크기 조정
@@ -555,7 +555,7 @@ class _MyPageState extends State<MyPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://192.168.200.103:3000/auth/profile/:uid';
+    const url = 'http://13.209.184.71:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -577,6 +577,7 @@ class _MyPageState extends State<MyPage> {
           name = responseData['userData']['name'];
           club = responseData['userData']['club'];
           studentId = responseData['userData']['studentId'];
+          penalty = responseData['userData']['penalty'].toString();
         });
       } else {}
     } else {

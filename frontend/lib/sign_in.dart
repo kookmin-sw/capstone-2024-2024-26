@@ -192,11 +192,11 @@ class _SignInState extends State<SignIn> {
     });
     // String? _fcmToken = await FirebaseMessaging.instance.getToken();
     // debugPrint('fcmToken: $_fcmToken');
-    const url = 'http://192.168.200.103:3000/auth/signin';
+    const url = 'http://13.209.184.71:3000/auth/signin';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
-      // 'fcmToken': _fcmToken ?? '',
+      'fcmToken': 'sival a',
     };
 
     debugPrint('$data');

@@ -72,7 +72,7 @@ class _select_cf extends State<Select_reserve_cf> {
   // 선택된 날짜를 서버로 전송하는 함수
   sendSelectedDateToServer(DateTime selectedDate) async {
     try {
-      const url = 'http://192.168.200.103:3000/reserveroom/selectdate';
+      const url = 'http://13.209.184.71:3000/reserveroom/selectdate';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       uid = prefs.getString('uid');
       final Map<String, String> data = {
@@ -93,7 +93,6 @@ class _select_cf extends State<Select_reserve_cf> {
         // 서버 응답이 성공적인 경우
 
         reservations = json.decode(response.body);
-
         _checkReservation(reservations);
       } else {
         // 서버 에러 처리
@@ -467,6 +466,13 @@ class _select_cf extends State<Select_reserve_cf> {
                                                     ed = st;
                                                   }
                                                 }
+
+                                                // 시간 선택의 연속성을 확인
+                                                if (!validateContinuousSelection(
+                                                    isButtonPressedList)) {
+                                                  showErrorAndReset(
+                                                      index, '연속적인 시간을 선택하세요.');
+                                                }
                                               });
                                             },
                                             style: ElevatedButton.styleFrom(
@@ -539,18 +545,24 @@ class _select_cf extends State<Select_reserve_cf> {
 
                       ElevatedButton(
                         onPressed: isTimeSelected
-                            ? () async {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FormPage(
-                                      roomName: roomName,
-                                      selectedDate: selectedDate,
-                                      startTime: st,
-                                      endTime: ed,
+                            ? () {
+                                // 연속된 시간이 선택된 경우에만 신청서 작성 페이지로 이동
+                                if (validateContinuousSelection(
+                                    isButtonPressedList)) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FormPage(
+                                        roomName: roomName,
+                                        selectedDate: selectedDate,
+                                        startTime: st,
+                                        endTime: ed,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  showErrorAndReset(-1, '연속적인 시간을 선택하세요.');
+                                }
                               }
                             : null,
                         style: ElevatedButton.styleFrom(

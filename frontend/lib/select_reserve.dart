@@ -15,31 +15,40 @@ class Select_reserve extends StatefulWidget {
   final String roomName;
   final String time;
   final String designImage;
-  Select_reserve(
-      {Key? key,
-      required this.roomName,
-      required this.time,
-      required this.designImage})
-      : super(key: key);
+  final List<dynamic> tableList;
+  Select_reserve({
+    Key? key,
+    required this.roomName,
+    required this.time,
+    required this.designImage,
+    required this.tableList,
+  }) : super(key: key);
 
   @override
-  State<Select_reserve> createState() =>
-      _select(roomName: roomName, time: time, designImage: designImage);
+  State<Select_reserve> createState() => _select(
+        roomName: roomName,
+        time: time,
+        designImage: designImage,
+        tableList: tableList,
+      );
 }
 
 class _select extends State<Select_reserve> {
   bool isFirstVisit = true; // 사용자가 첫 방문인지 여부
   bool isAgreed = false; // 사용자가 안내사항에 동의했는지 여부
+
   String time;
   final ScrollController _scrollController = ScrollController();
 
   Map<String, dynamic> reservations = {}; // 예약 정보를 불러와서 비활성화할거임 .
   String designImage;
   String roomName;
+  List<dynamic> tableList;
   _select({
     required this.roomName,
     required this.time,
     required this.designImage,
+    required this.tableList,
   });
 
   final double intervalWidth = 50.0;
@@ -68,30 +77,6 @@ class _select extends State<Select_reserve> {
   List<bool> updatedIsButtonPressedList =
       List.generate(16, (index) => false); //시간 차있는지 확인
   bool timeslot = false;
-
-// tablelist는 서버에서 받아온 데이터로 대체
-  List<dynamic> tableList = [
-    {
-      'available': '4',
-      'table_name': 'T1',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T2',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T3',
-      'table_status': 'true',
-    },
-    {
-      'available': '6',
-      'table_name': 'T4',
-      'table_status': 'true',
-    },
-  ];
 
   DateTime selectedDate = DateTime.utc(
     DateTime.now().year,
@@ -122,51 +107,33 @@ class _select extends State<Select_reserve> {
   _checkReservation(
     Map<String, dynamic> reservations,
   ) async {
-    if (reservations['reservations'].isEmpty) {
-      updatedIsButtonPressedList =
-          List.generate(16, (index) => false); //시간 차있는지 확인
+    // 초기화
+    updatedIsButtonPressedList = List.generate(16, (index) => false);
+    timeTableStatus = {
+      for (int i = 0; i < 16; i++)
+        i: List.generate(tableList.length, (index) => false)
+    };
 
-      List<bool> updatedIsButtonPressedTable =
-          List.generate(tableList.length, (index) => false); // 테이블 차있는지 확인
-      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
-        timeTableStatus[i] = List.generate(tableList.length, (index) => false);
-      }
+    if (reservations['reservations'].isEmpty) {
       return;
     }
-    for (var reservation in reservations['reservations']) {
-      updatedIsButtonPressedList =
-          List.generate(16, (index) => false); //시간 차있는지 확인
 
-      List<bool> updatedIsButtonPressedTable = List.generate(
-          reservation['tables'].length, (index) => false); // 테이블 차있는지 확인
+    for (var reservation in reservations['reservations']) {
       String timeRange = reservation['timeRange'];
       int startHour = int.parse(timeRange.split('-')[0]);
-
       int startIndex = startHour - 9;
-
       List<dynamic> tables = reservation['tables'];
 
-      for (int i = 0; i < updatedIsButtonPressedList.length; i++) {
-        timeTableStatus[i] =
-            List.generate(reservation['tables'].length, (index) => false);
-      }
       for (int i = 0; i < tables.length; i++) {
         var table = tables[i];
-        // 테이블이 예약되어 있으면 해당 테이블 버튼을 비활성화
         if (table['T${i + 1}'] == true) {
-          updatedIsButtonPressedTable[i] = true;
+          timeTableStatus[startIndex]?[i] = true;
         }
       }
 
-      if (updatedIsButtonPressedTable.every((element) => element == true)) {
+      if (timeTableStatus[startIndex]!.every((element) => element == true)) {
         updatedIsButtonPressedList[startIndex] = true;
       }
-
-      if (updatedIsButtonPressedList.every((element) => element == true)) {
-        timeslot = true;
-      }
-
-      timeTableStatus[startIndex] = updatedIsButtonPressedTable;
     }
   }
 
@@ -184,7 +151,7 @@ class _select extends State<Select_reserve> {
   // 선택된 날짜를 서버로 전송하는 함수
   sendSelectedDateToServer(DateTime selectedDate) async {
     try {
-      const url = 'http://192.168.200.103:3000/reserveclub/selectdate';
+      const url = 'http://13.209.184.71:3000/reserveclub/selectdate';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       uid = prefs.getString('uid');
       final Map<String, String> data = {
@@ -938,7 +905,7 @@ class _select extends State<Select_reserve> {
       return;
     }
 
-    const url = 'http://192.168.200.103:3000/reserveclub/';
+    const url = 'http://13.209.184.71:3000/reserveclub/';
     final Map<String, String> data = {
       'userId': uid!,
       'roomName': roomName,
