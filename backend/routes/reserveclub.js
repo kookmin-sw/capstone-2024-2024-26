@@ -677,7 +677,7 @@ cron.schedule("*/30 * * * *", async () => {
                       delete table.endTime;
                       await updateDoc(doc(dateCollectionRef, timeInfo), { tableData: reservationData.tableData }); // 변경
 
-                      userData.penalty += 1;
+                      userData.penalty += 0.5;
 
                       await updateDoc(
                         doc(userCollectionRef, user.id),
