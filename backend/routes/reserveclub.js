@@ -14,6 +14,8 @@ import {
 import { initializeApp } from "firebase/app";
 import express from "express";
 import dotenv from "dotenv";
+import cron from "node-cron";
+
 dotenv.config();
 const firebaseConfig = {
   apiKey: process.env.FLUTTER_APP_apikey,
@@ -189,6 +191,8 @@ reserveClub.post("/", async (req, res) => {
             tableInfo.name = userData.name;
             tableInfo.studentId = userData.studentId;
             tableInfo.status = "previous";
+            tableInfo.startTime = startTime;
+            tableInfo.endTime = endTime;
           }
           tableData.push(tableInfo);
         }
@@ -204,6 +208,9 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index] = {};
           for (let j = 1; j <= availableTable; j++) {
             reservationData.tableData[index][`T${j}`] = false;
+            reservationData.tableData[index].name = "";
+            reservationData.tableData[index].studentId = "";
+            reservationData.tableData[index].status = "previous";
           }
         }
 
@@ -212,6 +219,8 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index].name = userData.name;
           reservationData.tableData[index].studentId = userData.studentId;
           reservationData.tableData[index].status = "previous";
+          reservationData.tableDte[index].startTime = startTime;
+          reservationData.tableDte[index].endTime = endTime;
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -514,9 +523,11 @@ reserveClub.post("/delete", async (req, res) => {
         ) {
           // 예약 취소 및 테이블 상태 변경
           reservationData.tableData[index][`T${tableNumber}`] = false;
-          delete reservationData.tableData[index].name;
-          delete reservationData.tableData[index].studentId;
-          delete reservationData.tableData[index].status;
+          reservationData.tableData[index].name = ""
+          reservationData.tableData[index].studentId = "";
+          reservationData.tableData[index].status = "previous";
+          delete reservationData.tableData[index].startTime;
+          delete reservationData.tableData[index].endTime;
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -615,5 +626,81 @@ reserveClub.post("/return", async (req, res) => {
     res.status(500).json({ error: "Failed to return reservation club room" });
   }
 });
+
+// 모든 사용자가 반납을 잘했는지 판단
+cron.schedule("*/30 * * * *", async () => {
+  try {
+    const offset = 1000 * 60 * 60 * 9;
+    const koreaNow = new Date(new Date().getTime() + offset);
+    const formattedDate = koreaNow.toISOString().split("T")[0];
+    const koreaNowHourOnly = koreaNow.toISOString().substring(11, 13);
+
+
+    const userCollectionRef = collection(db, "users");
+    const querySnapshot = await getDocs(userCollectionRef);
+
+    querySnapshot.docs.forEach(async (user) => {
+      const userData = user.data();
+      const facultyRef = collection(db, `${userData.faculty}_Club`);
+      const roomSnapshot = await getDocs(facultyRef);
+
+      if (!roomSnapshot.empty) {
+        roomSnapshot.docs.forEach(async (roomDoc) => {
+          const roomName = roomDoc.id;
+          const dateCollectionRef = collection(
+            db,
+            `${userData.faculty}_Club/${roomName}/${formattedDate}`
+          );
+
+          const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+          if (!timeDocSnapshot.empty) {
+            timeDocSnapshot.docs.forEach(async (docSnapshot) => {
+              const timeInfo = docSnapshot.id;
+              if (docSnapshot.exists()) {
+                const reservationData = docSnapshot.data();
+
+                for (let i = 0; i < reservationData.tableData.length; i++) { // 변경
+                  const table = reservationData.tableData[i]; // 변경
+                  if (table.endTime) {
+                    const endTimeConfirm = table.endTime.split(":")[0];
+                    if (
+                      parseInt(endTimeConfirm) <= parseInt(koreaNowHourOnly) &&
+                      table.status === "previous" &&
+                      table.studentId === userData.studentId
+                    ) {
+                      table[`T${i+1}`] = false;
+                      table.name = "";
+                      table.studentId = "";
+                      table.status = "previous";
+                      delete table.startTime;
+                      delete table.endTime;
+                      await updateDoc(doc(dateCollectionRef, timeInfo), { tableData: reservationData.tableData }); // 변경
+
+                      userData.penalty += 1;
+
+                      await updateDoc(
+                        doc(userCollectionRef, user.id),
+                        userData
+                      );
+                    }
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+
+    res.status(200).json({
+      message: "check penalty successfully",
+    });
+  } catch (error) {
+    console.error("Error checking penalty");
+    res.status(500).json({ error: "Failed to check penalty" });
+  }
+});
+
 
 export default reserveClub;
