@@ -14,13 +14,49 @@ import 'loading.dart';
 import 'return_success.dart';
 
 class Return extends StatefulWidget {
+  final String roomName;
+  final String tableNumber;
+  final String date;
+  final String startTime;
+  final String endTime;
+  final bool isTap;
+  Return({
+    Key? key,
+    required this.roomName,
+    required this.tableNumber,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.isTap,
+  }) : super(key: key);
+
   @override
-  _ReturnState createState() => _ReturnState();
+  State<Return> createState() => _ReturnState(
+      roomName: roomName,
+      table_number: tableNumber,
+      date: date,
+      startTime: startTime,
+      isTap: isTap,
+      endTime: endTime);
 }
 
 class _ReturnState extends State<Return> {
   TakePictureScreen? _takePictureScreen;
   bool isLoading = false;
+  String roomName;
+  bool isTap;
+  String table_number;
+  String date;
+  String startTime;
+  String endTime;
+  _ReturnState({
+    required this.roomName,
+    required this.table_number,
+    required this.date,
+    required this.startTime,
+    required this.isTap,
+    required this.endTime,
+  });
 
   @override
   void initState() {
@@ -42,7 +78,14 @@ class _ReturnState extends State<Return> {
     final firstCamera = cameras.first;
 
     setState(() {
-      _takePictureScreen = TakePictureScreen(camera: firstCamera);
+      _takePictureScreen = TakePictureScreen(
+          camera: firstCamera,
+          isTap: isTap,
+          roomName: roomName,
+          table_number: table_number,
+          date: date,
+          startTime: startTime,
+          endTime: endTime);
       isLoading = false;
     });
   }
@@ -63,13 +106,7 @@ class _ReturnState extends State<Return> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          leading: IconButton(
-            icon:
-                SvgPicture.asset('assets/icons/back.svg', color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+          leading: Container(),
           centerTitle: true,
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.black,
@@ -91,16 +128,58 @@ class _ReturnState extends State<Return> {
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
+  final String roomName;
+  final String table_number;
+  final String date;
+  final String startTime;
+  final String endTime;
+  final bool isTap;
 
-  const TakePictureScreen({Key? key, required this.camera}) : super(key: key);
+  const TakePictureScreen(
+      {Key? key,
+      required this.camera,
+      required this.roomName,
+      required this.table_number,
+      required this.date,
+      required this.startTime,
+      required this.isTap,
+      required this.endTime})
+      : super(key: key);
 
   @override
-  _TakePictureScreenState createState() => _TakePictureScreenState();
+  _TakePictureScreenState createState() => _TakePictureScreenState(
+
+      // 생성자로 전달받은 값들을 상태 클래스로 전달
+      camera: camera,
+      roomName: roomName,
+      table_number: table_number,
+      date: date,
+      startTime: startTime,
+      isTap: isTap,
+      endTime: endTime);
 }
 
 class _TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  final CameraDescription camera;
+  final String roomName;
+  final String table_number;
+  final String date;
+  final String startTime;
+  final String endTime;
+  final bool isTap;
+  bool isLoading = false;
+
+  _TakePictureScreenState({
+    required this.camera,
+    required this.roomName,
+    required this.table_number,
+    required this.date,
+    required this.startTime,
+    required this.isTap,
+    required this.endTime,
+  });
 
   @override
   void initState() {
@@ -313,8 +392,14 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
               final image = await _controller.takePicture();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) =>
-                      DisplayPictureScreen(imagePath: image.path),
+                  builder: (context) => DisplayPictureScreen(
+                      imagePath: image.path,
+                      roomName: roomName,
+                      tableNumber: table_number,
+                      date: date,
+                      startTime: startTime,
+                      endTime: endTime,
+                      isTap: isTap),
                 ),
               );
             } catch (e) {
@@ -348,17 +433,30 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  final String roomName;
+  final String tableNumber;
+  final String date;
+  final String startTime;
+  final String endTime;
+  final bool isTap;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
+  const DisplayPictureScreen(
+      {Key? key,
+      required this.imagePath,
+      required this.roomName,
+      required this.tableNumber,
+      required this.date,
+      required this.startTime,
+      required this.endTime,
+      required this.isTap})
       : super(key: key);
 
   Future<void> _submitImage(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('uid')!;
-    String location = "미래관 101호"; // 적절한 위치 정보로 교체
-    String date = "2024-05-17"; // 적절한 날짜 정보로 교체
-    String time = "10-11"; // 적절한 시간 정보로 교체
-    String classType = "1"; // 0일때는 classroom, 1일때는 club
+    String location = roomName;
+    String classType = isTap ? "0" : "1";
+    String table = classType == "0" ? "0" : tableNumber.replaceFirst('T', '');
 
     File imageFile = File(imagePath);
     List<int> imageBytes = await imageFile.readAsBytes();
@@ -367,10 +465,10 @@ class DisplayPictureScreen extends StatelessWidget {
     final Map<String, dynamic> data = {
       'image': imgStr,
       'class': classType,
-      'table': '2',
+      'table': table,
       'location': location,
       'date': date,
-      'time': time,
+      'time': '$startTime-$endTime',
       'user': userId,
     };
 
@@ -385,7 +483,14 @@ class DisplayPictureScreen extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ReturnSuccess(imagePath: imagePath)),
+            builder: (context) => ReturnSuccess(
+                imagePath: imagePath,
+                isTap: classType,
+                roomName: roomName,
+                table: tableNumber,
+                date: date,
+                startTime: startTime,
+                endTime: endTime)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -436,7 +541,15 @@ class DisplayPictureScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Return()),
+                      MaterialPageRoute(
+                          builder: (context) => Return(
+                                roomName: roomName,
+                                tableNumber: tableNumber,
+                                date: date,
+                                startTime: startTime,
+                                endTime: endTime,
+                                isTap: isTap,
+                              )),
                     );
                   },
                   child: Text(

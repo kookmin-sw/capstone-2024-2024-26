@@ -577,6 +577,7 @@ class _MyPageState extends State<MyPage> {
           name = responseData['userData']['name'];
           club = responseData['userData']['club'];
           studentId = responseData['userData']['studentId'];
+          penalty = responseData['userData']['penalty'].toString();
         });
       } else {}
     } else {
