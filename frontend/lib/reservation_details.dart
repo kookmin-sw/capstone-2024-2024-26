@@ -126,6 +126,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             isLoading = false;
           });
         }
+        print(reservations);
       } else {
         throw Exception('Failed to load reservations');
       }
@@ -161,7 +162,6 @@ class _Details extends State<Details> with WidgetsBindingObserver {
 
             isLoading = false;
           });
-          print(classroomReservations);
         }
       } else {
         throw Exception('Failed to load classroom reservations');
@@ -444,7 +444,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                                 reservation['endTime'],
                                 getKeyWithTrueValue(reservation['tableData']),
                                 index,
-                                boolAgree),
+                                boolAgree,
+                                reservation),
                           ],
                         );
                       },
@@ -589,6 +590,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     String table_number,
     int index,
     bool? boolAgree,
+    Map<String, dynamic> reservation, // 예약 데이터를 직접 전달
   ) {
     bool isLent = isLentMap[index] ?? false;
     String remainingTime = remainingTimeMap[index] ?? '00:00:00';
@@ -707,8 +709,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
 
                   if (canEnter) {
                     isLent
-                        ? FlutterDialog("반납하시겠습니까?", "반납하기", index)
-                        : EnterDialog("입장하시겠습니까?", "입장하기", index);
+                        ? FlutterDialog("반납하시겠습니까?", "반납하기", index, reservation)
+                        : EnterDialog("입장하시겠습니까?", "입장하기", index, reservation);
                   } else if (boolAgree == false) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -891,7 +893,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> FlutterDialog(String text, String text2, int index) async {
+  Future<void> FlutterDialog(String text, String text2, int index,
+      Map<String, dynamic> reservation) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -964,16 +967,24 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                         Navigator.pop(context);
 
                         if (text2 == '반납하기') {
+                          saveTimerState(index);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Return(
+                                    roomName: reservation['roomName'],
+                                    date: reservation['date'],
+                                    startTime: reservation['startTime'],
+                                    endTime: reservation['endTime'],
+                                    isTap: is_tap,
+                                    tableNumber: getKeyWithTrueValue(
+                                        reservation['tableData']))),
+                          );
                           setState(() {
                             isLentMap[index] = false;
                             timersMap[index]?.cancel();
                             reservations.removeAt(index);
                           });
-                          saveTimerState(index);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Return()),
-                          );
                         }
                       },
                     ),
@@ -987,7 +998,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> EnterDialog(String text, String text2, int index) async {
+  Future<void> EnterDialog(String text, String text2, int index,
+      Map<String, dynamic> reservation) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1062,9 +1074,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                         setState(() {
                           isLentMap[index] = true;
                           DateTime endDateTime = DateTime.parse(
-                              reservations[index]['date'] +
+                              reservation['date'] +
                                   ' ' +
-                                  reservations[index]['endTime'] +
+                                  reservation['endTime'] +
                                   ':00');
                           DateTime now = DateTime.now();
                           endTimesMap[index] = endDateTime;

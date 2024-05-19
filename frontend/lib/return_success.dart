@@ -2,11 +2,28 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'loading.dart';
 import 'reservation_details.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReturnSuccess extends StatefulWidget {
   final String imagePath;
-
-  const ReturnSuccess({Key? key, required this.imagePath}) : super(key: key);
+  final String roomName;
+  final String table;
+  final String isTap;
+  final String startTime;
+  final String endTime;
+  final String date;
+  const ReturnSuccess(
+      {Key? key,
+      required this.imagePath,
+      required this.date,
+      required this.startTime,
+      required this.roomName,
+      required this.table,
+      required this.isTap,
+      required this.endTime})
+      : super(key: key);
 
   @override
   _ReturnSuccessState createState() => _ReturnSuccessState();
@@ -18,11 +35,53 @@ class _ReturnSuccessState extends State<ReturnSuccess> {
   @override
   void initState() {
     super.initState();
-    // 이미지 로딩이 비동기적으로 이루어지는 것을 가정하고 2초 후 로딩 완료 가정
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
+    _submitReturn();
+  }
+
+  Future<void> _submitReturn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('uid')!;
+    String location = widget.roomName;
+    String url;
+    Map<String, dynamic> data;
+
+    if (widget.isTap == '1') {
+      // isTap이 true이면 클럽 API 호출
+      url = 'http://13.209.184.71:3000/reserveclub/return';
+      data = {
+        'userId': userId,
+        'roomName': widget.roomName,
+        'date': widget.date,
+        'startTime': widget.startTime,
+        'endTime': widget.endTime,
+        'tableNumber': widget.table.replaceFirst('T', ''),
+      };
+    } else {
+      // isTap이 false이면 강의실 API 호출
+      url = 'http://13.209.184.71:3000/reserveroom/return';
+      data = {
+        'userId': userId,
+        'roomName': widget.roomName,
+        'date': widget.date,
+        'startTime': widget.startTime,
+        'endTime': widget.endTime,
+      };
+    }
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(data),
+    );
+
+    if (response.statusCode == 200) {
+      print('반납 성공');
+    } else {
+      print('반납 실패: ${response.body}');
+    }
+
+    setState(() {
+      isLoading = false;
     });
   }
 
