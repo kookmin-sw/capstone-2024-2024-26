@@ -60,6 +60,9 @@
 .popup_inner_box{
     display: flex;
     flex-direction: row;
+    height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .popup_inner_input_image{
     display: flex;
