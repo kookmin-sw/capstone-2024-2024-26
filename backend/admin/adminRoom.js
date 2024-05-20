@@ -366,7 +366,6 @@ adminRoom.get(
                   status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
-                  image: reservationData.image
                 });
               }
             });
