@@ -51,7 +51,6 @@ const Member = () => {
 
   const handleSendMessage = () => {
     handleCloseModal();
-    alert('성공적으로 알림이 전송되었습니다!');
   };
 
   const MemberTable = ({ members }) => (

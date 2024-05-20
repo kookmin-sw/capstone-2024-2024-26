@@ -51,7 +51,7 @@ const Traffic = () => {
         setCameras([...cameras, { id: cameras.length + 1, location: newCamera.locationName, locationName: newCamera.location}]);
         setShowPopup(false);
       } else {
-        alert('Failed to add camera');
+        alert('카메라 등록에 실패하였습니다');
       }
     } catch (error) {
       console.error('Error creating camera:', error);
@@ -98,12 +98,13 @@ const deleteCamera = async (event) => {
     const response = await axios.delete(`http://localhost:3000/adminCamera/delete/${locationName}`);
     if (response.status === 200) {
       console.log(response.data.message); // 성공 메시지 로깅
-      alert('Camera location deleted successfully'); // 사용자에게 성공 알림
+      const message = "카메라 위치를 삭제했습니다";
+      alert(message); // 사용자에게 성공 알림
       setCameras(prevCameras => prevCameras.filter(camera => camera.locationName !== locationName)); // 상태에서 카메라 삭제
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('Failed to delete the camera location'); // 에러 발생시 사용자에게 알림
+    alert('카메라 삭제에 실패했습니다'); // 에러 발생시 사용자에게 알림
   }
 };
 

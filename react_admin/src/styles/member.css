@@ -173,15 +173,15 @@
     display: block;
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #004F9E;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 15vh;
     font-size: 16px;
   }
   
   .modal-send-button:hover {
-    background-color: #45a049;
+    background-color: #004f9ea0;
   }
