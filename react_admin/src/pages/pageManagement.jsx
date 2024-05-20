@@ -28,6 +28,7 @@ const PageManagement = () => {
   const [conferenceInfo, setConferenceInfo] = useState([]);
   const [clubRoomInfo, setClubRoomInfo] = useState([]);
   const [tableSeats, setTableSeats] = useState([]);
+  const [tableImages, setTableImages] = useState([]);
 
   //추가된 강의실 정보 사이드 이펙트 실행 함수 : 리액트 컴포넌트가 랜더링 된 뒤에 작업이 이루어짐
   useEffect(() => {
@@ -164,6 +165,18 @@ const handleCloseClubPopup = () => {
       alert('강의실 삭제 실패');
     }
   };
+
+
+  const handleTableImageChange = (index, file) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newImages = [...tableImages];
+      newImages[index] = reader.result;
+      setTableImages(newImages);
+    };
+    reader.readAsDataURL(file);
+  };
+
 
   //공유공간 관련 함수 시작 구간
   //공유공간 추가 이벤트 핸들러 함수 : 사진 2개 인코딩(공유공간사진, 공유공간도안)
@@ -433,6 +446,18 @@ const handleTableSeatChange = (index, value) => {
       value={seat}
       onChange={(e) => handleTableSeatChange(index, e.target.value)}
       placeholder='좌석 수 입력'
+    />
+    <p className='popup_input_title'>T{index + 1} 테이블 이미지</p>
+    {tableImages[index] && (
+                                    <img
+                                      src={tableImages[index]}
+                                      alt={`미리보기 T${index + 1}`}
+                                      className='image_preview'
+                                    />
+                                  )}                          
+    <input
+      type='file'
+      onChange={(e) => handleTableImageChange(index, e.target.files[0])}
     />
   </div>
 ))}
