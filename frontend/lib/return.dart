@@ -378,58 +378,75 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         child: CircularProgressIndicator(),
       );
     }
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: CameraPreview(_controller),
-        ),
-        SizedBox(height: 20),
-        TextButton(
-          onPressed: () async {
-            try {
-              final image = await _controller.takePicture();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => DisplayPictureScreen(
-                      imagePath: image.path,
-                      roomName: roomName,
-                      tableNumber: table_number,
-                      date: date,
-                      startTime: startTime,
-                      endTime: endTime,
-                      isTap: isTap),
-                ),
-              );
-            } catch (e) {
-              print("Error: $e");
-            }
-          },
-          child:
-              SvgPicture.asset('assets/icons/camera.svg', color: Colors.grey),
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: Icon(Icons.help, color: Color(0XFFD9D9D9)),
-                onPressed: () {
-                  _showGuidanceDialog();
-                },
-              ),
+        CameraPreview(_controller),
+        // 반납 구도의 틀 이미지 오버레이
+        Positioned(
+          child: Opacity(
+            opacity: 0.3, // 투명도 설정 (흐릿하게 만들기 위해 0.5로 설정)
+            child: Image.asset(
+              'assets/frame.png',
+              height: 530, // Adjust the height as desired
+              width: 500, // Adjust the width as desired
+              fit: BoxFit.cover,
             ),
-            SizedBox(width: 30),
+          ),
+        ),
+        Column(
+          children: [
+            Expanded(
+              child: Container(), // 이 컨테이너는 빈 공간으로 남겨둡니다.
+            ),
+            SizedBox(height: 20),
+            TextButton(
+              onPressed: () async {
+                try {
+                  final image = await _controller.takePicture();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DisplayPictureScreen(
+                          imagePath: image.path,
+                          roomName: roomName,
+                          tableNumber: table_number,
+                          date: date,
+                          startTime: startTime,
+                          endTime: endTime,
+                          isTap: isTap),
+                    ),
+                  );
+                } catch (e) {
+                  print("Error: $e");
+                }
+              },
+              child: SvgPicture.asset('assets/icons/camera.svg',
+                  color: Colors.grey),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(Icons.help, color: Color(0XFFD9D9D9)),
+                    onPressed: () {
+                      _showGuidanceDialog();
+                    },
+                  ),
+                ),
+                SizedBox(width: 30),
+              ],
+            ),
+            SizedBox(height: 50),
           ],
         ),
-        SizedBox(height: 50),
       ],
     );
   }
 }
 
-class DisplayPictureScreen extends StatelessWidget {
+class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
   final String roomName;
   final String tableNumber;
@@ -449,14 +466,26 @@ class DisplayPictureScreen extends StatelessWidget {
       required this.isTap})
       : super(key: key);
 
+  @override
+  _DisplayPictureScreenState createState() => _DisplayPictureScreenState();
+}
+
+class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
+  bool isLoading = false;
+
   Future<void> _submitImage(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('uid')!;
-    String location = roomName;
-    String classType = isTap ? "0" : "1";
-    String table = classType == "0" ? "0" : tableNumber.replaceFirst('T', '');
+    String location = widget.roomName;
+    String classType = widget.isTap ? "0" : "1";
+    String table =
+        classType == "0" ? "0" : widget.tableNumber.replaceFirst('T', '');
 
-    File imageFile = File(imagePath);
+    File imageFile = File(widget.imagePath);
     List<int> imageBytes = await imageFile.readAsBytes();
     String imgStr = base64Encode(imageBytes);
 
@@ -465,8 +494,8 @@ class DisplayPictureScreen extends StatelessWidget {
       'class': classType,
       'table': table,
       'location': location,
-      'date': date,
-      'time': '$startTime-$endTime',
+      'date': widget.date,
+      'time': '${widget.startTime}-${widget.endTime}',
       'user': userId,
     };
 
@@ -482,24 +511,31 @@ class DisplayPictureScreen extends StatelessWidget {
         context,
         MaterialPageRoute(
             builder: (context) => ReturnSuccess(
-                imagePath: imagePath,
+                imagePath: widget.imagePath,
                 isTap: classType,
-                roomName: roomName,
-                table: tableNumber,
-                date: date,
-                startTime: startTime,
-                endTime: endTime)),
+                roomName: widget.roomName,
+                table: widget.tableNumber,
+                date: widget.date,
+                startTime: widget.startTime,
+                endTime: widget.endTime)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('이미지 제출에 실패했습니다.')),
       );
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (isLoading) {
+      return LoadingScreen();
+    } else {
+      return Scaffold(
         appBar: AppBar(
           title: const Text(
             '반납된 사진 확인',
@@ -520,7 +556,7 @@ class DisplayPictureScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Image.file(File(imagePath), width: 300, height: 500),
+            Image.file(File(widget.imagePath), width: 300, height: 500),
             TextButton(
               onPressed: () => _submitImage(context),
               child: Text(
@@ -541,12 +577,12 @@ class DisplayPictureScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => Return(
-                                roomName: roomName,
-                                tableNumber: tableNumber,
-                                date: date,
-                                startTime: startTime,
-                                endTime: endTime,
-                                isTap: isTap,
+                                roomName: widget.roomName,
+                                tableNumber: widget.tableNumber,
+                                date: widget.date,
+                                startTime: widget.startTime,
+                                endTime: widget.endTime,
+                                isTap: widget.isTap,
                               )),
                     );
                   },
@@ -570,6 +606,8 @@ class DisplayPictureScreen extends StatelessWidget {
                   fontSize: 12,
                 )),
           ],
-        ));
+        ),
+      );
+    }
   }
 }

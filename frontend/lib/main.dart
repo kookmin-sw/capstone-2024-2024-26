@@ -114,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    await _local.show(1, "예약 알림", "입장 10분 전입니다.", details);
+    await _local.show(1, "예약 알림", "입장 10분 전입니다 시간에 맞춰 입장해주세요.", details);
   }
 
   _checkLoginStatus() async {

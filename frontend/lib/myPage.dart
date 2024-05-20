@@ -30,6 +30,7 @@ class _MyPageState extends State<MyPage> {
   bool isAgreed = false;
   String? studentId;
   String? penalty;
+  String department = '';
   @override
   void initState() {
     super.initState();
@@ -253,7 +254,7 @@ class _MyPageState extends State<MyPage> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Text(
-                              club,
+                              department,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16, // 글씨 크기 조정
@@ -576,6 +577,7 @@ class _MyPageState extends State<MyPage> {
           club = responseData['userData']['club'];
           studentId = responseData['userData']['studentId'];
           penalty = responseData['userData']['penalty'].toString();
+          department = responseData['userData']['department'];
         });
       } else {}
     } else {
