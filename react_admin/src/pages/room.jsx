@@ -13,6 +13,7 @@ const Room = () => {
   const [currentReservation, setCurrentReservation] = useState(null);
   const [showApproveButton, setShowApproveButton] = useState(true);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   const handleOpenReservationModal = () => {
     setIsReservationModalOpen(true);
@@ -20,6 +21,15 @@ const Room = () => {
 
   const handleCloseReservationModal = () => {
     setIsReservationModalOpen(false);
+  };
+
+  const handleOpenReturnModal = (reservation) => {
+    setCurrentReservation(reservation);
+    setIsReturnModalOpen(true);
+  };
+
+  const handleCloseReturnModal = () => {
+    setIsReturnModalOpen(false);
   };
 
   //새로운 강의실 예약 생성 이벤트 핸들러함수
@@ -192,6 +202,7 @@ const handleDeleteReservation = async (reservation) => {
             <th className='confirm_room'>강의실 이름</th>
             <th className='confirm_time'>예약 시간</th>
             <th className='confirm_form'>신청서</th>
+            <th className='confirm_image'>반납 사진 확인</th>
             <th className='confirm_delete'>삭제하기</th>
           </tr>
         </thead>
@@ -207,6 +218,9 @@ const handleDeleteReservation = async (reservation) => {
               <button className="request-button" onClick={() => handleOpenModal(reservation, true)}>
                 신청서 보기
               </button>
+              </td>
+              <td>
+              <button className='response_room' onClick={() => handleOpenReturnModal(reservation)}>반납 사진</button>
               </td>
               <td>
               <button className="delete-button" onClick={() => handleDeleteReservation(reservation)}>
@@ -253,6 +267,28 @@ const handleDeleteReservation = async (reservation) => {
       </table>
     );
   };
+
+  const ReturnModal = ({ reservation, onClose }) => {
+    if (!reservation) return null;
+  
+    const decodedImage = reservation.image ? `data:image/png;base64,${reservation.image}` : null;
+    return (
+      <div className="modal-backdrop-image">
+        <div className="modal-content-image">
+          <div className='modal-content-image-title'>
+          <h2 className='retrunImage_close_title'>반납 사진</h2>
+          <button className="retrunImage_close" onClick={onClose}>닫기</button>
+          </div>
+          {decodedImage ? (
+            <img src={decodedImage} alt="Return" className="return-image" />
+          ) : (
+            <p className='return_image_alert'>미제출: 아직 제출된 반납 이미지가 없습니다</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
 
 const Modal = ({ reservation, onClose, onApprove }) => {
   let participants = [];
@@ -454,6 +490,7 @@ const ReservationModal = ({ isOpen, onClose, onSubmit }) => {
               </div>
             </div>
             {isModalOpen && <Modal reservation={currentReservation} onClose={handleCloseModal} onApprove={handleApproveReservation} />}
+            {isReturnModalOpen && <ReturnModal reservation={currentReservation} onClose={handleCloseReturnModal} />}
           </div>
         </div>
       </div>

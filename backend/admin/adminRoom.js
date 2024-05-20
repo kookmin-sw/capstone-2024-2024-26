@@ -270,8 +270,6 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -285,8 +283,10 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+                  status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
+                  image: reservationData.image
                 });
               }
             });
