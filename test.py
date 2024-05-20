@@ -8,8 +8,29 @@ import io
 import os
 from count import count
 from image_class import classification
+from waitress import serve
 from dotenv import load_dotenv
+from flask_cors import CORS
+import base64
+import json
+from PIL import Image
+import io
 
+# 이미지 파일 경로 설정
+image_path = "./test_image/1.jpg" #강의실
+
+# 이미지 파일을 열고 Base64로 인코딩
+with Image.open(image_path) as image:
+
+    resized_image = image.resize((1600, 1200), Image.Resampling.LANCZOS)
+
+    width, height = resized_image.size
+    print(f"이미지의 크기: 너비 {width} 픽셀, 높이 {height} 픽셀")
+    
+    buffered = io.BytesIO()
+    resized_image.save(buffered, format="JPEG")  # 이미지 형식에 맞게 JPEG 또는 PNG 등을 설정
+    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    print("인코딩된 이미지 문자열의 길이:", len(img_str))
 
 load_dotenv() 
 
@@ -30,8 +51,20 @@ cred = credentials.Certificate(firebase_config)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-
-get_doc_ref = db.collection("소프트웨어융합대학_Classroom_queue").document("미래관 447호")
+a= "소프트웨어융합대학_Club"
+#이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거
+get_doc_ref = db.collection(a).document('미래관 605-5호')
 get_doc = get_doc_ref.get()
-my = get_doc.to_dict()
-print(my['roomName'])
+dd = get_doc.to_dict()
+mytable = dd.get('tableList', [])
+
+if isinstance(mytable[0], dict):  # 인덱스 table의 요소가 사전인지 확인
+    mytable[0]['image'] = img_str
+else:
+    # table번 인덱스가 사전이 아니면 새로운 사전을 추가
+    mytable[0] = {'image': img_str}
+
+
+get_doc_ref.update({
+    'tableList': mytable
+})

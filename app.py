@@ -153,31 +153,40 @@ def classi():
     #10-11, 11-12로 쪼개서 다시 저장
 
     if myclass=='0':
-        a = "소프트웨어융합대학_Classroom_queue"
-        b = 'conferenceImage'
         c = "소프트웨어융합대학_Classroom"
+        get_doc_ref = db.collection("소프트웨어융합대학_Classroom_queue").document(location)
+        get_doc = get_doc_ref.get()
+        dd = get_doc.to_dict()
+        de_image = dd['conferenceImage']
+
+
+        default_image = base64.b64decode(de_image)
+        image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
     else:
-        a= "소프트웨어융합대학_Club"
-        b = 'clubRoomImage'
-        #이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거
-        c = "image_"+str(table)
+        if location == '미래관 605-5호':
+            path = f'./club_605/{table}.jpg'
+            image1 = Image.open(path).convert('RGB')
+        else:
+            print(2)
+            path = f'./club_101/{table}.jpg'
+            image1 = Image.open(path).convert('RGB')
+        # a= "소프트웨어융합대학_Club"
+        # #이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거
+        # get_doc_ref = db.collection(a).document(location)
+        # get_doc = get_doc_ref.get()
+        # dd = get_doc.to_dict()
+        # mytable = dd.get('tableList', [])
+        # de_image = mytable[table-1]['image']
 
-    get_doc_ref = db.collection(a).document(location)
-    get_doc = get_doc_ref.get()
-    dd = get_doc.to_dict()
-    de_image = dd[b]
-
-    #2. 입력 이미지디코딩
-    #파베에있는 이미지
-    default_image = base64.b64decode(de_image)
-    image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
+        # default_image = base64.b64decode(de_image)
+        # image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
 
 
     #입력으로 받은 이미지
     image_data = base64.b64decode(base64_image)
     image2 = Image.open(io.BytesIO(image_data)).convert('RGB')
         
-        
+
     #3. classfication에 보내준 뒤 결과 받아오기
     result = classification(image1, image2)
 
@@ -205,7 +214,7 @@ def classi():
     
     #여기서는 club에 저장
     else:
-        doc_ref = db.collection(a).document(location)
+        doc_ref = db.collection("소프트웨어융합대학_Club").document(location)
         start_time = int(time[:2])
         end_time = int(time[-2:])
         for i in range(start_time, end_time):
@@ -220,12 +229,12 @@ def classi():
 
                     # 배열의 0번 인덱스가 존재하고 사전 타입이면 이미지 정보 추가
 
-                    if len(tableData) > table:
-                        if isinstance(tableData[table], dict):  # 인덱스 table의 요소가 사전인지 확인
-                            tableData[table]['image'] = base64_image
+                    if len(tableData) > table-1:
+                        if isinstance(tableData[table-1], dict):  # 인덱스 table의 요소가 사전인지 확인
+                            tableData[table-1]['image'] = base64_image
                         else:
                             # table번 인덱스가 사전이 아니면 새로운 사전을 추가
-                            tableData[table] = {'image': base64_image}
+                            tableData[table-1] = {'image': base64_image}
                     else:
                         # 0번 인덱스가 없으면 새로운 사전을 추가
                         tableData.append({'image': base64_image})
