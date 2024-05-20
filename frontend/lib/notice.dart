@@ -24,8 +24,14 @@ class MyNotice extends StatefulWidget {
 
 class _MyNoticeState extends State<MyNotice> {
   List<dynamic> notifications = [
-    {'title': '1', 'body': '금일 12시에 이용이 예정되어있습니다.', 'date': '5월 5일 11:50'},
-    {'title': '1', 'body': '버전 1.12 업데이트', 'date': '5월 5일 11:00'}
+    {'title': '이용알림', 'body': '🔔 232호 반납이 완료되었습니다.', 'date': '5월 21일 13:00'},
+    {
+      'title': '긴급',
+      'body': '🚨 신청한 강의실이 611호->232호로 변경되었습니다.',
+      'date': '5월 21일 12:50'
+    },
+    {'title': '이용알림', 'body': '🔔 12시 이용 예정이 되어 있습니다.', 'date': '5월 21일 11:50'},
+    {'title': '공지사항', 'body': '🛠 1.12 기능 업데이트', 'date': '5월 21일 11:00'}
   ]; // 서버에서 받아온 알림 데이터를 저장할 리스트
 
   String name = '';
@@ -81,7 +87,9 @@ class _MyNoticeState extends State<MyNotice> {
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(notifications[index]['title']),
+            title: Text(
+              notifications[index]['title'],
+            ),
             subtitle: Text(notifications[index]['body']),
             trailing: Text(notifications[index]['date']),
           );

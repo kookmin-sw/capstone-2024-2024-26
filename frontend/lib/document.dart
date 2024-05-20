@@ -92,7 +92,6 @@ class _FormPageState extends State<FormPage> {
       'signature': base64Signature,
     };
 
-    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -102,8 +101,6 @@ class _FormPageState extends State<FormPage> {
     setState(() {
       isLoading = false; // 요청 완료 시 로딩 숨김
     });
-
-    debugPrint('${response.statusCode}');
 
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
@@ -143,7 +140,6 @@ class _FormPageState extends State<FormPage> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
