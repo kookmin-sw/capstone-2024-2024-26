@@ -97,7 +97,7 @@ const Main = () => {
   };
 
   const reservationChartData = {
-    labels: ['강의실', '공유공간', '문의'],
+    labels: ['미승인 강의실', '승인 강의실', '문의'],
     datasets: [
       {
         label: 'Reservation Status',
@@ -146,8 +146,8 @@ const Main = () => {
                   <div className='todo_number'>{reservationCounts.lectureRoom}</div>
                 </div>
                 <div className='todo_box'>
-                  <Link to="/Club">
-                  <p className='name_todo'>공유공간 예약</p>
+                  <Link to="/Room">
+                  <p className='name_todo'>승인 강의실 예약</p>
                   </Link>
                   <div className='todo_number'>{reservationCounts.sharedSpace}</div>
                 </div>
