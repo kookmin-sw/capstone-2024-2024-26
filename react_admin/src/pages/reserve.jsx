@@ -15,21 +15,35 @@ const Reserve = () => {
     const fetchReservations = async (selectedDate) => {
         try {
             const faculty = localStorage.getItem('faculty');
-            const formattedDate = selectedDate.toISOString().split('T')[0]; // 날짜 포맷 "YYYY-MM-DD"
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // 월을 두 자리 숫자로 변환
+            const day = String(selectedDate.getDate()).padStart(2, '0'); // 일을 두 자리 숫자로 변환
+            const formattedDate = `${year}-${month}-${day}`; // 날짜 포맷 "YYYY-MM-DD"
 
-            const [roomResponse, clubResponse] = await Promise.all([
-                axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`),
-                axios.get(`http://localhost:3000/adminClub/clubRoomInfo/${faculty}`)
-            ]);
+            console.log(`Fetching reservations for date: ${formattedDate}`);
 
-            const roomReservations = roomResponse.data.confirmReservations.map(reservation => ({
+            const roomResponse = await axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`);
+            console.log('Room response:', roomResponse.data);
+
+            const clubResponse = await axios.get(`http://localhost:3000/adminClub/reservationclubs/${faculty}/${formattedDate}/${formattedDate}`);
+            console.log('Club response:', clubResponse.data);
+
+            const roomReservations = (roomResponse.data.confirmReservations || []).map(reservation => ({
                 type: '강의실',
-                ...reservation
+                roomName: reservation.roomName,
+                startTime: reservation.startTime,
+                endTime: reservation.endTime,
+                mainName: reservation.mainName,
+                mainEmail: reservation.mainEmail
             }));
 
-            const clubReservations = clubResponse.data.allClubRoomInfo.map(reservation => ({
+            const clubReservations = (clubResponse.data.reservations || []).map(reservation => ({
                 type: '공유공간',
-                ...reservation
+                roomName: reservation.roomName,
+                startTime: reservation.startTime,
+                endTime: reservation.endTime,
+                mainName: reservation.tableData.name,
+                mainEmail: reservation.tableData.studentId
             }));
 
             setReservations([...roomReservations, ...clubReservations]);
@@ -82,7 +96,7 @@ const Reserve = () => {
                             <th className='reserve-room'>예약공간</th>
                             <th className='reserve-time'>예약시간</th>
                             <th className='reserve-name'>이름</th>
-                            <th className='reserve-email'>이메일</th>
+                            <th className='reserve-email'>Mail/Id</th>
                         </tr>
                     </thead>
                     <tbody>
