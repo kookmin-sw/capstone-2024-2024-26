@@ -61,7 +61,6 @@ def spfolks():
 #혼잡도 정보 알려주는곳
 @app.route('/api/info', methods=['POST'])
 def qffdqgaf():
-    print("Request received for /api/info")
     #하드코딩 해둔거
     cameras_ref = db.collection('Camera')
     docs = cameras_ref.stream()
@@ -164,11 +163,10 @@ def classi():
         image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
     else:
         if location == '미래관 605-5호':
-            path = f'./club_605/{table}.jpg'
+            path = f'./club_1/{table}.jpg'
             image1 = Image.open(path).convert('RGB')
         else:
-            print(2)
-            path = f'./club_101/{table}.jpg'
+            path = './club_2/1.jpg'
             image1 = Image.open(path).convert('RGB')
         # a= "소프트웨어융합대학_Club"
         # #이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거

@@ -83,6 +83,33 @@ def get_similarity_score(first_image, second_image, vit, resnet, inception, devi
     return score
 
 
+def show_images(image_path1, image_path2, s1, s2, s3):
+    image1 = mpimg.imread(image_path1)
+    # image1 = np.rot90(image1, k=-1)
+
+    image2 = mpimg.imread(image_path2)
+    image2 = np.rot90(image2, k=-1)
+
+    plt.figure(figsize=(10, 5)) 
+
+    # 첫 번째 이미지 표시
+    plt.subplot(1, 2, 1)
+    plt.imshow(image1)
+    plt.title('Before Image')
+    plt.axis('off') 
+
+    # 두 번째 이미지 표시
+    plt.subplot(1, 2, 2) 
+    plt.imshow(image2)
+    plt.title('After Image')
+    plt.axis('off') 
+    plt.figtext(0.15, 0.95, f'vit: {s1}', ha='center', va='top', fontsize=12, color='red')
+    plt.figtext(0.5, 0.95, f'resnet: {s2}', ha='center', va='top', fontsize=12, color='red')
+    plt.figtext(0.85, 0.95, f'inc: {s3}', ha='center', va='top', fontsize=12, color='red')
+
+    plt.show()
+
+
 def classification(image1, image2):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     resnet = models.resnet34().to(device)
@@ -99,27 +126,21 @@ def classification(image1, image2):
     vit.eval()
 
 
-    
-    #이미지 경로
-    #첫번째 이미지는 내 폴더에서, 두번째는 사진찍은거 받아와서
-    # default_image = './image/6.jpg'
-    # new_image = image
-
 
     # 유사도 점수 계산 및 출력
     score = get_similarity_score(image1, image2, vit, resnet, inception, device)
-
+    print(score)
     #각각의 임계값을 설정 후 셋중 두개 이상인걸로 ㄱㄱ
     # 동아리방 임계값 0.75, 0.8, 0.7로 설정
     #강의실 임계값도 사진 가져와서 테스트 후 정해야됨
     count = 0
-    if score["vit_score"] > 0.75:
+    if score["vit_score"] > 0.7:
         count+=1
 
-    if score["resnet_score"] > 0.8:
+    if score["resnet_score"] > 0.75:
         count+=1
 
-    if score["inception_score"] > 0.7:
+    if score["inception_score"] > 0.65:
         count+=1
 
     
@@ -130,3 +151,11 @@ def classification(image1, image2):
     else:
         # print("청소해")
         return {"score" : 0}
+    
+
+
+# before_image = './ai/classification/image/18.jpg'
+# after_image = './ai/classification/image/20.jpg'
+# score = get_similarity_score(before_image, after_image)
+
+# show_images(before_image, after_image, score["vit_score"], score["resnet_score"], score["inception_score"])

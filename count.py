@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision import transforms
+import matplotlib.pyplot as plt
 # 아마 이대로 갈듯
 
 class CSRNet(nn.Module):
@@ -64,8 +65,26 @@ def count(image):
 
     # 결과 출력
     predicted_density_map = output.squeeze(0).squeeze(0)  # 결과 텐서 차원 감소
-    # print(f"수치: {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
-    x = predicted_density_map.sum().item()
-    a = round(x, 3)
+    print(f"density score : {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
+
+    total_count = predicted_density_map.sum().item()  # 전체 사람 수 추정
+
+    # 그림 테스트
+    # plt.figure(figsize=(12, 6))  # 전체 그림의 크기 설정
+    # plt.subplot(1, 2, 1)  # 1행 2열의 첫 번째 subplot
+    # plt.imshow(image)  # 원본 이미지 출력
+    # plt.title('original image')
+    # plt.axis('off')  # 축 표시 제거
+
+    # plt.subplot(1, 2, 2)  # 1행 2열의 두 번째 subplot
+    # plt.imshow(predicted_density_map.numpy(), cmap='jet')
+    # plt.colorbar()  # 밀도 맵 색상 막대 추가
+    # plt.title(f'density map')
+    # plt.axis('off')  # 축 표시 제거
+    # plt.figtext(0.5, 0.95, f'score: {total_count:.2f}', ha='center', va='top', fontsize=12, color='red')
+    # plt.show()
+
+
+    a = round(total_count, 3)
     data = {"score" : a}
     return data
