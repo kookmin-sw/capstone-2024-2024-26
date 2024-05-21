@@ -18,7 +18,7 @@ import 'select_reserve_cf.dart';
 import 'notice.dart';
 import 'sign_in.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:firebase_core/firebase_core.dart';
@@ -159,7 +159,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   _checkRoomStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
-    print(uid);
 
     setState(() {
       isLoading = true; // 로딩 시작

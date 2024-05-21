@@ -126,7 +126,6 @@ class _Details extends State<Details> with WidgetsBindingObserver {
             isLoading = false;
           });
         }
-        print(reservations);
       } else {
         throw Exception('Failed to load reservations');
       }
