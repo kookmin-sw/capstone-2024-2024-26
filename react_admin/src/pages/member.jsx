@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/member.css';
+import Swal from 'sweetalert2';
 
 const Member = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +51,11 @@ const Member = () => {
   };
 
   const handleSendMessage = () => {
+    Swal.fire({
+      icon: "success",
+      title: "전송 성공!",
+      text: "알림을 성공적으로 전송하였습니다",
+  });
     handleCloseModal();
   };
 

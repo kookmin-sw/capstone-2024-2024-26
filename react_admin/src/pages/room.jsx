@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/room.css';
+import Swal from 'sweetalert2';
 
 //구현 기능 : 강의실 예약내역불러오기, 강의실 신청 승인, 강의실 예약 삭제, 
 const Room = () => {
@@ -32,23 +33,46 @@ const Room = () => {
     setIsReturnModalOpen(false);
   };
 
-  //새로운 강의실 예약 생성 이벤트 핸들러함수
-  const handleAddReservation = async (reservationData) => {
-    console.log("Sending reservation data to server:", reservationData);
-    try {
-      const response = await axios.post('http://localhost:3000/adminRoom/reserve', reservationData);
-      if (response.status === 201) {
-        alert('예약이 성공적으로 추가되었습니다.');
-        // 예약 목록을 새로 고침
-      } else {
-        throw new Error('Failed to add reservation');
-      }
-    } catch (error) {
-      console.error('예약 추가에 실패했습니다:', error);
-      alert('예약 추가에 실패했습니다.');
+  // 새로운 강의실 예약 생성 이벤트 핸들러 함수
+const handleAddReservation = async (reservationData) => {
+  console.log("Sending reservation data to server:", reservationData);
+
+  // localStorage에서 faculty 값 가져오기
+  const faculty = localStorage.getItem('faculty');
+  if (!faculty) {
+    Swal.fire({
+      icon: "error",
+      title: "예약 실패!",
+      text: "소속 정보가 누락되었습니다",
+    });
+    return;
+  }
+
+  // reservationData에 faculty 값 추가
+  const reservationDataWithFaculty = { ...reservationData, faculty };
+
+  try {
+    const response = await axios.post('http://localhost:3000/adminRoom/reserve', reservationDataWithFaculty);
+    if (response.status === 201) {
+      Swal.fire({
+        icon: "success",
+        title: "예약 성공!",
+        text: "예약이 추가되었습니다",
+      });
+      // 예약 목록을 새로 고침
+    } else {
+      throw new Error('Failed to add reservation');
     }
-    handleCloseReservationModal();
-  };
+  } catch (error) {
+    console.error('예약 추가에 실패했습니다:', error);
+    Swal.fire({
+      icon: "error",
+      title: "예약 실패!",
+      text: "예약 추가에 실패하였습니다",
+    });
+  }
+  handleCloseReservationModal();
+};
 
   const handleOpenModal = (reservation, isApproved = false) => {
     setCurrentReservation(reservation);
@@ -140,13 +164,21 @@ const Room = () => {
         }
       }
 
-      alert('모든 승인 처리가 완료되었습니다.');
+      Swal.fire({
+        icon: "success",
+        title: "승인 성공!",
+        text: "모든 승인처리가 완료되었습니다",
+    });
       setIsModalOpen(false);
       // 성공적인 승인 후 목록에서 해당 예약 제거 또는 업데이트
       // 예: setPendingReservations(prev => prev.filter(item => item.id !== reservation.id));
     } catch (error) {
       console.error('승인 처리에 실패했습니다:', error);
-      alert('승인 처리에 실패했습니다.');
+      Swal.fire({
+        icon: "error",
+        title: "승인 실패!",
+        text: "승인처리가 실패하였습니다",
+    });
     }
 };
 
@@ -177,7 +209,11 @@ const handleDeleteReservation = async (reservation) => {
       }
     }
 
-    alert('예약이 성공적으로 삭제되었습니다.');
+    Swal.fire({
+      icon: "success",
+      title: "삭제 성공!",
+      text: "예약이 성공적으로 삭제되었습니다",
+  });
     // 여기에서 상태 업데이트 로직 추가 (예약 목록에서 해당 예약 제거)
     setApprovedReservations(prevReservations => 
       prevReservations.filter(item => 
@@ -186,7 +222,11 @@ const handleDeleteReservation = async (reservation) => {
     );
   } catch (error) {
     console.error('예약 삭제에 실패했습니다:', error);
-    alert('예약 삭제에 실패했습니다.');
+    Swal.fire({
+      icon: "error",
+      title: "삭제 실패!",
+      text: "예약 삭제에 실패하였습니다",
+  });
   }
 };
 

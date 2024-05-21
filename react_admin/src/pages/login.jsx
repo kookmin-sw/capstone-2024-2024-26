@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import kookmin_logo from '../image/kookmin_logo.jpg';
 import '../styles/login.css';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,11 +35,26 @@ const Login = () => {
         navigate("/main");
       } else {
         console.error("Login failed:", response.data.message); // 로그인 실패
+        Swal.fire({
+          icon: "info",
+          title: "로그인 실패!",
+          text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+      });
         setError("로그인 실패: " + response.data.message);
       }
     } catch (error) {
       console.error("Error logging in:", error); //예외 발생
+      Swal.fire({
+        icon: "info",
+        title: "로그인 실패!",
+        text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+    });
       setError("로그인 실패: 서버 오류가 발생했습니다.");
+      Swal.fire({
+        icon: "info",
+        title: "로그인 실패!",
+        text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+    });
     }
   };
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/inquiry.css';
+import Swal from 'sweetalert2';
 
 //문의관리 관리자 웹
 const Inquiry = () => {
@@ -70,11 +71,19 @@ const Inquiry = () => {
       });
 
       console.log('Response submitted successfully:', response.data);
-      alert("답변이 성공적으로 등록되었습니다.");
+      Swal.fire({
+          icon: "success",
+          title: "등록 성공!",
+          text: "답변이 성공적으로 등록되었습니다",
+      });
       handleCloseModal();
     } catch (error) {
       console.error('Failed to submit response:', error);
-      alert("답변 등록에 실패하였습니다.");
+      Swal.fire({
+        icon: "error",
+        title: "등록 실패!",
+        text: "답변등록에 실패하였습니다",
+    });
     }
   };
 

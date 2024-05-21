@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/pageManagement.css';
+import Swal from 'sweetalert2';
 
 
 const PageManagement = () => {
@@ -117,20 +118,32 @@ const PageManagement = () => {
             },
           });
           if (response.status === 200) {
-            alert('강의실 생성 완료');
+            Swal.fire({
+              icon: "success",
+              title: "생성 완료!",
+              text: "강의실이 성공적으로 등록되었습니다",
+          });
             resetRoomData();
             setShowRoomPopup(false);
           }
         } catch (error) {
           console.error('Error creating room:', error);
-          alert('강의실 생성 실패: 서버 오류가 발생했습니다');
+          Swal.fire({
+            icon: "error",
+            title: "생성 실패!",
+            text: "서버에 오류가 발생하였습니다",
+        });
         }
       };
       reader.onerror = error => {
         console.error('Error loading image:', error);
       };
     } else {
-      alert('이미지를 추가해주세요.');
+      Swal.fire({
+        icon: "question",
+        title: "생성 실패!",
+        text: "이미지를 올바르게 등록해주세요",
+    });
     }
   };
 
@@ -156,13 +169,20 @@ const handleCloseClubPopup = () => {
       });
   
       if (response.status === 200) {
-        alert('강의실 삭제 완료');
-        // 삭제 후 리스트 업데이트
+        Swal.fire({
+          icon: "success",
+          title: "삭제 성공!",
+          text: "강의실이 성공적으로 삭제되었습니다",
+      });
         setConferenceInfo(conferenceInfo.filter(info => info.roomName !== roomName));
       }
     } catch (error) {
       console.error('Error deleting room:', error);
-      alert('강의실 삭제 실패');
+      Swal.fire({
+        icon: "error",
+        title: "삭제 실패!",
+        text: "강의실 삭제에 실패하였습니다",
+    });
     }
   };
 
@@ -218,7 +238,11 @@ const handleCloseClubPopup = () => {
             });
   
             if (response.status === 200) {
-              alert('공유공간이 성공적으로 등록되었습니다.');
+              Swal.fire({
+                icon: "success",
+                title: "등록 성공!",
+                text: "공유공간이 성공적으로 등록되었습니다",
+            });
               setClubRoomInfo(prev => [...prev, response.data]);
               resetRoomData();
               setShowClubPopup(false);
@@ -227,10 +251,18 @@ const handleCloseClubPopup = () => {
         };
       } catch (error) {
         console.error('Error creating club room:', error);
-        alert('공유공간 생성 실패');
+        Swal.fire({
+          icon: "error",
+          title: "등록 실패!",
+          text: "공유공간 등록에 실패하였습니다",
+      });
       }
     } else {
-      alert('두 이미지 모두 추가해주세요.');
+      Swal.fire({
+        icon: "error",
+        title: "등록 실패!",
+        text: "이미지 2개를 모두 등록해주세요",
+    });
     }
   };
 
@@ -265,13 +297,21 @@ const handleTableSeatChange = (index, value) => {
       });
   
       if (response.status === 200) {
-        alert('동아리방이 성공적으로 삭제되었습니다.');
+        Swal.fire({
+          icon: "success",
+          title: "삭제 성공!",
+          text: "공유공간을 삭제했습니다",
+      });
         // 삭제 후 상태 업데이트
         setClubRoomInfo(prev => prev.filter(info => info.roomName !== roomName || info.faculty !== faculty));
       }
     } catch (error) {
       console.error('Error deleting club room:', error);
-      alert('동아리방 삭제 실패');
+      Swal.fire({
+        icon: "error",
+        title: "삭제 실패!",
+        text: "공유공간 삭제에 실패하였습니다",
+    });
     }
   };
 

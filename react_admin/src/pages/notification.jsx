@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/notification.css';
+import Swal from 'sweetalert2';
 
 const Notification = () => {
   const [notices, setNotices] = useState([]);
@@ -29,6 +30,11 @@ const Notification = () => {
     const updatedNotices = [...notices, newNotice];
     setNotices(updatedNotices);
     saveNoticesToLocalStorage(updatedNotices);
+    Swal.fire({
+      icon: "success",
+      title: "등록 성공!",
+      text: "공지사항 등록이 완료되었습니다",
+  });
     setShowModal(false);
     setNoticeCategory('');
     setNoticeContent('');
@@ -38,6 +44,11 @@ const Notification = () => {
     const updatedNotices = notices.filter((_, i) => i !== index);
     setNotices(updatedNotices);
     saveNoticesToLocalStorage(updatedNotices);
+    Swal.fire({
+      icon: "success",
+      title: "삭제 성공!",
+      text: "공지사항이 성공적으로 삭제되었습니다",
+  });
   };
 
 

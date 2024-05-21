@@ -3,6 +3,7 @@ import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/traffic.css';
+import Swal from 'sweetalert2';
 
 const Traffic = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -49,9 +50,18 @@ const Traffic = () => {
     },);
       if (response.status === 200) {
         setCameras([...cameras, { id: cameras.length + 1, location: newCamera.locationName, locationName: newCamera.location}]);
+        Swal.fire({
+          icon: "success",
+          title: "등록 성공!",
+          text: "카메라가 성공적으로 등록되었습니다",
+      });
         setShowPopup(false);
       } else {
-        alert('카메라 등록에 실패하였습니다');
+        Swal.fire({
+          icon: "error",
+          title: "등록 실패!",
+          text: "카메라 등록에 실패하였습니다",
+      });
       }
     } catch (error) {
       console.error('Error creating camera:', error);
@@ -98,13 +108,20 @@ const deleteCamera = async (event) => {
     const response = await axios.delete(`http://localhost:3000/adminCamera/delete/${locationName}`);
     if (response.status === 200) {
       console.log(response.data.message); // 성공 메시지 로깅
-      const message = "카메라 위치를 삭제했습니다";
-      alert(message); // 사용자에게 성공 알림
+      Swal.fire({
+        icon: "success",
+        title: "삭제 성공!",
+        text: "카메라를 성공적으로 삭제하였습니다",
+    });
       setCameras(prevCameras => prevCameras.filter(camera => camera.locationName !== locationName)); // 상태에서 카메라 삭제
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('카메라 삭제에 실패했습니다'); // 에러 발생시 사용자에게 알림
+    Swal.fire({
+      icon: "error",
+      title: "삭제 실패!",
+      text: "카메라 삭제에 실패하였습니다",
+  });
   }
 };
 
