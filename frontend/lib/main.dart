@@ -65,7 +65,6 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _checkLoginStatus();
     _permissionWithNotification();
-    _initialization();
   }
 
   void _permissionWithNotification() async {
@@ -73,53 +72,6 @@ class _SplashScreenState extends State<SplashScreen> {
         !await Permission.notification.isPermanentlyDenied) {
       await [Permission.notification].request();
     }
-  }
-
-  void _initialization() async {
-    final FlutterLocalNotificationsPlugin _local =
-        FlutterLocalNotificationsPlugin();
-
-    AndroidInitializationSettings android =
-        const AndroidInitializationSettings("@mipmap/ic_launcher");
-
-    DarwinInitializationSettings ios = const DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
-
-    InitializationSettings settings =
-        InitializationSettings(android: android, iOS: ios);
-    await _local.initialize(settings);
-
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.max,
-    );
-
-    await _local
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    NotificationDetails details = const NotificationDetails(
-      iOS: DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-      android: AndroidNotificationDetails(
-        "1",
-        "test",
-        importance: Importance.max,
-        priority: Priority.high,
-      ),
-    );
-
-    // await _local.show(1, "예약 알림", "입장 10분 전입니다 시간에 맞춰 입장해주세요.", details);
   }
 
   _checkLoginStatus() async {

@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camera/camera.dart';
 import 'loading.dart';
 import 'return_success.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Return extends StatefulWidget {
   final String roomName;
@@ -507,6 +508,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     );
 
     if (response.statusCode == 200) {
+      _notification();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -528,6 +530,31 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  void _notification() async {
+    final FlutterLocalNotificationsPlugin _local =
+        FlutterLocalNotificationsPlugin();
+
+    DarwinInitializationSettings ios = const DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    InitializationSettings settings = InitializationSettings(iOS: ios);
+    await _local.initialize(settings);
+
+    NotificationDetails details = const NotificationDetails(
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+
+    await _local.show(
+        1, "반납 알림", "${widget.roomName} 성공적으로 반납이 완료되었습니다. ", details); // 알림 전송
   }
 
   @override

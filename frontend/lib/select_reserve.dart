@@ -10,6 +10,7 @@ import 'reservation_details.dart';
 import 'myPage.dart';
 import 'congestion.dart';
 import 'notice.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Select_reserve extends StatefulWidget {
   final String roomName;
@@ -36,6 +37,9 @@ class Select_reserve extends StatefulWidget {
 class _select extends State<Select_reserve> {
   bool isFirstVisit = true; // 사용자가 첫 방문인지 여부
   bool isAgreed = false; // 사용자가 안내사항에 동의했는지 여부
+
+  final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   String time;
   final ScrollController _scrollController = ScrollController();
@@ -896,6 +900,7 @@ class _select extends State<Select_reserve> {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'Creating reservation club successfully') {
+        _showNotification(); // 예약 성공 시 알림 보내기
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -917,6 +922,30 @@ class _select extends State<Select_reserve> {
         //errorMessage = '아이디와 비밀번호를 확인해주세요';
       });
     }
+  }
+
+  Future<void> _showNotification() async {
+    final FlutterLocalNotificationsPlugin _local =
+        FlutterLocalNotificationsPlugin();
+
+    DarwinInitializationSettings ios = const DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    InitializationSettings settings = InitializationSettings(iOS: ios);
+    await _local.initialize(settings);
+
+    NotificationDetails details = const NotificationDetails(
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+
+    await _local.show(1, "예약 완료", "${roomName} 예약이 완료되었습니다.", details); // 알림 전송
   }
 
   void showErrorAndReset(int index, String message) {
