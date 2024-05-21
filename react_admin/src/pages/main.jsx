@@ -25,14 +25,12 @@ const Main = () => {
       try {
         const response = await axios.get('http://localhost:3000/adminAuth/login-data');
         setLoginData(response.data);
-        console.log("Login data fetched successfully:", response.data);
 
         // 데이터를 날짜 키로 정렬하고, 가장 최신 데이터의 방문자 수를 업데이트합니다.
         const dates = Object.keys(response.data).sort();
         const mostRecentDate = dates[dates.length - 1];
         setLatestVisitorCount(response.data[mostRecentDate]);
       } catch (error) {
-        console.error('Failed to fetch login data:', error);
       }
     };
 
@@ -42,10 +40,6 @@ const Main = () => {
     const pendingReservationsCount = parseInt(localStorage.getItem('pendingReservationsCount'), 10) || 0;
     const approvedReservationsCount = parseInt(localStorage.getItem('approvedReservationsCount'), 10) || 0;
     const inquiryCount = parseInt(localStorage.getItem('inquiryCount'), 10) || 0;
-
-    console.log('Pending Reservations Count:', pendingReservationsCount);
-    console.log('Approved Reservations Count:', approvedReservationsCount);
-    console.log('Inquiry Count:', inquiryCount);
 
     setReservationCounts(prevCounts => ({
       ...prevCounts,

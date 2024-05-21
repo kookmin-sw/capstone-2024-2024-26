@@ -35,7 +35,7 @@ const Room = () => {
 
   // 새로운 강의실 예약 생성 이벤트 핸들러 함수
 const handleAddReservation = async (reservationData) => {
-  console.log("Sending reservation data to server:", reservationData);
+
 
   // localStorage에서 faculty 값 가져오기
   const faculty = localStorage.getItem('faculty');
@@ -64,7 +64,6 @@ const handleAddReservation = async (reservationData) => {
       throw new Error('Failed to add reservation');
     }
   } catch (error) {
-    console.error('예약 추가에 실패했습니다:', error);
     Swal.fire({
       icon: "error",
       title: "예약 실패!",
@@ -97,13 +96,13 @@ const handleAddReservation = async (reservationData) => {
     
       try {
         const response = await axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${startDate}/${endDate}`);
-        console.log('Data1 fetched successfully:', response.data);
+
         if (response.data && response.data.confirmReservations) {  // 응답 데이터의 키를 확인하고 조정
           setApprovedReservations(response.data.confirmReservations);  // 변경된 키 사용
           localStorage.setItem('approvedReservationsCount', response.data.confirmReservations.length);
         }
       } catch (error) {
-        console.error('Failed to fetch approved reservations:', error);
+
       }
     };
 
@@ -117,14 +116,14 @@ const handleAddReservation = async (reservationData) => {
     
       try {
         const response = await axios.get(`http://localhost:3000/adminRoom/reservationQueues/${faculty}/${startDate}/${endDate}`);
-        console.log('Data2 fetched successfully:', response.data);
+
         if (response.data && response.data.notConfirmReservations) {
           const filteredReservations = response.data.notConfirmReservations.filter(reservation => !reservation.boolAgree);
           setPendingReservations(filteredReservations);
           localStorage.setItem('pendingReservationsCount', filteredReservations.length);
         }
       } catch (error) {
-        console.error('Failed to fetch pending reservations:', error);
+
       }
     };
 
@@ -138,7 +137,6 @@ const handleAddReservation = async (reservationData) => {
   const handleApproveReservation = async (reservation) => {
     // reservation 객체에서 필요한 데이터 추출
     const { mainStudentId, roomName, date, startTime, endTime } = reservation;
-    console.log("Preparing to send data to server:", { mainStudentId, roomName, date, startTime, endTime });
 
     // 시간 처리를 위한 로직
     const startTimeHour = parseInt(startTime.split(":")[0]);
@@ -148,8 +146,6 @@ const handleAddReservation = async (reservationData) => {
       for (let hour = startTimeHour; hour < endTimeHour; hour++) {
         const start = hour.toString(); // '11:00' 대신 '11'로 표현
         const end = (hour + 1).toString(); // '12:00' 대신 '12'로 표현
-
-        console.log("Sending data to server for time slot:", { studentId: mainStudentId, roomName, date, start, end });
 
         const response = await axios.post('http://localhost:3000/adminRoom/agree', {
           studentId: mainStudentId,
@@ -173,7 +169,7 @@ const handleAddReservation = async (reservationData) => {
       // 성공적인 승인 후 목록에서 해당 예약 제거 또는 업데이트
       // 예: setPendingReservations(prev => prev.filter(item => item.id !== reservation.id));
     } catch (error) {
-      console.error('승인 처리에 실패했습니다:', error);
+
       Swal.fire({
         icon: "error",
         title: "승인 실패!",
@@ -221,7 +217,7 @@ const handleDeleteReservation = async (reservation) => {
       )
     );
   } catch (error) {
-    console.error('예약 삭제에 실패했습니다:', error);
+
     Swal.fire({
       icon: "error",
       title: "삭제 실패!",
@@ -335,7 +331,7 @@ const Modal = ({ reservation, onClose, onApprove }) => {
   try {
     participants = JSON.parse(reservation.participants);
   } catch (e) {
-    console.error("참가자 정보 파싱 오류:", e);
+
     participants = [];
   }
 

@@ -12,7 +12,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-      console.log("Attempting to log in with email:", email);
 
     try {
       const response = await axios.post("http://localhost:3000/adminAuth/signin", {
@@ -20,11 +19,8 @@ const Login = () => {
         password,
       });
 
-      console.log("Server response:", response);
-
       if (response.data.message === "Signin successful") {
         // 로그인 성공 시 이메일 저장
-        console.log("Login successful"); // 로그인 성공
         localStorage.setItem("userEmail", email);  // 로컬 스토리지에 이메일 저장
         const adminEmail = "react@kookmin.ac.kr"; // 관리자 이메일 설정
         if (email === adminEmail) {
@@ -34,7 +30,6 @@ const Login = () => {
         }
         navigate("/main");
       } else {
-        console.error("Login failed:", response.data.message); // 로그인 실패
         Swal.fire({
           icon: "info",
           title: "로그인 실패!",
@@ -43,7 +38,6 @@ const Login = () => {
         setError("로그인 실패: " + response.data.message);
       }
     } catch (error) {
-      console.error("Error logging in:", error); //예외 발생
       Swal.fire({
         icon: "info",
         title: "로그인 실패!",

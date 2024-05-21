@@ -20,13 +20,8 @@ const Reserve = () => {
             const day = String(selectedDate.getDate()).padStart(2, '0'); // 일을 두 자리 숫자로 변환
             const formattedDate = `${year}-${month}-${day}`; // 날짜 포맷 "YYYY-MM-DD"
 
-            console.log(`Fetching reservations for date: ${formattedDate}`);
-
             const roomResponse = await axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`);
-            console.log('Room response:', roomResponse.data);
-
             const clubResponse = await axios.get(`http://localhost:3000/adminClub/reservationclubs/${faculty}/${formattedDate}/${formattedDate}`);
-            console.log('Club response:', clubResponse.data);
 
             const roomReservations = (roomResponse.data.confirmReservations || []).map(reservation => ({
                 type: '강의실',
@@ -49,7 +44,7 @@ const Reserve = () => {
             setReservations([...roomReservations, ...clubReservations]);
 
         } catch (error) {
-            console.error('Failed to fetch reservations:', error);
+
         }
     };
 

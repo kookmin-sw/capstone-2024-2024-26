@@ -21,12 +21,11 @@ const Club = () => {
 
       try {
         const response = await axios.get(`http://localhost:3000/adminClub/reservationclubs/${faculty}/${startDate}/${endDate}`);
-        console.log('Data fetched successfully:', response.data);
         if (response.data && response.data.reservations) {
           setReservations(response.data.reservations); // Assuming the data is under the reservations key
         }
       } catch (error) {
-        console.error('Failed to fetch reservations:', error);
+        
       }
     };
 

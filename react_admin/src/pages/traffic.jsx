@@ -13,10 +13,10 @@ const Traffic = () => {
 
   //서버를 통해서 DB의 카메라 위치정보를 가져오는 이벤트 핸들러 함수
   const fetchCameras = async () => {
-    console.log("Fetching cameras from server..."); // 로깅 추가
+
     try {
       const response = await axios.get('http://localhost:3000/adminCamera/get');
-      console.log("Response received:", response.data); // 응답 로깅
+
       if (response.data.cameras) {
         setCameras(response.data.cameras.map((camera, index) => ({
           id: index + 1,
@@ -26,8 +26,7 @@ const Traffic = () => {
         })));
       }
     } catch (error) {
-      console.error('Failed to fetch cameras:', error);
-      console.log("Error details:", error.response || error.message); // 오류 상세 로깅
+
     }
   };
 
@@ -43,7 +42,7 @@ const Traffic = () => {
         locationName: newCamera.location,
         location: newCamera.locationName  // 바디 데이터
       };
-      console.log('Sending request data:', requestData);
+
       const response = await axios.post('http://localhost:3000/adminCamera/set', {
         locationName: newCamera.location,
         location: newCamera.locationName,  // 바디 데이터
@@ -64,7 +63,7 @@ const Traffic = () => {
       });
       }
     } catch (error) {
-      console.error('Error creating camera:', error);
+
     }
   };
 
@@ -103,11 +102,11 @@ const handleButtonClick = () => {
 //서버를 통해서 DB의 카메라 위치 정보를 삭제하는 이벤트 핸들러 함수
 const deleteCamera = async (event) => {
   const locationName = event.target.getAttribute('data-locationName');
-  console.log("target locationName!:", locationName);
+
   try {
     const response = await axios.delete(`http://localhost:3000/adminCamera/delete/${locationName}`);
     if (response.status === 200) {
-      console.log(response.data.message); // 성공 메시지 로깅
+
       Swal.fire({
         icon: "success",
         title: "삭제 성공!",
@@ -116,7 +115,7 @@ const deleteCamera = async (event) => {
       setCameras(prevCameras => prevCameras.filter(camera => camera.locationName !== locationName)); // 상태에서 카메라 삭제
     }
   } catch (error) {
-    console.error('Error:', error);
+
     Swal.fire({
       icon: "error",
       title: "삭제 실패!",

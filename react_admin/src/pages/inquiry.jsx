@@ -24,13 +24,12 @@ const Inquiry = () => {
 
       try {
         const response = await axios.get(`http://localhost:3000/adminInquiry/list/${faculty}/${startDate}/${endDate}`);
-        console.log('Data fetched successfully:', response.data);
         if (response.data && response.data.inquiries) {
           setInquiries(response.data.inquiries);
           localStorage.setItem('inquiryCount', response.data.inquiries.length);
         }
       } catch (error) {
-        console.error('Failed to fetch inquiries:', error);
+
       }
     };
 
@@ -58,10 +57,6 @@ const Inquiry = () => {
 
   const handleResponseSubmit = async () => {
     const currentTime = getCurrentTimeFormatted();
-    console.log('Student ID:', currentInquiry.studentId);
-    console.log('Date:', currentTime);
-    console.log('Time:', currentInquiry.date);
-    console.log('Response:', responseText);
     try {
       const response = await axios.post('http://localhost:3000/adminInquiry/', {
         studentId: currentInquiry.studentId,
@@ -70,7 +65,6 @@ const Inquiry = () => {
         response: responseText
       });
 
-      console.log('Response submitted successfully:', response.data);
       Swal.fire({
           icon: "success",
           title: "등록 성공!",
@@ -78,7 +72,6 @@ const Inquiry = () => {
       });
       handleCloseModal();
     } catch (error) {
-      console.error('Failed to submit response:', error);
       Swal.fire({
         icon: "error",
         title: "등록 실패!",

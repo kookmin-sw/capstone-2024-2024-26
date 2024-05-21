@@ -20,14 +20,13 @@ const Member = () => {
         headers: { email: userEmail }  // 이메일을 요청 본문에 포함
       });
       if (response.status === 200) {
-        console.log('Profiles:', response.data);
         setMembers(response.data.allUserData);  // 서버에서 보내준 데이터 구조에 맞춰 사용
         return response.data.allUserData;
       } else {
         throw new Error('Fetching profiles failed');
       }
     } catch (error) {
-      console.error('Error fetching profiles:', error.response || error.message);
+
     }
   };
 

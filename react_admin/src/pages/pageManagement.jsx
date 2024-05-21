@@ -40,10 +40,9 @@ const PageManagement = () => {
         if (response.status === 200) {
           setConferenceInfo(response.data.allConferenceInfo);
         } else {
-          console.error('Failed to fetch conference info');
         }
       } catch (error) {
-        console.error('Error while fetching conference info:', error);
+
       }
     };
 
@@ -62,10 +61,10 @@ const PageManagement = () => {
           if (response.status === 200) {
             setClubRoomInfo(response.data.allClubRoomInfo); // 상태 업데이트
           } else {
-            console.error('Failed to fetch club room info');
+            
           }
         } catch (error) {
-          console.error('Error while fetching club room info:', error);
+
         }
       }
     };
@@ -110,7 +109,7 @@ const PageManagement = () => {
           };
 
           localStorage.setItem('faculty', roomData.faculty); //로컬 스토리지에 단과대학 저장 : 강의실 불러올때 사용할 데이터
-          console.log('Sending the following data to the server:', payload);
+
 
           const response = await axios.post('http://localhost:3000/adminRoom/create/room', payload, {
             headers: {
@@ -127,7 +126,6 @@ const PageManagement = () => {
             setShowRoomPopup(false);
           }
         } catch (error) {
-          console.error('Error creating room:', error);
           Swal.fire({
             icon: "error",
             title: "생성 실패!",
@@ -136,7 +134,6 @@ const PageManagement = () => {
         }
       };
       reader.onerror = error => {
-        console.error('Error loading image:', error);
       };
     } else {
       Swal.fire({
@@ -177,7 +174,7 @@ const handleCloseClubPopup = () => {
         setConferenceInfo(conferenceInfo.filter(info => info.roomName !== roomName));
       }
     } catch (error) {
-      console.error('Error deleting room:', error);
+
       Swal.fire({
         icon: "error",
         title: "삭제 실패!",
@@ -250,7 +247,7 @@ const handleCloseClubPopup = () => {
           };
         };
       } catch (error) {
-        console.error('Error creating club room:', error);
+
         Swal.fire({
           icon: "error",
           title: "등록 실패!",
@@ -306,7 +303,7 @@ const handleTableSeatChange = (index, value) => {
         setClubRoomInfo(prev => prev.filter(info => info.roomName !== roomName || info.faculty !== faculty));
       }
     } catch (error) {
-      console.error('Error deleting club room:', error);
+
       Swal.fire({
         icon: "error",
         title: "삭제 실패!",
