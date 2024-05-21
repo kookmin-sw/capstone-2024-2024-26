@@ -36,7 +36,7 @@ const PageManagement = () => {
     const fetchConferenceInfo = async () => {
       const faculty = localStorage.getItem('faculty');
       try {
-        const response = await axios.get(`http://localhost:3000/adminRoom/conferenceInfo/${faculty}`);
+        const response = await axios.get(`http://3.35.96.145:3000/adminRoom/conferenceInfo/${faculty}`);
         if (response.status === 200) {
           setConferenceInfo(response.data.allConferenceInfo);
         } else {
@@ -57,7 +57,7 @@ const PageManagement = () => {
       const faculty = localStorage.getItem('faculty'); // 로컬 스토리지에서 faculty 정보 가져오기
       if (faculty) {
         try {
-          const response = await axios.get(`http://localhost:3000/adminClub/clubRoomInfo/${faculty}`);
+          const response = await axios.get(`http://3.35.96.145:3000/adminClub/clubRoomInfo/${faculty}`);
           if (response.status === 200) {
             setClubRoomInfo(response.data.allClubRoomInfo); // 상태 업데이트
           } else {
@@ -111,7 +111,7 @@ const PageManagement = () => {
           localStorage.setItem('faculty', roomData.faculty); //로컬 스토리지에 단과대학 저장 : 강의실 불러올때 사용할 데이터
 
 
-          const response = await axios.post('http://localhost:3000/adminRoom/create/room', payload, {
+          const response = await axios.post('http://3.35.96.145:3000/adminRoom/create/room', payload, {
             headers: {
               'Content-Type': 'application/json',
             },
@@ -161,7 +161,7 @@ const handleCloseClubPopup = () => {
   //강의실 삭제 이벤트 핸들러 함수 : 버튼 클릭시 저장된 Uid를 통해서 서버에 요청을 보냄
   const handleDeleteRoom = async (roomName, faculty) => {
     try {
-      const response = await axios.delete('http://localhost:3000/adminRoom/delete/conferenceInfo', {
+      const response = await axios.delete('http://3.35.96.145:3000/adminRoom/delete/conferenceInfo', {
         data: { faculty, roomName }
       });
   
@@ -228,7 +228,7 @@ const handleCloseClubPopup = () => {
               clubRoomDesignImage: clubRoomDesignImageEncoded,
             };
   
-            const response = await axios.post('http://localhost:3000/adminClub/create/room', payload, {
+            const response = await axios.post('http://3.35.96.145:3000/adminClub/create/room', payload, {
               headers: {
                 'Content-Type': 'application/json'
               }
@@ -289,7 +289,7 @@ const handleTableSeatChange = (index, value) => {
   //공유공간(동아리방)삭제 이벤트 핸들러 함수 : 버튼에 있는 Uid값으로 요청을 보냄
   const handleDeleteClubRoom = async (faculty, roomName) => {
     try {
-      const response = await axios.delete('http://localhost:3000/adminClub/delete/clubRoomInfo', {
+      const response = await axios.delete('http://3.35.96.145:3000/adminClub/delete/clubRoomInfo', {
         data: { faculty, roomName },
       });
   

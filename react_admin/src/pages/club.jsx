@@ -20,7 +20,7 @@ const Club = () => {
       const endDate = oneMonthLater.toISOString().split('T')[0];
 
       try {
-        const response = await axios.get(`http://localhost:3000/adminClub/reservationclubs/${faculty}/${startDate}/${endDate}`);
+        const response = await axios.get(`http://3.35.96.145:3000/adminClub/reservationclubs/${faculty}/${startDate}/${endDate}`);
         if (response.data && response.data.reservations) {
           setReservations(response.data.reservations); // Assuming the data is under the reservations key
         }

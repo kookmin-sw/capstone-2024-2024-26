@@ -20,8 +20,8 @@ const Reserve = () => {
             const day = String(selectedDate.getDate()).padStart(2, '0'); // 일을 두 자리 숫자로 변환
             const formattedDate = `${year}-${month}-${day}`; // 날짜 포맷 "YYYY-MM-DD"
 
-            const roomResponse = await axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`);
-            const clubResponse = await axios.get(`http://localhost:3000/adminClub/reservationclubs/${faculty}/${formattedDate}/${formattedDate}`);
+            const roomResponse = await axios.get(`http://3.35.96.145:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`);
+            const clubResponse = await axios.get(`http://3.35.96.145:3000/adminClub/reservationclubs/${faculty}/${formattedDate}/${formattedDate}`);
 
             const roomReservations = (roomResponse.data.confirmReservations || []).map(reservation => ({
                 type: '강의실',

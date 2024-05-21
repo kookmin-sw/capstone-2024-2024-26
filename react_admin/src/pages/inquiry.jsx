@@ -23,7 +23,7 @@ const Inquiry = () => {
       const endDate = oneMonthLater.toISOString().split('T')[0];
 
       try {
-        const response = await axios.get(`http://localhost:3000/adminInquiry/list/${faculty}/${startDate}/${endDate}`);
+        const response = await axios.get(`http://3.35.96.145:3000/adminInquiry/list/${faculty}/${startDate}/${endDate}`);
         if (response.data && response.data.inquiries) {
           setInquiries(response.data.inquiries);
           localStorage.setItem('inquiryCount', response.data.inquiries.length);
@@ -58,7 +58,7 @@ const Inquiry = () => {
   const handleResponseSubmit = async () => {
     const currentTime = getCurrentTimeFormatted();
     try {
-      const response = await axios.post('http://localhost:3000/adminInquiry/', {
+      const response = await axios.post('http://3.35.96.145:3000/adminInquiry/', {
         studentId: currentInquiry.studentId,
         date: currentTime,
         time: currentInquiry.date,

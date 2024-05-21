@@ -14,7 +14,7 @@ const Login = () => {
   const handleLogin = async () => {
 
     try {
-      const response = await axios.post("http://localhost:3000/adminAuth/signin", {
+      const response = await axios.post("http://3.35.96.145:3000/adminAuth/signin", {
         email,
         password,
       });

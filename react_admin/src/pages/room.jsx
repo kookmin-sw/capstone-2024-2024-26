@@ -52,7 +52,7 @@ const handleAddReservation = async (reservationData) => {
   const reservationDataWithFaculty = { ...reservationData, faculty };
 
   try {
-    const response = await axios.post('http://localhost:3000/adminRoom/reserve', reservationDataWithFaculty);
+    const response = await axios.post('http://3.35.96.145:3000/adminRoom/reserve', reservationDataWithFaculty);
     if (response.status === 201) {
       Swal.fire({
         icon: "success",
@@ -95,7 +95,7 @@ const handleAddReservation = async (reservationData) => {
       const endDate = oneMonthLater.toISOString().split('T')[0];
     
       try {
-        const response = await axios.get(`http://localhost:3000/adminRoom/reservations/${faculty}/${startDate}/${endDate}`);
+        const response = await axios.get(`http://3.35.96.145:3000/adminRoom/reservations/${faculty}/${startDate}/${endDate}`);
 
         if (response.data && response.data.confirmReservations) {  // 응답 데이터의 키를 확인하고 조정
           setApprovedReservations(response.data.confirmReservations);  // 변경된 키 사용
@@ -115,7 +115,7 @@ const handleAddReservation = async (reservationData) => {
       const endDate = oneMonthLater.toISOString().split('T')[0];
     
       try {
-        const response = await axios.get(`http://localhost:3000/adminRoom/reservationQueues/${faculty}/${startDate}/${endDate}`);
+        const response = await axios.get(`http://3.35.96.145:3000/adminRoom/reservationQueues/${faculty}/${startDate}/${endDate}`);
 
         if (response.data && response.data.notConfirmReservations) {
           const filteredReservations = response.data.notConfirmReservations.filter(reservation => !reservation.boolAgree);
@@ -147,7 +147,7 @@ const handleAddReservation = async (reservationData) => {
         const start = hour.toString(); // '11:00' 대신 '11'로 표현
         const end = (hour + 1).toString(); // '12:00' 대신 '12'로 표현
 
-        const response = await axios.post('http://localhost:3000/adminRoom/agree', {
+        const response = await axios.post('http://3.35.96.145:3000/adminRoom/agree', {
           studentId: mainStudentId,
           roomName,
           date,
@@ -190,7 +190,7 @@ const handleDeleteReservation = async (reservation) => {
       const start = `${hour}`;
       const end = `${hour + 1}`;
 
-      const response = await axios.delete('http://localhost:3000/adminRoom/delete', {
+      const response = await axios.delete('http://3.35.96.145:3000/adminRoom/delete', {
         data: {
           studentId: mainStudentId,
           roomName,

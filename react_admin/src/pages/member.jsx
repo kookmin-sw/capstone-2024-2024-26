@@ -16,7 +16,7 @@ const Member = () => {
   const fetchMembers = async () => {
     const userEmail = localStorage.getItem('userEmail');  // 로컬 스토리지에서 이메일 가져오기
     try {
-      const response = await axios.get('http://localhost:3000/adminAuth/profile', {
+      const response = await axios.get('http://3.35.96.145:3000/adminAuth/profile', {
         headers: { email: userEmail }  // 이메일을 요청 본문에 포함
       });
       if (response.status === 200) {

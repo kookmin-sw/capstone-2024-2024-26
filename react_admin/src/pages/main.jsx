@@ -23,7 +23,7 @@ const Main = () => {
   useEffect(() => {
     const fetchLoginData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/adminAuth/login-data');
+        const response = await axios.get('http://3.35.96.145:3000/adminAuth/login-data');
         setLoginData(response.data);
 
         // 데이터를 날짜 키로 정렬하고, 가장 최신 데이터의 방문자 수를 업데이트합니다.

@@ -15,7 +15,7 @@ const Traffic = () => {
   const fetchCameras = async () => {
 
     try {
-      const response = await axios.get('http://localhost:3000/adminCamera/get');
+      const response = await axios.get('http://3.35.96.145:3000/adminCamera/get');
 
       if (response.data.cameras) {
         setCameras(response.data.cameras.map((camera, index) => ({
@@ -43,7 +43,7 @@ const Traffic = () => {
         location: newCamera.locationName  // 바디 데이터
       };
 
-      const response = await axios.post('http://localhost:3000/adminCamera/set', {
+      const response = await axios.post('http://3.35.96.145:3000/adminCamera/set', {
         locationName: newCamera.location,
         location: newCamera.locationName,  // 바디 데이터
     },);
@@ -104,7 +104,7 @@ const deleteCamera = async (event) => {
   const locationName = event.target.getAttribute('data-locationName');
 
   try {
-    const response = await axios.delete(`http://localhost:3000/adminCamera/delete/${locationName}`);
+    const response = await axios.delete(`http://3.35.96.145:3000/adminCamera/delete/${locationName}`);
     if (response.status === 200) {
 
       Swal.fire({
