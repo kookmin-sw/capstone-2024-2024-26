@@ -16,12 +16,17 @@ import 'select_reserve.dart';
 import 'congestion.dart';
 import 'select_reserve_cf.dart';
 import 'notice.dart';
+import 'sign_in.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -114,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    await _local.show(1, "예약 알림", "입장 10분 전입니다 시간에 맞춰 입장해주세요.", details);
+    // await _local.show(1, "예약 알림", "입장 10분 전입니다 시간에 맞춰 입장해주세요.", details);
   }
 
   _checkLoginStatus() async {
@@ -124,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token == 'true') {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainPage()),
+          MaterialPageRoute(builder: (context) => const SignIn()),
         );
       });
     } else if (token == 'false') {
@@ -202,6 +207,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   _checkRoomStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
+    print(uid);
+
     setState(() {
       isLoading = true; // 로딩 시작
     });
@@ -222,15 +229,19 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
-          spaceData.add(responseData['share_room_data']);
-
+          spaceData = responseData['share_room_data'];
           isLoading = false; // 로딩 끝
         });
-      } else {}
+      } else {
+        setState(() {
+          isLoading = false; // 로딩 끝
+          String errorMessage = 'Failed to get room data';
+        });
+      }
     } else {
       setState(() {
-        String errorMessage = ''; // Define the variable errorMessage
-        errorMessage = 'no room';
+        isLoading = false; // 로딩 끝
+        String errorMessage = 'Failed to get room data';
       });
     }
   }
@@ -257,20 +268,24 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
-          spaceData2.add(responseData['share_room_data']);
+          spaceData2 = responseData['share_room_data'];
           isLoading = false; // 로딩 끝
         });
-      } else {}
+      } else {
+        setState(() {
+          isLoading = false; // 로딩 끝
+          String errorMessage = 'Failed to get room data';
+        });
+      }
     } else {
       setState(() {
-        String errorMessage = ''; // Define the variable errorMessage
-        errorMessage = 'no room';
+        isLoading = false; // 로딩 끝
+        String errorMessage = 'Failed to get room data';
       });
     }
   }
 
   List<dynamic> spaceData = [];
-
   List<dynamic> spaceData2 = [];
 
   @override
@@ -403,12 +418,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: is_tap
-                      ? (spaceData2.isEmpty ? 0 : spaceData2[0].length)
-                      : (spaceData.isEmpty ? 0 : spaceData[0].length),
+                      ? (spaceData2.isEmpty ? 0 : spaceData2.length)
+                      : (spaceData.isEmpty ? 0 : spaceData.length),
                   itemBuilder: (context, index) {
                     final data = is_tap
-                        ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
-                        : (spaceData.isNotEmpty ? spaceData[0][index] : null);
+                        ? (spaceData2.isNotEmpty ? spaceData2[index] : null)
+                        : (spaceData.isNotEmpty ? spaceData[index] : null);
 
                     List<dynamic> tableList = [];
                     if (data != null && data['tableList'] is String) {
