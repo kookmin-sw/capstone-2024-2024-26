@@ -130,9 +130,7 @@ def classification(image1, image2):
     # 유사도 점수 계산 및 출력
     score = get_similarity_score(image1, image2, vit, resnet, inception, device)
     print(score)
-    #각각의 임계값을 설정 후 셋중 두개 이상인걸로 ㄱㄱ
-    # 동아리방 임계값 0.75, 0.8, 0.7로 설정
-    #강의실 임계값도 사진 가져와서 테스트 후 정해야됨
+    
     count = 0
     if score["vit_score"] > 0.7:
         count+=1

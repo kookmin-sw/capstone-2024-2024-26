@@ -6,8 +6,8 @@ import base64
 from PIL import Image
 import io
 import os
-from count import count
-from image_class import classification
+from ai.count import count
+from ai.image_class import classification
 from waitress import serve
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -163,10 +163,10 @@ def classi():
         image1 = Image.open(io.BytesIO(default_image)).convert('RGB')
     else:
         if location == '미래관 605-5호':
-            path = f'./club_1/{table}.jpg'
+            path = f'./club_2/{table}.jpg'
             image1 = Image.open(path).convert('RGB')
         else:
-            path = './club_2/1.jpg'
+            path = './club_1/1.jpg'
             image1 = Image.open(path).convert('RGB')
         # a= "소프트웨어융합대학_Club"
         # #이게 원래는 테이블 번호 입력받으면 내가 쓴 테이블의 이미지랑 비교하는거

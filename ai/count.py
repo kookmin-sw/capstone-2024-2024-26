@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 import matplotlib.pyplot as plt
-# 아마 이대로 갈듯
 
 class CSRNet(nn.Module):
     def __init__(self):
@@ -38,13 +37,10 @@ def make_layers(cfg, in_channels = 3, batch_norm=False, dilation = False):
     return nn.Sequential(*layers)
 
 
-# 이걸 이제 입력받은 이미지, 강의실 정보 가지고
-#임계값 알아서 지정 후 return 하면됨
 def count(image):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     #info = 카메라 어디껀지(자줏, 무상실등)
     model = CSRNet().to(device)
-    # model_weights = torch.load('./ai/information/model.pt')
     model_weights = torch.load('./model/model.pt', map_location=torch.device('cpu'))
     model.load_state_dict(model_weights)
     model.eval()
@@ -65,7 +61,6 @@ def count(image):
 
     # 결과 출력
     predicted_density_map = output.squeeze(0).squeeze(0)  # 결과 텐서 차원 감소
-    # print(f"density score : {predicted_density_map.sum().item():.2f}")  # 전체 사람 수 추정
 
     total_count = predicted_density_map.sum().item()  # 전체 사람 수 추정
 
