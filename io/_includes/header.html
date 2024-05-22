@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <style>
+      .fa-stack-2x {
+        color: #004f9e;
+      }
+
+      /* Style for rounded corners */
+      header {
+        border-radius: 0 0 7% 7%;
+        overflow: hidden;
+        position: relative;
+        padding-top: 180px;
+        background-image: url("img/전경.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      /* Adjustments for logo */
+      .navbar-brand img {
+        max-height: 50px;
+        width: auto;
+        padding: 10px 15px;
+      }
+
+      /* Positioning and style for iPhone video */
+      .iphonePreview {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .intro-text {
+        position: absolute;
+        right: 3%;
+        top: 50%;
+        transform: translateY(0%);
+        text-align: center;
+        width: 750px;
+        height: 450px;
+        padding: 1px;
+        border-radius: 10px;
+        background-color: transparent;
+        font-family: "Roboto", sans-serif !important; /* Roboto 폰트 적용 */
+      }
+
+      .intro-lead-in {
+        color: black;
+        font-size: 2rem; /* 글씨 크기 조정 */
+        font-style: normal; /* 이탤릭체 제거 */
+      }
+
+      .intro-heading {
+        color: black;
+        font-size: 3rem; /* 글씨 크기 조정 */
+        font-weight: bold; /* 볼드체 추가 */
+      }
+
+      /* Navigation bar hover effect */
+      .navbar-default .navbar-nav > li > a:hover {
+        background-color: rgba(0, 79, 158, 0.8); /* 마우스 호버시 배경색 변화 */
+        color: white;
+      }
+
+      /* Navbar background */
+      .navbar-default {
+        background-color: rgba(255, 255, 255); /* 약간 투명한 흰색 배경 */
+      }
+
+      /* Active link color */
+      .navbar-default .navbar-nav > li > a.active {
+        background-color: #004f9e;
+        color: white !important;
+      }
+
+      /* Media Queries */
+      @media (max-width: 1200px) {
+        .intro-text {
+          width: 600px;
+          height: 300px;
+        }
+        .intro-heading {
+          font-size: 2.2rem;
+        }
+        .intro-lead-in {
+          font-size: 1.2rem;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .intro-text {
+          width: 400px;
+          height: 200px;
+        }
+        .intro-heading {
+          font-size: 1.8rem;
+        }
+        .intro-lead-in {
+          font-size: 0.8rem;
+        }
+        .iphonePreview img {
+          height: 400px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .intro-text {
+          position: static;
+          width: 100%;
+          height: auto;
+          text-align: center;
+          transform: none;
+          margin-top: 20px;
+        }
+        .intro-heading {
+          font-size: 1.2rem;
+        }
+        .intro-lead-in {
+          font-size: 0.2rem;
+        }
+        .iphonePreview img {
+          height: 300px;
+          margin: 0 auto;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .intro-text {
+          width: 100%;
+          height: auto;
+          padding: 10px;
+        }
+        .intro-heading {
+          font-size: 1.1rem;
+        }
+        .intro-lead-in {
+          font-size: 0.1rem;
+        }
+        .iphonePreview img {
+          height: 300px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navigation with Image Logo -->
+    <nav
+      class="navbar navbar-default navbar-fixed-top"
+      style="background-size: cover; background-position: center"
+    >
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+          <!-- Image Logo with adjusted size -->
+          <a class="navbar-brand page-scroll" href="#page-top">
+            <img
+              src="{{ 'img/Group 40.svg' | relative_url }}"
+              alt="K-Shareplace Logo"
+              style="margin-top: -8px"
+            />
+          </a>
+          <!-- End Image Logo -->
+
+          <!-- Toggle Button for Mobile -->
+          <button
+            type="button"
+            class="navbar-toggle"
+            data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1"
+          >
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!-- End Toggle Button for Mobile -->
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="hidden">
+              <a href="#page-top"></a>
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#services"
+                style="color: black; font-weight: bold"
+                >Services</a
+              >
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#about"
+                style="color: black; font-weight: bold"
+                >About</a
+              >
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#modals"
+                style="color: black; font-weight: bold"
+                >Stack</a
+              >
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#js"
+                style="color: black; font-weight: bold"
+                >SA</a
+              >
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#footer"
+                style="color: black; font-weight: bold"
+                >Video</a
+              >
+            </li>
+            <li>
+              <a
+                class="page-scroll"
+                href="#team"
+                style="color: black; font-weight: bold"
+                >Team</a
+              >
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+    <!-- End Navigation with Image Logo -->
+    <header>
+      <div class="container">
+        <!-- 아이폰 프레임 이미지 추가 -->
+        <div style="display: flex; align-items: center">
+          <div class="iphonePreview">
+            <img
+              src="img/아이폰 메인화면.png"
+              alt="iPhone Frame"
+              style="width: auto; height: 650px; margin-left: 20px"
+            />
+          </div>
+          <!-- Text on the right -->
+          <div
+            class="intro-text"
+            style="
+              background-color: rgba(255, 255, 255);
+              border-radius: 35px;
+              top: 34%;
+            "
+          >
+            <div
+              class="intro-heading"
+              style="
+                font-size: 3rem;
+                color: #004f9e;
+                float: left;
+                margin-left: 50px;
+              "
+            >
+              <br /><img
+                src="{{ 'img/Group 38.svg' | relative_url }}"
+                alt="K-Shareplace Logo"
+                style="
+                  float: left;
+                  width: 350px;
+                  height: auto;
+                  margin-left: 5px;
+                "
+              /></div><div
+              class="intro-heading"
+              style="
+                font-size: 2.8rem;
+                color: #004f9e;
+                float: left;
+                text-align: center;
+                margin-left: 50px;
+              "
+            >캠퍼스 공간 최적화를 위한 스마트 예약
+              플랫폼<br />
+            </div>
+            <div
+              class="text-muted"
+              style="font-size: 2.2rem; font-weight: bold; color:black; text-align: left; margin-left: 50px; font-style: italic;"
+            >
+            <br /><br /><br /><br /><br /><br />"더욱 간편해진
+              사용자 경험과 공간을 스마트하게 활용하는 새로운 길"</div><div class="text-muted"
+              style="font-size: 2rem; color:black; text-align: left; margin-left: 50px;"><br />
+              학교의 공간 이용 현황을 확인할 수 있는
+              편리한 앱을 통해,<br/>언제 어디서든 학교의 다양한 공간을
+              최대한 활용할 수 있습니다.<br />
+              이렇게 학교의 다양한 시설을 최대한 활용하여 더욱 쾌적한<br/>학교
+              생활을 즐겨보세요.<br />
+            </div></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Smooth scrolling script -->
+    <script>
+      $(document).ready(function () {
+        // Add smooth scrolling to all links
+        $("a.page-scroll").on("click", function (event) {
+          // Make sure this.hash has a value before overriding default behavior
+          if (this.hash !== "") {
+            // Prevent default anchor click behavior
+            event.preventDefault();
+            // Store hash
+            var hash = this.hash;
+            // Using jQuery's animate() method to add smooth page scroll
+            // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+            $("html, body").animate(
+              {
+                scrollTop: $(hash).offset().top,
+              },
+              800,
+              function () {
+                // Add hash (#) to URL when done scrolling (default click behavior)
+                window.location.hash = hash;
+              }
+            );
+          } // End if
+        });
+
+        // Change navbar color on scroll
+        $(window).on("scroll", function () {
+          var scrollPos = $(document).scrollTop();
+          $(".navbar-nav a").each(function () {
+            var currLink = $(this);
+            var refElement = $(currLink.attr("href"));
+            if (
+              refElement.position().top <= scrollPos &&
+              refElement.position().top + refElement.height() > scrollPos
+            ) {
+              $(".navbar-nav li a").removeClass("active");
+              currLink.addClass("active");
+            } else {
+              currLink.removeClass("active");
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
