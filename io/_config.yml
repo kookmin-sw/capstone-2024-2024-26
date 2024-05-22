@@ -6,3 +6,6 @@ github: [metadata]
 # Build settings
 markdown: kramdown
 permalink: pretty
+
+future: true
+published: true
