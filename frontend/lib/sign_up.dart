@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/signup_sucess.dart';
 import 'package:http/http.dart' as http;
 import 'sign_in.dart';
@@ -28,20 +29,21 @@ class _SignUpState extends State<SignUp> {
 
   String errorMessage = '';
 
-  final List<String> _clubs = [
-    'Wink',
-    'D-Alpha',
-    'KoBot',
-    'Poska',
-  ];
   final List<String> _faculties = [
-    '소프트웨어 융합 대학',
-    '창의 공과 대학',
-    '조형 대학',
-    '경상 대학',
+    '소프트웨어융합대학',
+    '창의공과대학',
+    '조형대학',
+    '경상대학',
+    '법학대학',
+    '사회과학대학',
+    '자동차융합대학',
+    '예술대학',
+    '글로벌인문지역대학',
+    '과학기술대학',
+    '경영대학',
+    '체육대학'
   ];
 
-  String? _selectedClub;
   String? _selectedFaculty;
 
   @override
@@ -124,7 +126,7 @@ class _SignUpState extends State<SignUp> {
               buildInputField('학번을 입력하세요', controller: studentIdController),
               const SizedBox(height: 10),
               const Padding(
-                padding: EdgeInsets.only(right: 195),
+                padding: EdgeInsets.only(right: 200),
                 child: Text(
                   '단과대학',
                   style: TextStyle(
@@ -156,7 +158,7 @@ class _SignUpState extends State<SignUp> {
               buildInputField('학과를 입력하세요', controller: departmentController),
               const SizedBox(height: 10),
               const Padding(
-                padding: EdgeInsets.only(right: 180),
+                padding: EdgeInsets.only(right: 190),
                 child: Text(
                   '소속 동아리',
                   style: TextStyle(
@@ -169,10 +171,10 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
               const SizedBox(height: 10),
-              buildDropdownField('소속 동아리', _clubs, _selectedClub),
+              buildInputField('소속 동아리', controller: clubController),
               const SizedBox(height: 10),
               const Padding(
-                padding: EdgeInsets.only(right: 170),
+                padding: EdgeInsets.only(right: 173),
                 child: Text(
                   '이메일(아이디)',
                   style: TextStyle(
@@ -239,11 +241,14 @@ class _SignUpState extends State<SignUp> {
               buildInputField('휴대폰 번호를 입력하세요', controller: phoneController),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
+                padding:
+                    const EdgeInsets.only(left: 35.0), // Row 위쪽에 10 픽셀의 여백 추가
                 child: Row(
                   children: [
                     Checkbox(
                       value: isChecked,
+                      checkColor: Colors.white,
+                      activeColor: const Color(0xFF004F9E),
                       onChanged: (value) {
                         setState(() {
                           isChecked = value!;
@@ -342,16 +347,17 @@ class _SignUpState extends State<SignUp> {
         style: const TextStyle(
           fontSize: 12,
           fontFamily: 'Inter',
+          height: 1.7,
         ),
         decoration: InputDecoration(
           hintText: labelText,
-          hintStyle: const TextStyle(color: Color(0xFF9C9C9C)),
+          hintStyle: const TextStyle(color: Color(0xFFb8b8b8)),
           focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF9C9C9C)),
+            borderSide: BorderSide(color: Color(0x4FECECEC)),
           ),
           border: InputBorder.none,
           filled: true,
-          fillColor: const Color.fromARGB(255, 246, 246, 246),
+          fillColor: Color(0x4FECECEC),
         ),
       ),
     );
@@ -368,24 +374,25 @@ class _SignUpState extends State<SignUp> {
           hintStyle: const TextStyle(
             color: Color(0xFF9C9C9C),
             fontSize: 13,
+            height: 1.9,
           ),
           filled: true,
-          fillColor: const Color.fromARGB(255, 246, 246, 246),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          fillColor: const Color(0x4FECECEC),
           border: InputBorder.none,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(2.0),
-            borderSide: const BorderSide(color: Colors.transparent),
+            borderSide: const BorderSide(
+              color: Color(0x4FECECEC),
+            ),
           ),
+          isDense: true,
+          alignLabelWithHint: true,
         ),
         value: value,
         onChanged: (newValue) {
           setState(() {
-            if (labelText == '소속 동아리') {
-              _selectedClub = newValue;
-            } else if (labelText == '단과대학') {
-              _selectedFaculty = newValue;
+            if (labelText == '단과대학') {
+              facultyController.text = newValue!;
             }
           });
         },
@@ -438,7 +445,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> registerUser() async {
-    const url = 'http://localhost:3000/auth/signup';
+    const url = 'http://3.35.96.145:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
@@ -460,7 +467,6 @@ class _SignUpState extends State<SignUp> {
       final responseData = json.decode(response.body);
 
       if (responseData['message'] == 'User created successfully') {
-        print('회원가입 성공'); // echo check
         // 회원가입 성공 시 회원가입 완료 화면으로 이동
         Navigator.push(
           context,

@@ -5,6 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_button/sign_in_button.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -42,9 +46,7 @@ class _SignInState extends State<SignIn> {
                     height: 0.06,
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 50),
                 const Padding(
                   padding: EdgeInsets.only(right: 220),
                   child: Text(
@@ -58,9 +60,7 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Container(
                   child: buildInputField(
                     '아이디를 입력하세요',
@@ -137,6 +137,37 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Container(
+                  width: 265.75,
+                  height: 39.46,
+                  child: SignInButton(
+                    Buttons.google,
+                    text: "      Google로 로그인",
+                    onPressed: () async {
+                      try {
+                        UserCredential userCredential =
+                            await signInWithGoogle(context);
+                        if (userCredential.user != null) {
+                          String uid = userCredential.user!.uid;
+                          await saveTokenToSharedPreferences(isChecked, uid);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MainPage(),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setState(() {
+                          isLoading = false;
+                          errorMessage = 'Google 로그인 실패: $e';
+                        });
+                      }
+                    },
+                  ),
+                ),
                 const Divider(
                   color: Colors.grey,
                   thickness: 0.5,
@@ -149,9 +180,7 @@ class _SignInState extends State<SignIn> {
                   children: [
                     const Text("회원이 아니신가요?",
                         style: TextStyle(color: Color(0xFF7A7A7A))),
-                    const SizedBox(
-                      width: 4,
-                    ),
+                    const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -185,18 +214,46 @@ class _SignInState extends State<SignIn> {
     // 자동로그인 체크되어있으면 토큰 발급
   }
 
+  Future<UserCredential> signInWithGoogle(BuildContext context) async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        // User cancelled the sign-in
+        throw Exception("Google sign-in was cancelled");
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print("Google sign-in failed: $e");
+      rethrow; // Rethrow the exception to be handled in the caller
+    }
+  }
+
   Future<void> loginUser(BuildContext context) async {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
     });
 
-    const url = 'http://localhost:3000/auth/signin';
+    const url = 'http://3.35.96.145:3000/auth/signin';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
+      'fcmToken': 'fcmToken',
     };
 
-    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -207,7 +264,6 @@ class _SignInState extends State<SignIn> {
       isLoading = false; // 요청 완료 시 로딩 숨김
     });
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'Signin successful') {

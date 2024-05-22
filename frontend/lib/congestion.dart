@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'dart:io';
 import 'settings.dart';
 import 'main.dart';
@@ -12,6 +11,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'myPage.dart';
+import 'notice.dart';
 
 enum MenuType { first, second, third }
 
@@ -23,33 +23,14 @@ class Congestion extends StatefulWidget {
 }
 
 class _CongestionState extends State<Congestion> {
-  List<Map<String, String>> congestionData = [
-    {
-      'location': 'Study Rounge',
-      'location_detail': '미래관 4층',
-      'congestion': '매우 혼잡',
-      'color': '0XFFD30000'
-    },
-    {
-      'location': '자율주행스튜디오',
-      'location_detail': '미래관 4층',
-      'congestion': '보통',
-      'color': '0XFF00A61B'
-    },
-    {
-      'location': '무한상상실',
-      'location_detail': '미래관 4층',
-      'congestion': '여유',
-      'color': '0XFF0081B9'
-    },
-    {
-      'location': '블루파빌리온',
-      'location_detail': '북악관 1층',
-      'congestion': '혼잡',
-      'color': '0XFFEF7300'
-    },
-    // 다른 위치 데이터도 추가할 수 있음 서버에서 받아와야함
-  ];
+  List<Map<String, String>> congestionData = [];
+
+  final Map<String, int> congestionWeights = {
+    '매우 혼잡': 4,
+    '혼잡': 3,
+    '보통': 2,
+    '여유': 1
+  };
 
   final _values = [
     '전체',
@@ -67,6 +48,7 @@ class _CongestionState extends State<Congestion> {
 
   String _selectedValue = '';
   String _selectedSortValue = '';
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +56,51 @@ class _CongestionState extends State<Congestion> {
       _selectedValue = _values[0];
       _selectedSortValue = _sortValues[0];
     });
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    const url = 'http://3.39.102.188:5000/api/info';
+    try {
+      final response = await http.post(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          Map<String, dynamic> responseData = jsonDecode(response.body);
+          List<dynamic> dataList = responseData.values.toList();
+          congestionData = dataList.map((item) {
+            return {
+              'color': item['color'] as String,
+              'congestion': item['congestion'] as String,
+              'location': item['location'] as String,
+              'location_detail': item['location_detail'] as String,
+            };
+          }).toList();
+        });
+      } else {
+        print('Failed to load congestion data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  List<Map<String, dynamic>> get filteredAndSortedData {
+    List<Map<String, String>> filteredData = congestionData
+        .where((data) =>
+            _selectedValue == '전체' ||
+            data['location_detail']!.contains(_selectedValue))
+        .toList();
+
+    List<Map<String, dynamic>> sorted = List.from(filteredData);
+    sorted.sort((a, b) {
+      return _selectedSortValue == '혼잡도 높은 순'
+          ? congestionWeights[b['congestion']]!
+              .compareTo(congestionWeights[a['congestion']]!)
+          : congestionWeights[a['congestion']]!
+              .compareTo(congestionWeights[b['congestion']]!);
+    });
+    return sorted;
   }
 
   @override
@@ -93,19 +120,20 @@ class _CongestionState extends State<Congestion> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset('assets/icons/notice_none.svg'))
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyNotice()),
+              );
+            },
+            icon: SvgPicture.asset('assets/icons/notice_none.svg'),
+          ),
         ],
-        backgroundColor: Colors.transparent, // 상단바 배경색
-        foregroundColor: Colors.black, //상단바 아이콘색
-
-        //shadowColor: Colors(), 상단바 그림자색
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         bottomOpacity: 0.0,
         elevation: 0.0,
         scrolledUnderElevation: 0,
-
-        ///
-        // 그림자 없애는거 위에꺼랑 같이 쓰면 됨
         shape: const Border(
           bottom: BorderSide(
             color: Colors.grey,
@@ -149,14 +177,13 @@ class _CongestionState extends State<Congestion> {
                 Container(
                   width: 83,
                   child: ButtonTheme(
-                    alignedDropdown:
-                        true, // DropdownButton의 너비를 ButtonTheme에 맞게 조정합니다.
+                    alignedDropdown: true,
                     child: DropdownButton(
                       isExpanded: true,
                       value: _selectedValue,
                       items: _values
                           .map((e) => DropdownMenuItem(
-                                value: e, // 선택 시 onChanged 를 통해 반환할 value
+                                value: e,
                                 child: Text(e,
                                     style: const TextStyle(
                                       color: Colors.black,
@@ -166,7 +193,6 @@ class _CongestionState extends State<Congestion> {
                               ))
                           .toList(),
                       onChanged: (value) {
-                        // items 의 DropdownMenuItem 의 value 반환
                         setState(() {
                           _selectedValue = value!;
                         });
@@ -180,14 +206,13 @@ class _CongestionState extends State<Congestion> {
                 Container(
                   width: 120,
                   child: ButtonTheme(
-                    alignedDropdown:
-                        true, // DropdownButton의 너비를 ButtonTheme에 맞게 조정합니다.
+                    alignedDropdown: true,
                     child: DropdownButton(
                       isExpanded: true,
                       value: _selectedSortValue,
                       items: _sortValues
                           .map((e) => DropdownMenuItem(
-                                value: e, // 선택 시 onChanged 를 통해 반환할 value
+                                value: e,
                                 child: Text(e,
                                     style: const TextStyle(
                                       color: Colors.black,
@@ -197,7 +222,6 @@ class _CongestionState extends State<Congestion> {
                               ))
                           .toList(),
                       onChanged: (value) {
-                        // items 의 DropdownMenuItem 의 value 반환
                         setState(() {
                           _selectedSortValue = value!;
                         });
@@ -209,15 +233,13 @@ class _CongestionState extends State<Congestion> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: congestionData.length,
+              itemCount: filteredAndSortedData.length,
               itemBuilder: (context, index) {
-                print(index); // Add this line to print the index to the console
-                final data = congestionData[index];
-                print(data);
+                final data = filteredAndSortedData[index];
+
                 return Column(
                   children: [
-                    SizedBox(height: 10), // Add spacing here
-
+                    SizedBox(height: 10),
                     _CustomScrollViewWidget(
                       location: data['location']!,
                       location_detail: data['location_detail']!,
@@ -234,8 +256,7 @@ class _CongestionState extends State<Congestion> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-
-        currentIndex: 1, // Adjust the index according to your need
+        currentIndex: 1,
         onTap: (index) {
           switch (index) {
             case 0:
@@ -244,7 +265,6 @@ class _CongestionState extends State<Congestion> {
                 MaterialPageRoute(builder: (context) => const MainPage()),
               );
               break;
-
             case 1:
               break;
             case 2:
@@ -252,6 +272,7 @@ class _CongestionState extends State<Congestion> {
                 context,
                 MaterialPageRoute(builder: (context) => const Details()),
               );
+              break;
             case 3:
               Navigator.push(
                 context,
@@ -279,7 +300,6 @@ class _CongestionState extends State<Congestion> {
         ],
         selectedLabelStyle:
             const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-
         selectedItemColor: const Color.fromARGB(255, 158, 136, 136),
         unselectedLabelStyle:
             const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
@@ -288,11 +308,9 @@ class _CongestionState extends State<Congestion> {
     );
   }
 
-  // 버튼을 생성하는 함수
   Widget _buildButton(String label, VoidCallback onPressed) {
     return Container(
-      // 버튼을 Container로 감싸서 margin 설정
-      margin: const EdgeInsets.only(left: 20), // 왼쪽에만 margin 설정
+      margin: const EdgeInsets.only(left: 20),
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
@@ -308,13 +326,12 @@ class _CongestionState extends State<Congestion> {
     );
   }
 
-  // Divider를 생성하는 함수
   Widget _buildDivider() {
     return const Divider(
-      thickness: 1, // 실선의 두께를 지정
-      color: Colors.grey, // 실선의 색상을 지정
-      indent: 20, // 시작점에서의 들여쓰기
-      endIndent: 20, // 끝점에서의 들여쓰기
+      thickness: 1,
+      color: Colors.grey,
+      indent: 20,
+      endIndent: 20,
     );
   }
 }
@@ -382,7 +399,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              Spacer(), // 추가된 부분
+              Spacer(),
               Container(
                 alignment: Alignment.center,
                 width: 67,

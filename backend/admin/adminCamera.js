@@ -6,7 +6,9 @@ import {
   getDocs,
   getDoc,
   query,
-  collection
+
+  collection,
+
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -41,7 +43,9 @@ adminCamera.get("/get", async (req, res) => {
     cameraDocs.forEach((doc) => {
       // cameras.push(doc.data());
       const cameraData = doc.data();
+
       cameraData.locationName = doc.id; // 데이터 객체에 id 속성 추가
+
 
       cameras.push(cameraData);
     });
@@ -63,7 +67,9 @@ adminCamera.post("/set", async (req, res) => {
     await setDoc(doc(db, "Camera", `${locationName}`), {
       location: location,
       info: "",
-      state: ""
+
+      state: "",
+
     });
 
     res.status(200).json({ message: "Setting camera successfully" });
@@ -71,6 +77,7 @@ adminCamera.post("/set", async (req, res) => {
     res.status(400).json({ error: "Failed to setting camera location" });
   }
 });
+
 
 
 adminCamera.delete("/delete/:locationName", async (req, res) => {
@@ -102,3 +109,4 @@ adminCamera.patch("/update/:locationName", async (req, res) => {
 
 
 export default adminCamera;
+

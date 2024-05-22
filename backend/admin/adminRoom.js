@@ -139,7 +139,9 @@ adminRoom.post("/agree", async (req, res) => {
   const { studentId, roomName, date, startTime, endTime } = req.body;
   try {
     // 사용자 정보 가져오기
+
     const user = query(collection(db, "users"), where("studentId", "==", studentId));
+
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -349,7 +351,6 @@ adminRoom.get(
               const reservationData = docSnapshot.data();
               if (reservationData) {
 
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -363,6 +364,9 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+
+                  status: reservationData.status,
+
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
                 });
@@ -391,7 +395,9 @@ adminRoom.delete("/delete", async (req, res) => {
 
   try {
     // 사용자 정보 가져오기
+
     const user = query(collection(db, "users"), where("studentId", "==", studentId));
+
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -504,5 +510,6 @@ adminRoom.post("/reserve", async (req, res) => {
       .json({ error: "Failed to administrator reserve conference room" });
   }
 });
+
 
 export default adminRoom;

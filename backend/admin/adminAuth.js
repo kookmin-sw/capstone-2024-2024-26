@@ -194,7 +194,9 @@ adminAuth.post("/profile/update/:uid", isAdmin, async (req, res) => {
     if (faculty) updateFields.faculty = faculty;
     if (department) updateFields.department = department;
     if (club) updateFields.club = club;
+
     if (phone) updateFields.phone = phone;
+
     if (agreeForm) updateFields.agreeForm = agreeForm;
 
     // 사용자 문서를 업데이트

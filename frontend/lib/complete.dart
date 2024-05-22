@@ -1,25 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// 필요시 main.dart 파일을 import합니다.
-import 'loading.dart'; // 로딩 화면을 표시하는 데 사용할 LoadingScreen 위젯을 import합니다.
-// 예약 페이지를 보여주는 데 사용할 Select_reserve 위젯을 import합니다.
+import 'package:frontend/main.dart';
+
+import 'loading.dart';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'myPage.dart';
 import 'reservation_details.dart';
+import 'congestion.dart';
 
 class Complete extends StatefulWidget {
-  const Complete({super.key});
+  final DateTime selectedDate;
+  final int startTime;
+  final int endTime;
+  final String roomName;
+  final String table_number;
+
+  const Complete(
+      {Key? key,
+      required this.selectedDate,
+      required this.startTime,
+      required this.endTime,
+      required this.roomName,
+      required this.table_number})
+      : super(key: key);
 
   @override
-  _Complete createState() => _Complete();
+  _Complete createState() => _Complete(
+        selectedDate: selectedDate,
+        startTime: startTime,
+        endTime: endTime,
+        roomName: roomName,
+        table_number: table_number,
+      );
 }
 
 class _Complete extends State<Complete> {
   final PageController _pageController = PageController();
   final ExpansionTileController controller = ExpansionTileController();
   final int _currentIndex = 0;
-
+  bool roomtype = false;
+  final DateTime selectedDate;
+  final int startTime;
+  final int endTime;
+  final String roomName;
+  final String table_number;
   bool isLoading = false; // 추가: 로딩 상태를 나타내는 변수
+
+  _Complete({
+    required this.selectedDate,
+    required this.startTime,
+    required this.endTime,
+    required this.roomName,
+    required this.table_number,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +71,7 @@ class _Complete extends State<Complete> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          leading: IconButton(
-            icon:
-                SvgPicture.asset('assets/icons/back.svg', color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+          leading: Container(),
           centerTitle: true,
           actions: [
             IconButton(
@@ -88,8 +116,8 @@ class _Complete extends State<Complete> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 35),
-                      const Text(
-                        '[ 미래관 610호 ]',
+                      Text(
+                        '[${roomName}]',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -100,8 +128,8 @@ class _Complete extends State<Complete> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        '2024.3.19(화)',
+                      Text(
+                        '${selectedDate.year}.${selectedDate.month}.${selectedDate.day}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF004F9E),
@@ -112,8 +140,8 @@ class _Complete extends State<Complete> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        '오후 12:00 ~ 3:00  | 8인 | 좌석 2',
+                      Text(
+                        ' ${startTime}:00 ~ ${endTime}:00  | 좌석 T${table_number}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -141,7 +169,7 @@ class _Complete extends State<Complete> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const Details()),
+                            MaterialPageRoute(builder: (context) => Details()),
                           );
                         },
                         child: const Text(
@@ -166,19 +194,31 @@ class _Complete extends State<Complete> {
         ),
         // 하단 바
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+
           currentIndex: 0, // Adjust the index according to your need
           onTap: (index) {
             switch (index) {
               case 0:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainPage()),
+                );
                 break;
 
               case 1:
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Details()),
+                  MaterialPageRoute(builder: (context) => const Congestion()),
                 );
                 break;
               case 2:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Details()),
+                );
+                break;
+              case 3:
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MyPage()),
@@ -192,6 +232,10 @@ class _Complete extends State<Complete> {
               label: '공간대여',
             ),
             BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/congestion_off.svg'),
+              label: '혼잡도',
+            ),
+            BottomNavigationBarItem(
               icon: SvgPicture.asset('assets/icons/reserved.svg'),
               label: '예약내역',
             ),
@@ -202,7 +246,6 @@ class _Complete extends State<Complete> {
           ],
           selectedLabelStyle:
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-
           selectedItemColor: Colors.black,
           unselectedLabelStyle:
               const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
