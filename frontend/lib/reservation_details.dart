@@ -444,6 +444,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                                 getKeyWithTrueValue(reservation['tableData']),
                                 index,
                                 boolAgree,
+                                is_tap,
                                 reservation),
                           ],
                         );
@@ -507,6 +508,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                           done_reservation['startTime'],
                           done_reservation['endTime'],
                           getKeyWithTrueValue(done_reservation['tableData']),
+                          is_tap,
                         ),
                       ],
                     );
@@ -589,6 +591,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     String table_number,
     int index,
     bool? boolAgree,
+    bool is_tap,
     Map<String, dynamic> reservation, // 예약 데이터를 직접 전달
   ) {
     bool isLent = isLentMap[index] ?? false;
@@ -616,8 +619,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(width: 100),
-                const Text(
-                  '강의실',
+                Text(
+                  is_tap ? '강의실' : '공유공간',
                   style: TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
@@ -786,7 +789,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
   }
 
   Widget _buildUsageHistoryItem(String roomName, String date, String startTime,
-      String endTime, String table_number) {
+      String endTime, String table_number, bool is_tap) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -809,8 +812,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(width: 100),
-                const Text(
-                  '공유공간',
+                Text(
+                  is_tap ? '강의실' : '공유공간',
                   style: TextStyle(
                     color: Color(0XFF484848),
                     fontSize: 12,
