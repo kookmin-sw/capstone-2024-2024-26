@@ -17,7 +17,6 @@ import inquiry from "./routes/inquiry.js";
 import adminInquiry from "./admin/adminInquiry.js";
 // import notify from "./routes/notify.js";
 
-const cors = require('cors');
 
 
 
