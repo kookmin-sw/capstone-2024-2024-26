@@ -25,7 +25,7 @@
 
 
 ## 2. 시연 영상
-      [YouTube Video](https://youtu.be/yvX1-mZZx_o)
+     [![Video Label](http://img.youtube.com/vi/yvX1-mZZx_o/0.jpg)](https://youtu.be/yvX1-mZZx_o)
 
 
 
