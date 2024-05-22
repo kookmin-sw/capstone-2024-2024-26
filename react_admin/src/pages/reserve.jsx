@@ -1,29 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import React, { useState } from 'react';
+import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import Calendar from 'react-calendar';
+import Modal from 'react-modal';
 import 'react-calendar/dist/Calendar.css';
 import '../styles/reserve.css';
 
 const Reserve = () => {
     const [date, setDate] = useState(new Date());
     const [reservations, setReservations] = useState([]);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const db = firebase.firestore();
-            const formattedDate = date.toISOString().split('T')[0]; // 날짜 포맷 "YYYY-MM-DD"
-            const querySnapshot = await db.collection('reservationClub')
-                .where('date', '==', formattedDate + " 00:00:00.000Z")
-                .get();
-            const fetchedReservations = querySnapshot.docs.map(doc => doc.data());
-            setReservations(fetchedReservations);
-        };
-        fetchData();
-    }, [date]);
+    const fetchReservations = async (selectedDate) => {
+        try {
+            const faculty = localStorage.getItem('faculty');
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // 월을 두 자리 숫자로 변환
+            const day = String(selectedDate.getDate()).padStart(2, '0'); // 일을 두 자리 숫자로 변환
+            const formattedDate = `${year}-${month}-${day}`; // 날짜 포맷 "YYYY-MM-DD"
+
+            const roomResponse = await axios.get(`http://3.35.96.145:3000/adminRoom/reservations/${faculty}/${formattedDate}/${formattedDate}`);
+            const clubResponse = await axios.get(`http://3.35.96.145:3000/adminClub/reservationclubs/${faculty}/${formattedDate}/${formattedDate}`);
+
+            const roomReservations = (roomResponse.data.confirmReservations || []).map(reservation => ({
+                type: '강의실',
+                roomName: reservation.roomName,
+                startTime: reservation.startTime,
+                endTime: reservation.endTime,
+                mainName: reservation.mainName,
+                mainEmail: reservation.mainEmail
+            }));
+
+            const clubReservations = (clubResponse.data.reservations || []).map(reservation => ({
+                type: '공유공간',
+                roomName: reservation.roomName,
+                startTime: reservation.startTime,
+                endTime: reservation.endTime,
+                mainName: reservation.tableData.name,
+                mainEmail: reservation.tableData.studentId
+            }));
+
+            setReservations([...roomReservations, ...clubReservations]);
+
+        } catch (error) {
+
+        }
+    };
+
+    const handleDateChange = (selectedDate) => {
+        setDate(selectedDate);
+        fetchReservations(selectedDate);
+        setModalIsOpen(true);
+    };
 
     const formatDate = (date) => {
         const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -31,7 +60,7 @@ const Reserve = () => {
         return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${dayOfWeek})`;
     };
 
-     return (
+    return (
         <div className="main-container">
             <Banner />
             <div className="sidebar-and-content">
@@ -39,35 +68,45 @@ const Reserve = () => {
                 <div className="main-content">
                     <div className='calendar_box'>
                         <Calendar
-                            onChange={setDate}
+                            onChange={handleDateChange}
                             value={date}
                         />
                     </div>
-                    <div className='calendar_show'>
-                        <h2>예약 내역: {formatDate(date)}</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th className='reserve-room'>예약공간</th>
-                                    <th className='reserve-time'>예약시간</th>
-                                    <th className='reserve-name'>이름</th>
-                                    <th className='reserve-email'>이메일</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {reservations.map((reservation, index) => (
-                                    <tr key={index}>
-                                        <td>{reservation.roomId}</td>
-                                        <td>{`${reservation.startTime} - ${reservation.endTime}`}</td>
-                                        <td>{reservation.userName}</td>
-                                        <td>{reservation.userEmail}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => setModalIsOpen(false)}
+                contentLabel="Reservation Details"
+                overlayClassName="react-modal-overlay"
+                className="react-modal-content"
+                ariaHideApp={false}
+            >
+                <h2>예약 내역: {formatDate(date)}</h2>
+                <button className="react-modal-close" onClick={() => setModalIsOpen(false)}>닫기</button>
+                <table className='calendar_table'>
+                    <thead>
+                        <tr>
+                            <th className='reserve-type'>구분</th>
+                            <th className='reserve-room'>예약공간</th>
+                            <th className='reserve-time'>예약시간</th>
+                            <th className='reserve-name'>이름</th>
+                            <th className='reserve-email'>Mail/Id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {reservations.map((reservation, index) => (
+                            <tr key={index}>
+                                <td>{reservation.type}</td>
+                                <td>{reservation.roomName}</td>
+                                <td>{`${reservation.startTime} - ${reservation.endTime}`}</td>
+                                <td>{reservation.mainName}</td>
+                                <td>{reservation.mainEmail}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Modal>
         </div>
     );
 };

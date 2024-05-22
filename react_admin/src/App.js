@@ -10,6 +10,8 @@ import Notification from './pages/notification.jsx';
 import Member from './pages/member.jsx';
 import Reserve from './pages/reserve.jsx';
 import Traffic from './pages/traffic.jsx';
+import Club from './pages/club.jsx';
+import Room from './pages/room.jsx';
 
 
 function App() {
@@ -34,6 +36,8 @@ function App() {
         <Route path='/notification' element={<Notification sidebar={<Sidebar />} banner={<Banner />} />} />
         <Route path='/reserve' element={<Reserve sidebar={<Sidebar />} banner={<Banner />} />} />
         <Route path='/traffic' element={<Traffic sidebar={<Sidebar />} banner={<Banner />} />} />
+        <Route path='/club' element={<Club sidebar={<Sidebar />} banner={<Banner />} />} />
+        <Route path='/room' element={<Room sidebar={<Sidebar />} banner={<Banner />} />} />
       </Routes>
     </div>
   );

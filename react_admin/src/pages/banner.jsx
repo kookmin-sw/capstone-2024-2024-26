@@ -13,7 +13,7 @@ function Banner() {
       await authService.signOut(); // Firebase의 signOut 메서드를 사용하여 로그아웃
       navigate('/'); // 로그아웃 후 login 페이지로 이동
     } catch (error) {
-      console.error('로그아웃 에러:', error);
+      
     }
   };
 

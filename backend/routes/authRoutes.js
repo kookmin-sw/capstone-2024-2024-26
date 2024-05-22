@@ -105,7 +105,9 @@ router.post("/signin", async (req, res) => {
     );
     const user = userCredential.user;
 
+
     await updateDoc(doc(db, "users", user.uid), { fcmToken: fcmToken });
+
 
     // 로그인 성공 시 사용자 정보 반환
     res.status(200).json({
@@ -120,6 +122,24 @@ router.post("/signin", async (req, res) => {
     res.status(401).json({ error: "Signin failed" });
   }
 });
+
+async function updateLoginCount(date) {
+  const docRef = doc(db, "login", "count");
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    await updateDoc(docRef, {
+      [date]: docSnap.data()[date] ? docSnap.data()[date] + 1 : 1
+    });
+  } else {
+
+    await setDoc(docRef, {
+      [date]: 1
+    });
+  }
+}
+
+
 
 // 로그아웃
 router.post("/logout", async (req, res) => {

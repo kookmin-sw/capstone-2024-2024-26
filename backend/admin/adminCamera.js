@@ -6,7 +6,9 @@ import {
   getDocs,
   getDoc,
   query,
+
   collection,
+
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -41,7 +43,9 @@ adminCamera.get("/get", async (req, res) => {
     cameraDocs.forEach((doc) => {
       // cameras.push(doc.data());
       const cameraData = doc.data();
-      cameraData.building = doc.id; // 데이터 객체에 id 속성 추가
+
+      cameraData.locationName = doc.id; // 데이터 객체에 id 속성 추가
+
 
       cameras.push(cameraData);
     });
@@ -63,7 +67,9 @@ adminCamera.post("/set", async (req, res) => {
     await setDoc(doc(db, "Camera", `${locationName}`), {
       location: location,
       info: "",
+
       state: "",
+
     });
 
     res.status(200).json({ message: "Setting camera successfully" });
@@ -71,6 +77,8 @@ adminCamera.post("/set", async (req, res) => {
     res.status(400).json({ error: "Failed to setting camera location" });
   }
 });
+
+
 
 adminCamera.delete("/delete/:locationName", async (req, res) => {
   const locationName = req.params.locationName;
@@ -84,4 +92,21 @@ adminCamera.delete("/delete/:locationName", async (req, res) => {
   }
 });
 
+
+adminCamera.patch("/update/:locationName", async (req, res) => {
+  const locationName = req.params.locationName;
+  const updateData = req.body; // Data to update
+  try {
+    await setDoc(doc(db, "Camera", locationName), updateData, { merge: true }); // Set with merge to update fields
+    console.log(`Updated camera at location: ${locationName}`); // Log the update
+    res.status(200).json({ message: `Camera updated at ${locationName}` });
+  } catch (error) {
+    console.error(`Error updating camera at ${locationName}:`, error);
+    res.status(500).json({ message: "Failed to update camera location" });
+  }
+});
+
+
+
 export default adminCamera;
+

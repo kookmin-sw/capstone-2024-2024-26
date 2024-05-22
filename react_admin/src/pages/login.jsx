@@ -1,31 +1,61 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { authService } from '../firebase/fbInstance';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import kookmin_logo from '../image/kookmin_logo.jpg';
-import styles from "../styles/login.css";
+import '../styles/login.css';
+import Swal from 'sweetalert2';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    const onChange = (event) => {
-        const { name, value } = event.target;
-        if (name === "email") setEmail(value);
-        else if (name === "password") setPassword(value);
-    }
+  const handleLogin = async () => {
 
-    const onSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            await signInWithEmailAndPassword(authService, email, password);
-            navigate('/Main');
-        } catch (error) {
-            setError(error.message);
+    try {
+      const response = await axios.post("http://3.35.96.145:3000/adminAuth/signin", {
+        email,
+        password,
+      });
+
+      if (response.data.message === "Signin successful") {
+        // 로그인 성공 시 이메일 저장
+        localStorage.setItem("userEmail", email);  // 로컬 스토리지에 이메일 저장
+        const adminEmail = "react@kookmin.ac.kr"; // 관리자 이메일 설정
+        if (email === adminEmail) {
+            localStorage.setItem("isAdmin", "true"); // 관리자로 로그인된 상태 저장
+        } else {
+            localStorage.removeItem("isAdmin"); // 관리자가 아니면 관리자 상태 제거
         }
+        navigate("/main");
+      } else {
+        Swal.fire({
+          icon: "info",
+          title: "로그인 실패!",
+          text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+      });
+        setError("로그인 실패: " + response.data.message);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "info",
+        title: "로그인 실패!",
+        text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+    });
+      setError("로그인 실패: 서버 오류가 발생했습니다.");
+      Swal.fire({
+        icon: "info",
+        title: "로그인 실패!",
+        text: "아이디와 비밀번호를 확인해주시길 바랍니다",
+    });
     }
+  };
+
+  const onSubmit = (e) => {
+      e.preventDefault();  // 폼의 기본 제출 동작을 막습니다.
+      handleLogin();
+  };
 
     const backgroundImageStyle = {
         backgroundImage: `url(${kookmin_logo})`,
@@ -50,7 +80,7 @@ const Login = () => {
                             placeholder='exmaple@kookmin.ac.kr'
                             required
                             value={email}
-                            onChange={onChange} />
+                            onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <div className='form_group'>
                         <label htmlFor="Password">비밀번호</label>
@@ -61,7 +91,7 @@ const Login = () => {
                             placeholder="Password"
                             required
                             value={password}
-                            onChange={onChange} />
+                            onChange={(e) => setPassword(e.target.value)} />
                 </div>
                         <input
                             className='login_box_button'

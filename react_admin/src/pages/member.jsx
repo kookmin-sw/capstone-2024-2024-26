@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/app';
-import 'firebase/compat/firestore';
+import axios from 'axios';
 import Sidebar from './sideBar';
 import Banner from './banner';
 import '../styles/member.css';
+import Swal from 'sweetalert2';
 
 const Member = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [messageTitle, setMessageTitle] = useState('');
+  const [messageContent, setMessageContent] = useState('');
 
-  const fetchData = async () => {
-    const db = firebase.firestore();
-    const usersCollection = await db.collection('users').get();
-    return usersCollection.docs.map(doc => doc.data());
+  // 서버에서 회원 데이터를 가져오는 함수
+  const fetchMembers = async () => {
+    const userEmail = localStorage.getItem('userEmail');  // 로컬 스토리지에서 이메일 가져오기
+    try {
+      const response = await axios.get('http://3.35.96.145:3000/adminAuth/profile', {
+        headers: { email: userEmail }  // 이메일을 요청 본문에 포함
+      });
+      if (response.status === 200) {
+        setMembers(response.data.allUserData);  // 서버에서 보내준 데이터 구조에 맞춰 사용
+        return response.data.allUserData;
+      } else {
+        throw new Error('Fetching profiles failed');
+      }
+    } catch (error) {
+
+    }
   };
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const fetchedMembers = await fetchData();
-      setMembers(fetchedMembers);
-    };
-
-    fetchMembers();
+    fetchMembers(); // 컴포넌트 마운트 시 회원 정보 가져오기
   }, []);
 
   const filteredMembers = members.filter(member =>
@@ -31,11 +40,26 @@ const Member = () => {
   );
 
   const handleNotify = (member) => {
-    // 팝업 로직을 구현하거나 알림 메시지 전송
+    setSelectedMember(member);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedMember(null);
+    setMessageTitle('');
+    setMessageContent('');
+  };
+
+  const handleSendMessage = () => {
+    Swal.fire({
+      icon: "success",
+      title: "전송 성공!",
+      text: "알림을 성공적으로 전송하였습니다",
+  });
+    handleCloseModal();
   };
 
   const MemberTable = ({ members }) => (
-    <table>
+    <table className="table">
       <thead>
         <tr>
           <th className='name-header'>이름</th>
@@ -54,7 +78,7 @@ const Member = () => {
             <td>{member.faculty}</td>
             <td>{member.email}</td>
             <td>{member.phone}</td>
-            <td><button onClick={() => handleNotify(member)}>알림</button></td>
+            <td><button className='member_notify_button' onClick={() => handleNotify(member)}>🔔알림</button></td>
           </tr>
         ))}
       </tbody>
@@ -74,18 +98,53 @@ const Member = () => {
                 <input
                  type='text'
                  className='search_member'
-                 placeholder='학번 또는 이름'
+                 placeholder='학번 또는 이름 검색'
                  value={searchTerm}
                  onChange={e => setSearchTerm(e.target.value)}
                  />
-                 <button className='search_button'>검색</button>
               </div>
               <hr></hr>
+              <div className='memberTable_scroll'>
               <MemberTable members={filteredMembers} />
+              </div>
             </div>
           </div>
         </div>
       </div>
+      {selectedMember && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <span className="close-button" onClick={handleCloseModal}>&times;</span>
+            <h2 className="modal-title">알림 보내기</h2>
+            <div className="modal-body">
+              <div className="modal-row">
+                <span className="modal-label">이름:</span>
+                <span className="modal-data">{selectedMember.name}</span>
+                <span className="modal-label">학번:</span>
+                <span className="modal-data">{selectedMember.studentId}</span>
+              </div>
+              <div className="modal-row">
+                <label className="modal-label">제목:</label>
+                <input
+                  type="text"
+                  className="modal-input"
+                  value={messageTitle}
+                  onChange={e => setMessageTitle(e.target.value)}
+                />
+              </div>
+              <div className="modal-row">
+                <label className="modal-label">내용:</label>
+                <textarea
+                  className="modal-textarea"
+                  value={messageContent}
+                  onChange={e => setMessageContent(e.target.value)}
+                />
+              </div>
+            </div>
+            <button className="modal-send-button" onClick={handleSendMessage}>전송하기</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
