@@ -6,8 +6,8 @@ import base64
 from PIL import Image
 import io
 import os
-from ai.count import count
-from ai.image_class import classification
+from count import count
+from image_class import classification
 from waitress import serve
 from dotenv import load_dotenv
 from flask_cors import CORS
