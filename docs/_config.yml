@@ -1,0 +1,11 @@
+url: /kookmin-sw.github.io
+baseurl: /capstone-2024-26
+
+github: [metadata]
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+
+future: true
+published: true
