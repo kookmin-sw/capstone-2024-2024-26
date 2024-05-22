@@ -14,7 +14,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -54,7 +54,7 @@ router.post("/signup", async (req, res) => {
     // 이미 가입된 이메일인지 확인
     const signInMethods = await fetchSignInMethodsForEmail(auth, email);
     if (signInMethods && signInMethods.length > 0) {
-      console.error("Email already in use");
+      
       return res.status(400).json({ error: "Email already in use" });
     }
 
@@ -91,7 +91,9 @@ router.post("/signup", async (req, res) => {
 // 로그인
 router.post("/signin", async (req, res) => {
 
+
   const { email, password,fcmToken } = req.body;
+
 
 
   try {
@@ -103,7 +105,7 @@ router.post("/signin", async (req, res) => {
     );
     const user = userCredential.user;
 
-    await updateDoc(doc(db,"users",user.uid), {fcmToken: fcmToken});
+    await updateDoc(doc(db, "users", user.uid), { fcmToken: fcmToken });
 
     // 로그인 성공 시 사용자 정보 반환
     res.status(200).json({
@@ -182,7 +184,6 @@ router.post("/profile/update/:uid", async (req, res) => {
 // 프로필 조회
 router.post("/profile/:uid", async (req, res) => {
   const { uid } = req.body;
-
 
   try {
     // Firebase Firestore에서 해당 사용자의 문서를 가져옴
