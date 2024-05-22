@@ -14,7 +14,9 @@ import {
 import { initializeApp } from "firebase/app";
 import express from "express";
 import dotenv from "dotenv";
+
 import cron from "node-cron";
+
 
 dotenv.config();
 const firebaseConfig = {
@@ -48,24 +50,26 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
 
     const collectionName = `${userData.faculty}_Club`;
 
-    const collectionRef = collection(db, collectionName);
 
-    const existDoc = query(collectionRef);
+  const collectionRef = collection(db, collectionName);
+
 
     const existDocSnapShot = await getDocs(existDoc);
 
     const share_room_data = [];
 
-    existDocSnapShot.forEach((doc) => {
-      const existData = doc.data();
-      share_room_data.push({
-        roomName: doc.id,
+  const share_room_data = [];
+  
+  existDocSnapShot.forEach((doc) => {
+    const existData = doc.data();
+    share_room_data.push({
+      roomName: doc.id,
+      tableList : existData.tableList,
+      time: existData.available_Time,
+      people: existData.available_People,
+      clubRoomImage: existData.clubRoomImage,
+      clubRoomDesignImage : existData.clubRoomDesignImage,
 
-        time: existData.available_Time,
-        people: existData.available_People,
-        clubRoomImage: existData.clubRoomImage,
-        clubRoomDesignImage: existData.clubRoomDesignImage,
-      });
     });
 
     // 사용자의 예약 정보 반환
@@ -190,9 +194,11 @@ reserveClub.post("/", async (req, res) => {
           if (j === parseInt(tableNumber)) {
             tableInfo.name = userData.name;
             tableInfo.studentId = userData.studentId;
+
             tableInfo.status = "previous";
             tableInfo.startTime = startTime;
             tableInfo.endTime = endTime;
+
           }
           tableData.push(tableInfo);
         }
@@ -218,9 +224,11 @@ reserveClub.post("/", async (req, res) => {
           reservationData.tableData[index][`T${tableNumber}`] = true;
           reservationData.tableData[index].name = userData.name;
           reservationData.tableData[index].studentId = userData.studentId;
+
           reservationData.tableData[index].status = "previous";
           reservationData.tableDte[index].startTime = startTime;
           reservationData.tableDte[index].endTime = endTime;
+
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
@@ -372,7 +380,9 @@ reserveClub.get(
 
 // 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
 reserveClub.get(
-  "/reservationDone/:userId/:startDate/:endDate",
+
+  "/reservationPrevious/:userId/:startDate/:endDate",
+
   async (req, res) => {
     const userId = req.params.userId;
     const startDate = new Date(req.params.startDate);
@@ -427,10 +437,9 @@ reserveClub.get(
 
                 // 예약된 테이블 정보 조회
                 reservationData.tableData.forEach((table) => {
-                  if (
-                    table.studentId === userData.studentId &&
-                    table.status === "done"
-                  ) {
+
+                  if (table.studentId === userData.studentId && table.status === "previous") {
+
                     userReservations.push({
                       roomName: roomName,
                       date: dateString,
@@ -459,10 +468,107 @@ reserveClub.get(
   }
 );
 
+
+// 사용자별 특정 시작 날짜부터 특정 끝 날짜까지의 예약 내역 반환
+reserveClub.get(
+  "/reservationDone/:userId/:startDate/:endDate",
+  async (req, res) => {
+    const userId = req.params.userId;
+    const startDate = new Date(req.params.startDate);
+    const endDate = new Date(req.params.endDate);
+
+    try {
+      // 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, "users", userId));
+
+      if (!userDoc.exists()) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const userData = userDoc.data();
+
+
+      // 컬렉션 이름 설정
+      const collectionName = `${userData.faculty}_Club`;
+
+
+      // 사용자 예약 내역
+      const userReservations = [];
+
+
+      // 동아리방 컬렉션 참조
+      const facultyClubCollectionRef = collection(db, collectionName);
+
+      const querySnapshot = await getDocs(facultyClubCollectionRef);
+
+      // 비동기 처리를 위해 Promise.all 사용
+      await Promise.all(
+        querySnapshot.docs.map(async (roomDoc) => {
+          const roomName = roomDoc.id;
+
+
+          for (
+            let currentDate = new Date(startDate);
+            currentDate <= new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1)
+          ) {
+            const dateString = currentDate.toISOString().split("T")[0]; // yyyy-mm-dd 형식의 문자열로 변환
+
+
+            const dateCollectionRef = collection(
+              db,
+              `${collectionName}/${roomName}/${dateString}`
+            ); // 컬렉션 참조 생성
+
+            // 해당 날짜별 시간 대 예약 내역 조회
+            const timeDocSnapshot = await getDocs(dateCollectionRef);
+
+
+            timeDocSnapshot.forEach((docSnapshot) => {
+              const reservationData = docSnapshot.data();
+
+              if (reservationData && reservationData.tableData) {
+                const startTime = docSnapshot.id.split("-")[0];
+                const endTime = docSnapshot.id.split("-")[1];
+
+
+                // 예약된 테이블 정보 조회
+                reservationData.tableData.forEach((table) => {
+                  if (table.studentId === userData.studentId && table.status === "done") {
+                    userReservations.push({
+                      roomName: roomName,
+                      date: dateString,
+                      startTime: startTime,
+                      endTime: endTime,
+                      tableData: table,
+                    });
+                  }
+                });
+              }
+            });
+          }
+        })
+      );
+
+      // 사용자 예약 내역 반환
+      res.status(200).json({
+        message: "User reservations fetched successfully",
+        reservations: userReservations,
+      });
+    } catch (error) {
+      // 오류 발생 시 오류 응답
+      console.error("Error fetching user reservations", error);
+      res.status(500).json({ error: "Failed to fetch user reservations" });
+
+    }
+  }
+);
+
+
+
 // 동아리방 예약 취소
 reserveClub.post("/delete", async (req, res) => {
   let { userId, roomName, date, startTime, endTime, tableNumber } = req.body;
-  console.log(req.body);
+ 
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -510,35 +616,29 @@ reserveClub.post("/delete", async (req, res) => {
 
         // 해당 테이블 번호의 예약을 취소하고 상태를 false로 변경합니다.
         const index = parseInt(tableNumber) - 1;
+       
+        
 
-        // Debugging: 예약 데이터 출력
-        console.log(
-          `Before update: ${JSON.stringify(reservationData.tableData)}`
-        );
-
-        if (
-          reservationData.tableData &&
-          reservationData.tableData[index] &&
-          reservationData.tableData[index][`T${tableNumber}`]
-        ) {
+        if (reservationData.tableData && reservationData.tableData[index] && reservationData.tableData[index][`T${tableNumber}`]) {
+         
           // 예약 취소 및 테이블 상태 변경
           reservationData.tableData[index][`T${tableNumber}`] = false;
-          reservationData.tableData[index].name = ""
-          reservationData.tableData[index].studentId = "";
-          reservationData.tableData[index].status = "previous";
-          delete reservationData.tableData[index].startTime;
-          delete reservationData.tableData[index].endTime;
+          delete reservationData.tableData[index].name;
+          delete reservationData.tableData[index].studentId;
+          delete reservationData.tableData[index].status;
+
+          
 
           await updateDoc(reservationDocRef, {
             tableData: reservationData.tableData,
           });
         } else {
           // Debugging: 테이블 데이터가 없거나 상태가 false인 경우
-          console.log("Table data not found or already false");
+          console.log('Table data not found or already false');
         }
       } else {
         // Debugging: 예약 문서가 존재하지 않는 경우
-        console.log("Reservation document not found");
+        console.log('Reservation document not found');
       }
     }
 
@@ -548,6 +648,7 @@ reserveClub.post("/delete", async (req, res) => {
     return res.status(500).json({ error: "Failed to cancel reservation" });
   }
 });
+
 
 // 반납하기
 reserveClub.post("/return", async (req, res) => {
@@ -608,7 +709,10 @@ reserveClub.post("/return", async (req, res) => {
         // 기존에 예약된 테이블이 있는 경우, 해당 테이블만 true로 설정하고 업데이트
         // 특정 테이블 번호를 true로 설정합니다.
         const index = parseInt(tableNumber) - 1;
-        if (reservationData.tableData[index][`T${tableNumber}`] === true) {
+
+        if (
+          reservationData.tableData[index][`T${tableNumber}`] === true) {
+
           // 해당 테이블에 대해 name과 studentId도 업데이트
           reservationData.tableData[index].status = "done";
 
@@ -626,6 +730,7 @@ reserveClub.post("/return", async (req, res) => {
     res.status(500).json({ error: "Failed to return reservation club room" });
   }
 });
+
 
 // 모든 사용자가 반납을 잘했는지 판단
 cron.schedule("*/30 * * * *", async () => {
@@ -701,6 +806,7 @@ cron.schedule("*/30 * * * *", async () => {
     res.status(500).json({ error: "Failed to check penalty" });
   }
 });
+
 
 
 export default reserveClub;

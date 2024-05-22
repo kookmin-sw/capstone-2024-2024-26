@@ -342,9 +342,11 @@ reserveroom.get(
   }
 );
 
+
 // 사용자별 강의실 예약 내역 조회
 reserveroom.get(
-  "/reservationDone/:userId/:startDate/:endDate",
+  "/reservationsDone/:userId/:startDate/:endDate",
+
   async (req, res) => {
     const userId = req.params.userId;
     const startDate = new Date(req.params.startDate);
@@ -480,6 +482,7 @@ reserveroom.get(
         })
       );
 
+
       // 사용자 예약 내역 반환
       res.status(200).json({
         message: "User reservations fetched successfully",
@@ -523,6 +526,7 @@ reserveroom.post("/return", async (req, res) => {
         error: `${roomName} does not exist in ${collectionName} collection`,
       });
     }
+
 
     const dateCollection = collection(conferenceRoomDoc, date);
 
@@ -572,10 +576,12 @@ reserveroom.post("/return", async (req, res) => {
 // 동아리방 예약 취소
 reserveroom.post("/delete", async (req, res) => {
   const { userId, roomName, date, startTime, endTime } = req.body;
+
+
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
-
+   
     if (!userDoc.exists()) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -585,6 +591,7 @@ reserveroom.post("/delete", async (req, res) => {
     const collectionName1 = `${userData.faculty}_Classroom`;
 
     const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
+
 
     const existDocSnapShot1 = await getDoc(doc(db, collectionName1, roomName));
 
@@ -597,6 +604,7 @@ reserveroom.post("/delete", async (req, res) => {
       // 해당 문서가 존재하지 않는 경우
       return res.status(404).json({ error: "This Club room does not exist" });
     }
+
 
     const clubRoomDoc = doc(collection(db, collectionName), roomName);
 
@@ -615,7 +623,9 @@ reserveroom.post("/delete", async (req, res) => {
 
     if (!clubRoomDocSnap1.exists()) {
       return res.status(404).json({
-        error: `${roomName} does not exist in ${collectionName1} collection`,
+
+        error: `${roomName} does not exist in ${collectionName} collection`,
+
       });
     }
 
@@ -641,10 +651,12 @@ reserveroom.post("/delete", async (req, res) => {
       // 해당 시간대 예약 문서가 있는지 확인
       if (reservationDocSnap.exists()) {
         await deleteDoc(reservationDocRef);
-      }
+
+      } 
       if (reservationDocSnap1.exists()) {
         await deleteDoc(reservationDocRef1);
-      }
+      } 
+
     }
 
     res.status(200).json({ message: "Reservation canceled successfully" });

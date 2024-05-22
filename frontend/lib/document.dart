@@ -77,7 +77,7 @@ class _FormPageState extends State<FormPage> {
     final signatureBytes = await main_controller.toPngBytes();
     String base64Signature = base64Encode(signatureBytes!);
 
-    const url = 'http://192.168.200.103:3000/reserveroom/';
+    const url = 'http://3.35.96.145:3000/reserveroom/';
     final Map<String, String> data = {
       'userId': uid!,
       'roomName': roomName,
@@ -92,7 +92,6 @@ class _FormPageState extends State<FormPage> {
       'signature': base64Signature,
     };
 
-    debugPrint('$data');
     final response = await http.post(
       Uri.parse(url),
       body: json.encode(data),
@@ -102,8 +101,6 @@ class _FormPageState extends State<FormPage> {
     setState(() {
       isLoading = false; // 요청 완료 시 로딩 숨김
     });
-
-    debugPrint('${response.statusCode}');
 
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
@@ -131,7 +128,7 @@ class _FormPageState extends State<FormPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://192.168.200.103:3000/auth/profile/:uid';
+    const url = 'http://3.35.96.145:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -143,7 +140,6 @@ class _FormPageState extends State<FormPage> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 

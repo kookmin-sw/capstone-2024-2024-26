@@ -8,7 +8,7 @@ import 'package:frontend/loading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/myPage.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'notification.dart';
 import 'return.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,12 +16,17 @@ import 'select_reserve.dart';
 import 'congestion.dart';
 import 'select_reserve_cf.dart';
 import 'notice.dart';
+import 'sign_in.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -60,7 +65,6 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _checkLoginStatus();
     _permissionWithNotification();
-    _initialization();
   }
 
   void _permissionWithNotification() async {
@@ -70,40 +74,6 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void _initialization() async {
-    final FlutterLocalNotificationsPlugin _local =
-        FlutterLocalNotificationsPlugin();
-
-    AndroidInitializationSettings android =
-        const AndroidInitializationSettings("@mipmap/ic_launcher");
-
-    DarwinInitializationSettings ios = const DarwinInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
-    );
-
-    InitializationSettings settings =
-        InitializationSettings(android: android, iOS: ios);
-    await _local.initialize(settings);
-
-    NotificationDetails details = const NotificationDetails(
-      iOS: DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-      android: AndroidNotificationDetails(
-        "1",
-        "test",
-        importance: Importance.max,
-        priority: Priority.high,
-      ),
-    );
-
-    await _local.show(1, "title", "body", details);
-  }
-
   _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
@@ -111,10 +81,16 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token == 'true') {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainPage()),
+          MaterialPageRoute(builder: (context) => const SignIn()),
         );
       });
     } else if (token == 'false') {
+      Timer(const Duration(seconds: 2), () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const SignIn()),
+        );
+      });
+    } else {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const SignIn()),
@@ -162,7 +138,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
+    initNotification(context);
     _checkRoomStatus();
   }
 
@@ -183,11 +159,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   _checkRoomStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
+
     setState(() {
       isLoading = true; // 로딩 시작
     });
 
-    const url = 'http://192.168.200.103:3000/reserveclub/main_lentroom/:uid';
+    final url = 'http://3.35.96.145:3000/reserveclub/main_lentroom/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -199,20 +176,23 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
-          spaceData.add(responseData['share_room_data']);
-
+          spaceData = responseData['share_room_data'];
           isLoading = false; // 로딩 끝
         });
-      } else {}
+      } else {
+        setState(() {
+          isLoading = false; // 로딩 끝
+          String errorMessage = 'Failed to get room data';
+        });
+      }
     } else {
       setState(() {
-        String errorMessage = ''; // Define the variable errorMessage
-        errorMessage = 'no room';
+        isLoading = false; // 로딩 끝
+        String errorMessage = 'Failed to get room data';
       });
     }
   }
@@ -223,8 +203,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     setState(() {
       isLoading = true; // 로딩 시작
     });
-    const url =
-        'http://192.168.200.103:3000/reserveclub/main_conference_room/:uid';
+    const url = 'http://3.35.96.145:3000/reserveclub/main_conference_room/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -236,25 +215,28 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
-          spaceData2.add(responseData['share_room_data']);
+          spaceData2 = responseData['share_room_data'];
           isLoading = false; // 로딩 끝
         });
-      } else {}
+      } else {
+        setState(() {
+          isLoading = false; // 로딩 끝
+          String errorMessage = 'Failed to get room data';
+        });
+      }
     } else {
       setState(() {
-        String errorMessage = ''; // Define the variable errorMessage
-        errorMessage = 'no room';
+        isLoading = false; // 로딩 끝
+        String errorMessage = 'Failed to get room data';
       });
     }
   }
 
   List<dynamic> spaceData = [];
-
   List<dynamic> spaceData2 = [];
 
   @override
@@ -387,12 +369,23 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: is_tap
-                      ? (spaceData2.isEmpty ? 0 : spaceData2[0].length)
-                      : (spaceData.isEmpty ? 0 : spaceData[0].length),
+                      ? (spaceData2.isEmpty ? 0 : spaceData2.length)
+                      : (spaceData.isEmpty ? 0 : spaceData.length),
                   itemBuilder: (context, index) {
                     final data = is_tap
-                        ? (spaceData2.isNotEmpty ? spaceData2[0][index] : null)
-                        : (spaceData.isNotEmpty ? spaceData[0][index] : null);
+                        ? (spaceData2.isNotEmpty ? spaceData2[index] : null)
+                        : (spaceData.isNotEmpty ? spaceData[index] : null);
+
+                    List<dynamic> tableList = [];
+                    if (data != null && data['tableList'] is String) {
+                      try {
+                        tableList = json.decode(data['tableList']);
+                      } catch (e) {
+                        print('Error decoding tableList: $e');
+                      }
+                    } else if (data != null && data['tableList'] is List) {
+                      tableList = data['tableList'];
+                    }
 
                     return Column(
                       children: [
@@ -406,6 +399,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                 roomImage: data['clubRoomImage'] ??
                                     data['conferenceImage'],
                                 designImage: data['clubRoomDesignImage'] ?? '',
+                                tableList: tableList,
                                 istap: is_tap,
                               )
                             : Container(), // Return empty container if data is null
@@ -483,6 +477,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
   final String roomName;
   final String roomImage;
   final String designImage;
+  final List<dynamic> tableList;
   final bool istap;
 
   const _CustomScrollViewWidget({
@@ -492,6 +487,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
     required this.roomName,
     required this.roomImage,
     required this.designImage,
+    required this.tableList,
     required this.istap,
   }) : super(key: key);
 
@@ -550,24 +546,6 @@ class _CustomScrollViewWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 12,
-                right: 18,
-                child: GestureDetector(
-                  onTap: () {
-                    // 맵 버튼 눌렀을 때 이동할 화면
-                  },
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/map.png',
-                        width: 22,
-                        height: 22,
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -641,6 +619,7 @@ class _CustomScrollViewWidget extends StatelessWidget {
                             roomName: roomName,
                             time: time,
                             designImage: designImage,
+                            tableList: tableList,
                           )),
               );
             },

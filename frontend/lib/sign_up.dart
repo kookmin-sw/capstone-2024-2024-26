@@ -445,7 +445,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> registerUser() async {
-    const url = 'http://192.168.200.103:3000/auth/signup';
+    const url = 'http://3.35.96.145:3000/auth/signup';
     final Map<String, String> data = {
       'email': emailController.text,
       'password': passwordController.text,
@@ -467,7 +467,6 @@ class _SignUpState extends State<SignUp> {
       final responseData = json.decode(response.body);
 
       if (responseData['message'] == 'User created successfully') {
-        print('회원가입 성공'); // echo check
         // 회원가입 성공 시 회원가입 완료 화면으로 이동
         Navigator.push(
           context,

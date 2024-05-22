@@ -24,8 +24,14 @@ class MyNotice extends StatefulWidget {
 
 class _MyNoticeState extends State<MyNotice> {
   List<dynamic> notifications = [
-    {'title': '1', 'body': '금일 12시에 이용이 예정되어있습니다.', 'date': '5월 5일 11:50'},
-    {'title': '1', 'body': '버전 1.12 업데이트', 'date': '5월 5일 11:00'}
+    {'title': '이용알림', 'body': '🔔 232호 반납이 완료되었습니다.', 'date': '5월 21일 13:00'},
+    {
+      'title': '긴급',
+      'body': '🚨 신청한 강의실이 611호->232호로 변경되었습니다.',
+      'date': '5월 21일 12:50'
+    },
+    {'title': '이용알림', 'body': '🔔 12시 이용 예정이 되어 있습니다.', 'date': '5월 21일 11:50'},
+    {'title': '공지사항', 'body': '🛠 1.12 기능 업데이트', 'date': '5월 21일 11:00'}
   ]; // 서버에서 받아온 알림 데이터를 저장할 리스트
 
   String name = '';
@@ -38,21 +44,6 @@ class _MyNoticeState extends State<MyNotice> {
     _checkUidStatus();
     // fetchNotifications(); // 화면 로딩 시 알림 데이터를 가져옵니다.
   }
-
-  // // 서버로부터 알림 데이터를 받아오는 함수
-  // Future<void> fetchNotifications() async {
-  //   var url = 'http://localhost:3000/notifications'; // 서버 URL
-  //   var response = await http.get(Uri.parse(url));
-  //   var data = jsonDecode(response.body);
-  //   if (response.statusCode == 200) {
-  //     setState(() {
-  //       notifications = data; // 받아온 데이터를 notifications 리스트에 저장
-  //     });
-  //   } else {
-  //     // 오류 처리
-  //     print('Failed to fetch notifications');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +87,9 @@ class _MyNoticeState extends State<MyNotice> {
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(notifications[index]['title']),
+            title: Text(
+              notifications[index]['title'],
+            ),
             subtitle: Text(notifications[index]['body']),
             trailing: Text(notifications[index]['date']),
           );
@@ -279,7 +272,7 @@ class _MyNoticeState extends State<MyNotice> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString('uid');
 
-    const url = 'http://192.168.200.103:3000/auth/profile/:uid';
+    const url = 'http://3.35.96.145:3000/auth/profile/:uid';
 
     final Map<String, String> data = {
       'uid': uid ?? '',
@@ -291,11 +284,9 @@ class _MyNoticeState extends State<MyNotice> {
       headers: {'Content-Type': 'application/json'},
     );
 
-    debugPrint('${response.statusCode}');
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['message'] == 'User checking success') {
-        print(responseData['userData']);
         setState(() {
           name = responseData['userData']['name'];
           club = responseData['userData']['club'];

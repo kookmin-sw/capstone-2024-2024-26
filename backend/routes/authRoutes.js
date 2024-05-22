@@ -54,7 +54,7 @@ router.post("/signup", async (req, res) => {
     // 이미 가입된 이메일인지 확인
     const signInMethods = await fetchSignInMethodsForEmail(auth, email);
     if (signInMethods && signInMethods.length > 0) {
-      console.error("Email already in use");
+      
       return res.status(400).json({ error: "Email already in use" });
     }
 
@@ -90,7 +90,11 @@ router.post("/signup", async (req, res) => {
 
 // 로그인
 router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+
+
+  const { email, password,fcmToken } = req.body;
+
+
 
   try {
     // Firebase를 이용하여 이메일과 비밀번호로 로그인
