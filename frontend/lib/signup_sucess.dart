@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'sign_in.dart';
-import 'package:frontend/sign_in.dart';
-import 'dart:convert';
-import 'sign_up.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
 
 bool isLoading = false;
 
 class SignupSuccess extends StatelessWidget {
+  const SignupSuccess({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +14,7 @@ class SignupSuccess extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               '회원가입 완료',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -27,9 +24,9 @@ class SignupSuccess extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
-            Image.asset(
-              'assets/success.png', // Replace with your image path
+            const SizedBox(height: 20),
+            SvgPicture.asset(
+              'assets/icons/success.svg', // Replace with your image path
               width: 150,
               height: 150,
             ),
@@ -37,19 +34,19 @@ class SignupSuccess extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignIn()),
+                  MaterialPageRoute(builder: (context) => const SignIn()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF9F9F9),
+                backgroundColor: Colors.white,
                 minimumSize: const Size(265.75, 39.46),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(3)),
               ),
               child: Text(
                 isLoading ? '로딩 중...' : '로그인하기',
-                style: TextStyle(
-                  color: Color(0xFF3694A8),
+                style: const TextStyle(
+                  color: Color(0xFF004F9E),
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),

@@ -1,0 +1,189 @@
+.notice_container{
+    width: 90vw;
+    height: 92vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(208, 208, 208);
+}
+.notice{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.notice_box{
+    height: 88vh;
+    width: 86vw;
+    border-radius: 10px;
+    background-color: white;
+}
+.notice_table_scroll{
+    height: 76vh;
+    overflow-y: auto;
+}
+.notice_box_button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .notice_title {
+    margin-left: 2vw;
+    font-weight: bold;
+    font-size: 24px;
+  }
+  .notice_add_button {
+    position: absolute;
+    right: 5vw;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #004F9E;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .notice_add_button:hover {
+    background-color: #004f9eb8;
+  }
+  
+  .notice_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .notice_table th, .notice_table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .notice_table th {
+    background-color: #f2f2f2;
+  }
+  .table_date{
+    width: 4vw;
+  }
+  .table_category{
+    width: 4vw;
+  }
+  .table_content{
+    width: 30vw;
+    max-width: 30vw; /* 원하는 최대 너비 설정 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .notice_table td.notice-content-cell {
+    max-width: 30vw; /* 원하는 최대 너비 설정 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .table_delete{
+    width: 10vw;
+  }
+  
+  .notice_delete_button {
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .notice_delete_button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .modal-title {
+    margin-top: 0;
+    text-align: center;
+  }
+  
+  .modal-body {
+    margin-top: 20px;
+  }
+  
+  .modal-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .modal-label {
+    font-weight: bold;
+    width: 100px;
+  }
+  
+  .modal-data {
+    flex-grow: 1;
+  }
+  
+  .modal-input {
+    width: calc(100% - 110px);
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .modal-textarea {
+    width: calc(100% - 110px);
+    height: 100px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .send-button{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #004F9E;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 22vh;
+    font-size: 16px;
+  }
+  
+  .send-button:hover {
+    background-color: #004f9eaa;
+  }

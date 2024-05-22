@@ -1,0 +1,282 @@
+.addition_container{
+    width: 90vw;
+    height: 92vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(245, 244, 244);
+}
+
+.addition_box{
+    width: 40vw;
+    height: 88vh;
+    background-color: white;
+    border-radius: 20px;
+}
+.addition_banner{
+    height: 8vh;
+    display: flex;
+    flex: row;
+    align-items: center;
+}
+.addition_title{
+    font-weight: bolder;
+    font-size: larger;
+    margin: 0 20px;
+}
+.addition_room_button,
+.addition_club_button{  
+    height: 6vh;
+    width: 8vw;
+    margin-left: 20vw;
+    border-radius: 10px;
+    background-color: transparent;
+}
+.addition_room_button:hover,
+.addition_club_button:hover{
+    background-color: rgb(238, 238, 238);
+}
+.blank{
+    width: 3vw;
+}
+.addition_chart{
+    width: 40vw;
+    height: 75vh;
+    overflow-y: auto;
+    background-color: transparent;
+}
+.popup-inner {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.popup_inner_banner{
+    display: flex;
+    flex-direction: row ;
+}
+.popup_inner_box{
+    display: flex;
+    flex-direction: row;
+    height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.popup_inner_input_image{
+    display: flex;
+    flex-direction: column;
+}
+.image_preview {
+    height: 35vh;
+    width: 20vw;
+    max-width: 100%;
+    max-height: 150px; /* 최대 높이 설정 */
+    margin-bottom: 10px;
+    object-fit: contain; /* 이미지가 왜곡되지 않도록 조정 */
+    background-color: transparent;
+}
+.chart_element_image {
+    padding: 1vw;
+    width: 20vw; /* 이미지 컨테이너의 너비를 100%로 설정 */
+    height: 200px; /* 고정된 높이 설정, 필요에 따라 조절 가능 */
+    overflow: hidden; /* 이미지가 div 크기를 넘어갈 때 숨김 처리 */
+}
+.roomImage_preview {
+    width: 100%; /* 이미지 너비를 부모 컨테이너에 맞춤 */
+    height: 100%; /* 이미지 높이를 부모 컨테이너에 맞춤 */
+    object-fit: cover; /* 비율을 유지하면서 컨테이너를 가득 채우도록 조정 */
+}
+.addition_chart ul {
+    list-style-type: none; /* 리스트 아이템 앞의 불릿을 제거 */
+    padding: 0;
+    margin: 0;
+}
+
+.addition_chart li {
+    margin-bottom: 20px; /* 리스트 아이템 간의 간격 */
+    border-bottom: 1px solid #ccc; /* 아래쪽에 경계선 추가 */
+    padding-bottom: 10px; /* 경계선 아래쪽 패딩 */
+}
+
+.addition_chart p {
+    margin: 5px 0; /* 각 문단 사이의 마진 조정 */
+}
+.addition_chart_element{
+    width: 38vw;
+    height: 32vh;
+    display: flex;
+    flex-direction: row;
+    background-color: transparent;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+.chart_element_data{
+    width: 20vw;
+    height: 35vh;
+    padding: 1vw;
+}
+.club_delete_button{
+    margin-top: 4vh;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid red;
+    height: 4vh;
+    width: 10vw;
+    color: red;
+    font-weight: bold;
+}
+.club_delete_button:hover{
+    background-color: rgb(254, 214, 214);
+}
+.room_delete_button{
+    margin-top: 6vh;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid red;
+    height: 4vh;
+    width: 10vw;
+    color: red;
+    font-weight: bold;
+}
+.room_delete_button:hover{
+    background-color: rgb(254, 214, 214);
+}
+/*공유공간 팝업 관련 CSS*/
+.popup_room_background{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+.popup_room {
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(255, 255, 255);
+    width: 40vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: 1px solid black;
+    padding: 10px;
+    z-index: 1051;
+}
+.popup_club_banner_title{
+    margin-left: 16vw;
+}
+.popup_club_banner_back{
+    font-size: larger;
+    background-color: transparent;
+    border: none;   
+    color: black;
+    margin-left: 10vw;
+}
+.popup_inner_input_data{
+    margin-left: 2vw;
+}
+.popup_inner_input_image{
+    margin-left: 5vw;
+}
+.popup_createClub_button{
+    position: absolute;
+    bottom: 5vh;
+    margin-left: 10vw;
+    width: 20vw;
+    height: 5vh;
+    position: absolute;
+    bottom: 5vh;
+    background-color: #004F9E;
+    border: 1px solid #004F9E;
+    color: white;
+    border-radius: 5px;
+}
+.popup_createClub_button:hover{
+    background-color: #004f9ebc;
+}
+/*강의실 팝업 관련 CSS*/
+.popup_class_background{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+.popup_class {
+    position: fixed; /* 고정된 위치 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    background-color: rgb(255, 255, 255);
+    width: 20vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    border: solid 1px black;
+    padding: 10px;
+    z-index: 1051;
+}
+.popup_room_banner_back{
+    font-size: larger;
+    background-color: transparent;
+    border: none;   
+    color: black;
+    margin-left: 3vw;
+}
+.popup_room_banner_title{
+    margin-left: 5vw;
+}
+.popup_inner_Club{
+    margin-left: 2vw;
+}
+.room_inputdata{
+    border: none;
+    width: 15vw;
+    height: 4vh;
+    border-bottom: 1px solid transparent;
+    border-radius: 1px;
+    background-color: rgba(187, 187, 187, 0.165);
+}
+.room_inputdata:focus{
+    outline: none;
+    border: 1px solid #004F9E;
+}
+.popup_input_title{
+    font-size: 1.5vh;
+    font-weight: bold;
+}
+.popup_creatRoom_button{
+    position: absolute;
+    bottom: 5vh;
+    background-color: #004F9E;
+    border: 1px solid #004F9E;
+    color: white;
+    width: 15vw;
+    height: 5vh;
+    margin-left: 2.6vw;
+    border-radius: 5px;
+}
+.popup_creatRoom_button:hover{
+    background-color: #004f9ebc;
+}
+.divide_line{
+    border-width: 0.1px;
+    font-size: 1px;
+    color: rgba(128, 128, 128, 0.099);
+    background-color: rgba(128, 128, 128, 0.078);
+}

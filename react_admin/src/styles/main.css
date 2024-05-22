@@ -1,0 +1,102 @@
+.sidebar-and-content{
+    display: flex;
+}
+.home_container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90vw;
+    height: 92vh;
+    background-color: rgb(245, 244, 244);
+
+}
+.todo_box1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.todo_number1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3vh;
+    width: 2vw;
+    background-color: red;
+    margin-left: 0.5vw;
+    border-radius: 1vw;
+    color: white;
+    font-weight: bold;
+}
+.name_todo1{
+    font-size: 3.5vh;
+    margin: 0.7vw;
+}
+.name_todo{
+    text-decoration: none;
+    font-size: 3vh;
+    margin: 0;
+    color: black;
+}
+.todo_function{
+    display: flex;
+    flex-direction: row;
+    padding: 1vh;
+    margin-left: 1vw;
+}
+.todo_number{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3vh;
+    width: 2vw;
+    background-color: rgb(186, 186, 186);
+    margin-left: 0.5vw;
+    border-radius: 1vw;
+    color: white;
+    font-weight: bold;
+}
+.todo_box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 3vw;
+}
+.graph_container{
+    display: flex;
+    flex-direction: row;
+    height: 63vh;
+}
+/*오늘 할일 베너 컨테이너*/
+.todo_container{
+    margin-bottom: 3vh;
+    height: 20vh;
+    width: 86vw;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+}
+/*방문자 그래프 컨테이너*/
+.graph1{
+    width: 42vw;
+    height: 63vh;
+    margin-right: 2vw;
+    margin-top: 1vh;
+    background-color: white;
+    border-radius: 15px;
+}
+.visitor_graph{
+    font-size: 3vh;
+    margin: 1vh 3vw;
+}
+/*총 할일 테이블 컨테이너*/
+.graph2{
+    width: 42vw;
+    height: 63vh;
+    margin-top: 1vh;
+    background-color: white;
+    border-radius: 15px;
+}
+.todo_table{
+    font-size: 3vh;
+    margin: 1vh 3vw;
+}

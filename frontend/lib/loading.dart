@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,13 +15,13 @@ class LoadingScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(50.0),
               child: Container(
                 child: LoadingAnimationWidget.inkDrop(
-                  color: Color(0xFF3694A8),
+                  color: const Color(0xFF004F9E),
                   size: 70.0,
                 ),
               ),
             ),
-            SizedBox(height: 30.0),
-            Text(
+            const SizedBox(height: 30.0),
+            const Text(
               '잠시만 기다려주세요...',
               textAlign: TextAlign.center,
               style: TextStyle(
