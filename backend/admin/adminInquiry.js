@@ -8,6 +8,7 @@ import {
   where,
   deleteDoc,
   updateDoc,
+  query,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -61,7 +62,6 @@ adminInquiry.post("/", async (req, res) => {
 
     const userDoc = userDocSnapshot.docs[0];
     const userData = userDoc.data();
-
     const collectionName = `${userData.faculty}_Inquiry`;
 
     // 학번을 문서 ID로 사용하여 문의 문서 참조 생성
@@ -74,6 +74,7 @@ adminInquiry.post("/", async (req, res) => {
 
     const offset = 1000 * 60 * 60 * 9;
     const koreaNow = new Date(new Date().getTime() + offset);
+    // YY-MM-DD HH:MM 형식
     const formattedDate = koreaNow
       .toISOString()
       .replace("T", " ")
@@ -115,6 +116,7 @@ adminInquiry.get("/list/:faculty/:startDate/:endDate", async (req, res) => {
     await Promise.all(
       querySnapshot.docs.map(async (student) => {
         const studentId = student.id;
+        console.log(studentId);
         for (
           let currentDate = new Date(startDate);
           currentDate <= new Date(endDate);
@@ -126,11 +128,14 @@ adminInquiry.get("/list/:faculty/:startDate/:endDate", async (req, res) => {
             `${collectionName}/${studentId}/${dateString}`
           ); // 컬렉션 참조 생성
 
+          // console.log(dateCollectionRef);
           // 해당 날짜별 시간 문서 조회
           const timeDocSnapshot = await getDocs(dateCollectionRef);
 
+          // console.log(timeDocSnapshot);
           timeDocSnapshot.forEach((docSnapshot) => {
             const reservationData = docSnapshot.data();
+            console.log(docSnapshot.id);
             // 문의 정보 조회
             allInquiry.push({
               faculty: reservationData.faculty,

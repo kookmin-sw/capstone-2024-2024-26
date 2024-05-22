@@ -139,7 +139,10 @@ adminRoom.post("/agree", async (req, res) => {
   const { studentId, roomName, date, startTime, endTime } = req.body;
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const user = query(
+      collection(db, "users"),
+      where("studentId", "==", studentId)
+    );
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -216,8 +219,6 @@ adminRoom.post("/agree", async (req, res) => {
           // 해당 시간대의 데이터를 컬렉션에 저장
 
           await setDoc(reservationDocRef, reservationDataLast);
-
-          await deleteDoc(reservationDocRefQueue);
         }
       }
     }
@@ -271,8 +272,6 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -286,8 +285,10 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+                  status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
+                  image: reservationData.image
                 });
               }
             });
@@ -349,8 +350,6 @@ adminRoom.get(
             timeDocSnapshot.forEach((docSnapshot) => {
               const reservationData = docSnapshot.data();
               if (reservationData) {
-                
-
                 // 예약된 문서 정보 조회
                 userReservations.push({
                   roomName: reservationData.roomName,
@@ -364,6 +363,7 @@ adminRoom.get(
                   mainEmail: reservationData.mainEmail, // 대표자 이메일
                   participants: reservationData.participants,
                   usingPurpose: reservationData.usingPurpose,
+                  status: reservationData.status,
                   boolAgree: reservationData.boolAgree,
                   signature: reservationData.signature,
                 });
@@ -392,7 +392,10 @@ adminRoom.delete("/delete", async (req, res) => {
 
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
+    const user = query(
+      collection(db, "users"),
+      where("studentId", "==", studentId)
+    );
     const userDocSnapshot = await getDocs(user);
 
     if (userDocSnapshot.empty) {
@@ -433,26 +436,10 @@ adminRoom.delete("/delete", async (req, res) => {
 
 // 강의실 예약
 adminRoom.post("/reserve", async (req, res) => {
-  const {
-    roomName,
-    date,
-    startTime,
-    endTime,
-    usingPurpose
-  } = req.body;
+  const { faculty, roomName, date, startTime, endTime, usingPurpose } = req.body;
   try {
     // 사용자 정보 가져오기
-    const user = query(collection(db, "users"), where("studentId", "==", studentId));
-    const userDocSnapshot = await getDocs(user);
-
-    if (userDocSnapshot.empty) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const userDoc = userDocSnapshot.docs[0];
-    const userData = userDoc.data();
-
-    const collectionName = `${userData.faculty}_Classroom`;
+    const collectionName = `${faculty}_Classroom`;
 
     const facultyConferenceCollection = collection(db, collectionName);
     const conferenceRoomDoc = doc(facultyConferenceCollection, roomName);
@@ -488,32 +475,6 @@ adminRoom.post("/reserve", async (req, res) => {
       const reservationDocRef = doc(dateCollection, `${i}-${i + 1}`);
       const reservationDocSnap = await getDoc(reservationDocRef);
       if (!reservationDocSnap.exists()) {
-        if (studentIds.length !== parseInt(numberOfPeople) - 1) {
-          return res.status(401).json({
-            error: "The number of people does not match number of students",
-          });
-        } else {
-          // 각 학생의 이름과 전공을 저장할 배열
-          const studentNames = [];
-          const studentDepartments = [];
-          for (const studentId of studentIds) {
-            const collectionRef = collection(db, "users");
-            const userDoc = query(
-              collectionRef,
-              where("studentId", "==", studentId)
-            );
-
-            const userDocSnapshot = await getDocs(userDoc);
-            if (!userDocSnapshot.empty) {
-              const userData = userDocSnapshot.docs[0].data();
-              const studentName = userData.name;
-              const studentDepartment = userData.department;
-
-              // 배열에 학생의 이름과 전공 추가
-              studentNames.push(studentName);
-              studentDepartments.push(studentDepartment);
-            }
-          }
 
           await setDoc(reservationDocRef, {
             roomName: roomName,
@@ -529,10 +490,10 @@ adminRoom.post("/reserve", async (req, res) => {
             numberOfPeople: "",
             usingPurpose: usingPurpose,
             boolAgree: true,
+            status: "",
             signature: "",
           });
         }
-      }
     }
 
     // 예약 성공 시 응답

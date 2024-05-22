@@ -58,7 +58,6 @@ reserveroom.post("/", async (req, res) => {
 
     const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
 
-
     if (!existDocSnapShot.exists()) {
       // 해당 문서가 존재하지 않는 경우
       return res.status(404).json({ error: "This Classroom does not exists" });
@@ -80,7 +79,6 @@ reserveroom.post("/", async (req, res) => {
 
     const endTimeParts = endTime.split(":");
     const endTimeHour = parseInt(endTimeParts[0]);
-
 
     const timeDiff = endTimeHour - startTimeHour;
 
@@ -126,6 +124,7 @@ reserveroom.post("/", async (req, res) => {
             numberOfPeople: numberOfPeople,
             usingPurpose: usingPurpose,
             boolAgree: false,
+            status: "previous",
             signature: signature,
           });
         }
@@ -143,56 +142,49 @@ reserveroom.post("/", async (req, res) => {
   }
 });
 
-
-// 날짜 받았을때 가능 시간대 보여주기 
-reserveroom.post('/selectdate', async (req, res) => {
+// 날짜 받았을때 가능 시간대 보여주기
+reserveroom.post("/selectdate", async (req, res) => {
   const { userId, roomName, date } = req.body; // 클라이언트로부터 userId, roomName, date를 쿼리 파라미터로 받습니다.
 
- 
   try {
-      // 사용자 정보 가져오기
-      const userDoc = await getDoc(doc(db, "users", userId));
-      if (!userDoc.exists()) {
-          return res.status(404).json({ error: "User not found" });
-      }
-      const userData = userDoc.data();
+    // 사용자 정보 가져오기
+    const userDoc = await getDoc(doc(db, "users", userId));
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userData = userDoc.data();
 
-      const collectionName = `${userData.faculty}_Classroom`;
-      const clubRoomDoc = doc(db, collectionName, roomName);
+    const collectionName = `${userData.faculty}_Classroom`;
+    const clubRoomDoc = doc(db, collectionName, roomName);
 
-      // 해당 동아리방 정보 조회
-      const clubRoomDocSnap = await getDoc(clubRoomDoc);
-      if (!clubRoomDocSnap.exists()) {
-          return res.status(404).json({ error: "Club room does not exist" });
-      }
+    // 해당 동아리방 정보 조회
+    const clubRoomDocSnap = await getDoc(clubRoomDoc);
+    if (!clubRoomDocSnap.exists()) {
+      return res.status(404).json({ error: "Club room does not exist" });
+    }
 
-      // 해당 날짜에 대한 예약 컬렉션 참조
-      const dateCollection = collection(clubRoomDoc, date);
-      const querySnapshot = await getDocs(dateCollection);
-      
-      const reservations = [];
-      querySnapshot.forEach(doc => {
-          // 각 문서(예약)에서 예약된 시간추출
-          const data = doc.data();
-          reservations.push({
-              timeRange: doc.id, // 문서 ID는 예약 시간대 (예: "9-10")
-              
-          });
+    // 해당 날짜에 대한 예약 컬렉션 참조
+    const dateCollection = collection(clubRoomDoc, date);
+    const querySnapshot = await getDocs(dateCollection);
+
+    const reservations = [];
+    querySnapshot.forEach((doc) => {
+      // 각 문서(예약)에서 예약된 시간추출
+      const data = doc.data();
+      reservations.push({
+        timeRange: doc.id, // 문서 ID는 예약 시간대 (예: "9-10")
       });
+    });
 
-      // 예약된 시간대 반환
-      res.status(200).json({
-          
-          reservations: reservations
-      });
-
+    // 예약된 시간대 반환
+    res.status(200).json({
+      reservations: reservations,
+    });
   } catch (error) {
-      console.error("Error fetching reservations", error);
-      res.status(500).json({ error: "Failed to fetch reservations" });
+    console.error("Error fetching reservations", error);
+    res.status(500).json({ error: "Failed to fetch reservations" });
   }
 });
-
-
 
 // 사용자별 강의실 예약 내역 조회
 reserveroom.get(
@@ -354,6 +346,7 @@ reserveroom.get(
 // 사용자별 강의실 예약 내역 조회
 reserveroom.get(
   "/reservationsDone/:userId/:startDate/:endDate",
+
   async (req, res) => {
     const userId = req.params.userId;
     const startDate = new Date(req.params.startDate);
@@ -534,6 +527,7 @@ reserveroom.post("/return", async (req, res) => {
       });
     }
 
+
     const dateCollection = collection(conferenceRoomDoc, date);
 
     const startTimeParts = startTime.split(":");
@@ -582,7 +576,8 @@ reserveroom.post("/return", async (req, res) => {
 // 동아리방 예약 취소
 reserveroom.post("/delete", async (req, res) => {
   const { userId, roomName, date, startTime, endTime } = req.body;
-  console.log(req.body);
+
+
   try {
     // 사용자 정보 가져오기
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -597,6 +592,7 @@ reserveroom.post("/delete", async (req, res) => {
 
     const existDocSnapShot = await getDoc(doc(db, collectionName, roomName));
 
+
     const existDocSnapShot1 = await getDoc(doc(db, collectionName1, roomName));
 
     if (!existDocSnapShot.exists()) {
@@ -608,6 +604,7 @@ reserveroom.post("/delete", async (req, res) => {
       // 해당 문서가 존재하지 않는 경우
       return res.status(404).json({ error: "This Club room does not exist" });
     }
+
 
     const clubRoomDoc = doc(collection(db, collectionName), roomName);
 
@@ -626,7 +623,9 @@ reserveroom.post("/delete", async (req, res) => {
 
     if (!clubRoomDocSnap1.exists()) {
       return res.status(404).json({
+
         error: `${roomName} does not exist in ${collectionName} collection`,
+
       });
     }
 
@@ -652,10 +651,12 @@ reserveroom.post("/delete", async (req, res) => {
       // 해당 시간대 예약 문서가 있는지 확인
       if (reservationDocSnap.exists()) {
         await deleteDoc(reservationDocRef);
+
       } 
       if (reservationDocSnap1.exists()) {
         await deleteDoc(reservationDocRef1);
       } 
+
     }
 
     res.status(200).json({ message: "Reservation canceled successfully" });
@@ -664,7 +665,4 @@ reserveroom.post("/delete", async (req, res) => {
     return res.status(500).json({ error: "Failed to cancel reservation" });
   }
 });
-
-
 export default reserveroom;
-

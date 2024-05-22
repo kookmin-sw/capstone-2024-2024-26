@@ -1,11 +1,4 @@
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  deleteUser,
-  fetchSignInMethodsForEmail,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import {
   setDoc,
   getFirestore,
   doc,
@@ -13,7 +6,7 @@ import {
   getDocs,
   getDoc,
   query,
-  collection
+  collection,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -28,36 +21,29 @@ const firebaseConfig = {
   appId: process.env.FLUTTER_APP_appId,
   measurementId: process.env.FLUTTER_APP_measurementId,
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const adminCamera = express.Router();
 
-adminCamera.post("/set", async (req, res) => {
-  const { location } = req.body;
-  try {
-    // 카메라 위치정보 등록
-    await setDoc(doc(db, "Camera", `${location}`), {
-      location: location,
-      message: `Camera setting at ${location}`,
-    });
-
-    res.status(200).json({ message: "Setting camera successfully" });
-  } catch (error) {
-    res.status(400).json({ error: "Failed to setting camera location" });
-  }
-});
-
 adminCamera.get("/get", async (req, res) => {
+  console.log("Received get request for cameras."); // 서버에서 요청 받음 확인 로그
   try {
     const cameraDocs = await getDocs(query(collection(db, "Camera")));
+    console.log("Query executed, documents count:", cameraDocs.size); // 문서 수 로깅
     if (cameraDocs.empty) {
+      console.log("No camera locations found."); // 데이터가 없는 경우 로그
       return res.status(400).json({ message: "No location for camera" });
     }
 
     const cameras = [];
     cameraDocs.forEach((doc) => {
-      cameras.push(doc.data());
+      // cameras.push(doc.data());
+      const cameraData = doc.data();
+      cameraData.building = doc.id; // 데이터 객체에 id 속성 추가
+
+      cameras.push(cameraData);
     });
 
     res.status(200).json({
@@ -67,6 +53,34 @@ adminCamera.get("/get", async (req, res) => {
   } catch (error) {
     console.error("Error retrieving camera locations:", error);
     res.status(500).json({ message: "Failed to retrieve camera locations" });
+  }
+});
+
+adminCamera.post("/set", async (req, res) => {
+  const { locationName, location } = req.body;
+  try {
+    // 카메라 위치정보 등록
+    await setDoc(doc(db, "Camera", `${locationName}`), {
+      location: location,
+      info: "",
+      state: "",
+    });
+
+    res.status(200).json({ message: "Setting camera successfully" });
+  } catch (error) {
+    res.status(400).json({ error: "Failed to setting camera location" });
+  }
+});
+
+adminCamera.delete("/delete/:locationName", async (req, res) => {
+  const locationName = req.params.locationName;
+  try {
+    await deleteDoc(doc(db, "Camera", locationName));
+    console.log(`Deleted camera at location: ${locationName}`); // Log the deletion
+    res.status(200).json({ message: `Camera deleted at ${locationName}` });
+  } catch (error) {
+    console.error(`Error deleting camera at ${locationName}:`, error);
+    res.status(500).json({ message: "Failed to delete camera location" });
   }
 });
 
