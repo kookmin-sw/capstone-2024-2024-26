@@ -5,14 +5,14 @@
 .sidebar_middle{
     display: flex;
     flex-direction: row;
-    height: 93vh;
+    height: 92vh;
 }
 .sidebar_middle a{
     text-decoration: none;
 }
 .sidebar{
     width: 10vw;
-    background-color: rgb(243, 243, 243);
+    background-color: rgb(255, 255, 255);
     display: flex;
     flex-direction: column;
     align-items: center;

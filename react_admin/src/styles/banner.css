@@ -4,12 +4,12 @@
     flex-direction: row;
     align-items: center;
     height: 7vh;
-    background-color: rgb(243, 243, 243);
+    background-color: rgb(255, 255, 255);
     border: solid 1px rgb(192, 192, 192);
 }
 .banner_title{
     margin-left: 2vw;
-    height: 6vh;
+    height: 4vh;
 }
 .logout_button{
     position: absolute;
@@ -18,7 +18,7 @@
     border: 1px solid white;
     border-radius: 4px;
     color: white;
-    background-color: transparent;
+    background-color: #004F9E;
 }
 .logout_button:hover{
     background-color: #0372e0;

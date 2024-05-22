@@ -1,0 +1,344 @@
+.classRoom_container{
+    width: 90vw;
+    height: 92vh;
+    background-color: rgb(245, 244, 244);
+}
+.classRoom{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.classRoom_box{
+    height: 42vh;
+    width: 86vw;
+    background-color: white;
+    margin-top: 3.5vh;
+    border-radius: 15px;
+}
+.classRoom_box_inner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.classRoom_title{
+    font-weight: bold;
+    margin: 0.5vw 0;
+}
+.classRoom_table{
+    max-height: 35vh;  /* 원하는 최대 높이 설정 */
+    overflow-y: auto;   /* 필요시 y축 스크롤 생성 */
+}
+.add-reservation-button{
+    position: absolute;
+    right: 5vw;
+    height: 4vh;
+    width: 10vw;
+    color: rgb(102, 102, 206);
+    font-weight: bolder;
+    background-color: white;
+    border: solid 1px rgb(134, 134, 248);
+    border-radius: 5px;
+}
+.add-reservation-button:hover{
+    background-color: rgba(137, 137, 215, 0.28);
+}
+  /* 모달 (팝업) 관련 CSS */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* 모달이 다른 요소들 위에 표시되도록 높은 z-index 설정 */
+  }
+  
+  /* 모달 컨텐츠 */
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 50%; /* 또는 적절한 너비 설정 */
+    max-width: 600px; /* 최대 너비 설정 */
+    height: 80vh;
+    overflow-y: auto;
+    z-index: 1051;
+  }
+  
+  /* 닫기 버튼 */
+  .close-button {
+    float: right;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .popup_form{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  .confirm_button{
+    color: white;
+    background-color: #004f9e;
+    border: 1px solid blue;
+    border-radius: 10px;
+    width: 10vw;
+    height: 8vh;
+    margin-top: 4vh;
+    margin-left: 26vw;
+  }
+  .confirm_button:hover{
+    background-color: #004f9e8b;
+  }
+  /* 대기열 테이블 CSS */
+  .confirm_date{
+    width: 7vw;
+  }
+  .confirm_name{
+    width: 7vw;
+  }
+  .confirm_id{
+    width: 7vw;
+  }
+  .confirm_room{
+    width: 7vw;
+  }
+  .confirm_time{
+    width: 10vw;
+  }
+  .confirm_image{
+    width: 15vw;
+  }
+  .confirm_form{
+    width: 10vw;
+  }
+  .confirm_delete{
+    width: 15vw;
+  }
+  /* 대기열 테이블 CSS */
+  .waiting_date{
+    width: 8vw;
+  }
+  .waiting_name{
+    width: 8vw;
+  }
+  .waiting_id{
+    width: 10vw;
+  }
+  .waiting_room{
+    width: 10vw;
+  }
+  .waiting_time{
+    width: 20vw;
+  }
+  .waiting_form{
+    width: 20vw;
+  }
+  .request-button{
+    border-radius: 5px;
+    border: 0.8px solid black;
+    background-color: transparent;
+    height: 4vh;
+    width: 6vw;
+  }
+  .request-button:hover{
+    background-color: rgb(238, 238, 238);
+  }
+  .response_room{
+    border-radius: 5px;
+    border: 0.8px solid black;
+    background-color: transparent;
+    height: 4vh;
+    width: 6vw;
+  }
+  .response_room:hover{
+    background-color: rgb(238, 238, 238);
+  }
+  .delete-button{
+    border-radius: 5px;
+    border: 0.8px solid rgb(250, 68, 68);
+    background-color: transparent;
+    height: 4vh;
+    width: 6vw;
+    color: red;
+  }
+  .delete-button:hover{
+    background-color: rgb(250, 226, 226);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-label {
+    display: inline-block;
+    width: 120px; /* 레이블의 고정 너비를 설정 */
+    font-weight: bold;
+  }
+  
+/* 폼 테이블 */
+.form-table {
+  width: 100%;
+  display: table;
+  border-collapse: separate;
+  border-spacing: 10px 15px;
+}
+
+/* 폼 행 */
+.form-row {
+  display: table-row;
+}
+
+/* 폼 셀 */
+.form-label, .admin-reserve-input {
+  display: table-cell;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+/* 폼 레이블 */
+.form-label {
+  font-weight: bold;
+  width: 150px; /* 레이블의 고정 너비를 설정 */
+}
+
+/* 폼 입력 */
+.admin-reserve-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* 버튼 */
+.admin-reservation-button {
+  background-color: #004f9e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20vh;
+  font-weight: bold;
+}
+
+.admin-reservation-button:hover {
+  background-color: #004f9eaa;
+}
+.admin_reserve_input{
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: calc(100% - 140px); /* 레이블 너비를 뺀 나머지 공간을 채움 */
+  }
+
+  .form_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    background-color: #f0f0f0;
+  }
+  .form_form_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25vh;
+    background-color: #f0f0f0;
+  }
+  
+  .form-container {
+    display: table;
+    border-collapse: collapse;
+    width: 600px;
+  }
+  
+  .form-row {
+    display: table-row;
+  }
+  
+  .form-cell, .form-sub-cell, .participant-sub-cell {
+    display: table-cell;
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .header {
+    background-color: #f2f2f2;
+  }
+  
+  .form-sub-container, .participant-sub-container {
+    display: table;
+    width: 100%;
+    height: 100%; /* Add this line to match the height */
+  }
+  
+  .form-sub-row, .participant-sub-row {
+    display: table-row;
+  }
+  
+  .sub-header {
+    background-color: #f9f9f9;
+    width: 100px;
+  }
+  
+  .form-sub-container .form-sub-cell,
+  .participant-sub-container .participant-sub-cell {
+    border: 1px solid #dddddd;
+    padding: 4px;
+  }
+  
+  .signature-image {
+    max-width: 100%;
+    height: auto;
+  }
+  .modal-backdrop-image{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* 모달이 다른 요소들 위에 표시되도록 높은 z-index 설정 */
+  }
+  .modal-content-image{
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 30%; /* 또는 적절한 너비 설정 */
+    max-width: 600px; /* 최대 너비 설정 */
+    height: 80vh;
+    overflow-y: auto;
+    z-index: 1051;
+  }
+  .return_image_alert{
+    font-weight: bold;
+  }
+  .retrunImage_close{
+    background-color: transparent;
+    font-weight: bold;
+    border: none;
+    margin-left: 7vw;
+  }
+  .retrunImage_close_title{
+    margin-left: 11vw;
+  }
+  .modal-content-image-title{
+    display: flex;
+    flex-direction: row;
+  }
+  .return-image{
+    width: 30vw;
+    height: 50vh;
+  }

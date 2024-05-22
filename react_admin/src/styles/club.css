@@ -1,0 +1,22 @@
+.club_date{
+    width: 10vw;
+}
+.club_room{
+    width: 15vw;
+}
+.club_time{
+    width: 15vw;
+}
+.club_table{
+    width: 10vw;
+}
+.club_id{
+    width: 15vw;
+}
+.club_return{
+    width: 20vw;
+}
+.club_table_box{
+    overflow-y: auto;
+    height: 70vh;
+}

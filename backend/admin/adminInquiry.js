@@ -8,7 +8,9 @@ import {
   where,
   deleteDoc,
   updateDoc,
-  query,
+
+  query
+
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import express from "express";
@@ -116,7 +118,8 @@ adminInquiry.get("/list/:faculty/:startDate/:endDate", async (req, res) => {
     await Promise.all(
       querySnapshot.docs.map(async (student) => {
         const studentId = student.id;
-        console.log(studentId);
+
+
         for (
           let currentDate = new Date(startDate);
           currentDate <= new Date(endDate);
@@ -128,14 +131,13 @@ adminInquiry.get("/list/:faculty/:startDate/:endDate", async (req, res) => {
             `${collectionName}/${studentId}/${dateString}`
           ); // 컬렉션 참조 생성
 
-          // console.log(dateCollectionRef);
+
           // 해당 날짜별 시간 문서 조회
           const timeDocSnapshot = await getDocs(dateCollectionRef);
 
-          // console.log(timeDocSnapshot);
           timeDocSnapshot.forEach((docSnapshot) => {
             const reservationData = docSnapshot.data();
-            console.log(docSnapshot.id);
+
             // 문의 정보 조회
             allInquiry.push({
               faculty: reservationData.faculty,
@@ -163,4 +165,6 @@ adminInquiry.get("/list/:faculty/:startDate/:endDate", async (req, res) => {
   }
 });
 
+
 export default adminInquiry;
+
