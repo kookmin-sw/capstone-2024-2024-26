@@ -1,6 +1,12 @@
-## 🏫 &nbsp;&nbsp;캠퍼스 공간 최적화를 위한 스마트 예약 플랫폼, <br>K-SharePlace
+<div align="center">
+<br>
+<br>
 
-## 포스터 사진
+# 🏫 &nbsp;&nbsp;캠퍼스 공간 최적화를 위한 스마트 예약 플랫폼, <br> K-SharePlace
+
+
+
+
 ![포스터](/read.me_image/poster.png)
 
 ## 1. 프로젝트 소개 및 의의
@@ -11,8 +17,7 @@
 
 ### 2️⃣ 프로젝트 소개
 
-공유공간과 강의실을 활용하여 교내의 공간부족 문제를 해결하고자 하여 나온 아이디어인 K-SharePlace 프로젝트는 앱을 중심으로 웹과 ai 기술을 접목하여 학부생들이 느끼는 공간부족 현상에 대한 해결책을 제시하고자 합니다. 공간부족 문제를 해결하기 위한 가장 효율적인 방법은 단과대학별로 학부생들이 스터디, 멘토-멘티 활동 등 각종 모임활동을 하기 위한 공간을 어렵지 않게 대여 할 수 있는 시스템이 구축되어야 한다고 생각하여, 가장 접근성이 뛰어난 스마트폰 앱으로 구현하였습니다. K-SharePlace는 이러한 점을 고려하여 학부생들이 앱을 통하여 강의실과 공유공간의 대여 가능여부를 쉽게 판단하고 예약할 수 있도록 설계했으며, 관리자 웹을 통하여 시스템이 필요한 단과대학에서 이 서비스를 사용하여 해당 단과대학에 알맞는 정보를 등록하고 앱을 관리하기 용이하게 구성하였습니다. 또한, AI 기술을 접목하여 강의실과 공유공간을 제외한 자습 혹은 회의를 할 수 있는 공간에 대한 혼잡도와 공유공간과 강의실 반납에 대한 사진을 분석하여 다음 학부생들을 위해 정리정돈을 잘 하였는지 분석해주어 관리자의 부담을 덜어주었습니다.
-
+첫번째로 K-SharePlace 프로젝트는 앱을 중심으로 관리자 웹과 ai 기술을 접목하여 학부생들이 느끼는 공간부족 현상에 대한 해결책을 제시하고자 합니다. 두번째로는 동아리-소모임 방을 최대한 공유공간으로 전환하고 강의실 대여를 예약가능하게 개방하는 정책을 제시하며 시스템을 설계했습니다. K-SharePlace는 관리자 웹을 통하여 어느 집단에서나 쉽게 예약 공간 등록이 가능하며 소속 학생들은 간편하게 예약이 가능합니다. 또한, AI 청결도 확인, 군중 밀집도 기술을 접목하여 관리에 용이하면서도 인구밀집으로 인한 학생들의 공간부족 갈증을 해결하려합니다.
 
  |공유 공간 예약|상세 테이블 선택|혼잡도 제공|AI 기반 반납 시스템|
 |---|---|---|---|
@@ -20,69 +25,65 @@
  
 ### 3️⃣ 기대 효과
 
-쉽고 효율적인 공간 예약 시스템을 도입함으로써 학생들과 교수진이 공간을 더욱 효과적으로 활용할 수 있게 되어 캠퍼스 내의 다양한 활동을 조화롭게 조절하고 공간 활용도를 최대화할 수 있습니다. AI 기술을 활용한 청결도 확인 시스템은 공간 관리의 효율성을 높여, 관리자는 시간과 노력을 절약할 수 있으며 사용자들은 항상 깨끗하고 쾌적한 환경에서 활동할 수 있습니다. 실시간으로 장소별 혼잡도를 제공함으로써 학생들이 혼잡한 장소를 피하고 분산되도록 유도할 수 있으며, 이는 캠퍼스 내 인구 분산을 도모하여 공간 부족 문제를 완화할 수 있습니다. 이 시스템은 관리자가 간단히 등록만 하면 모든 단과대학에서 사용할 수 있는 높은 확장성을 가지고 있어, 교내 공간 관리의 일원화와 효율성을 높일 수 있습니다. 자유 전공화 정책에 따라 동아리 수가 증가할 것으로 예상되는 상황에서 이 시스템은 더 많은 동아리와 학생들이 공간을 공유하고 활용할 수 있도록 지원하여, 그 기반이 될 수 있습니다. 또한, 교내 공간 예약 시스템을 일원화하고 공간 정보를 공유하는 커뮤니티로 나아감으로써 학생들 간의 소통과 협력을 촉진하고, 캠퍼스 내 자원을 보다 효율적으로 활용할 수 있게 될 것입니다.
+쉽고 효율적인 공간 예약 시스템을 도입함으로써 학생들과 관리자 모두가 공간을 더욱 효과적으로 관리하고 활용할 수 있게 되어 캠퍼스 내의 공간 활용도를 최대화할 수 있습니다. AI 기술을 활용한 청결도 확인 시스템은 관리의 효율성을 높여, 관리자는 시간과 노력을 절약할 수 있으며 사용자들은 항상 깨끗하고 쾌적한 환경을 이용 가능합니다.실시간으로 장소별 혼잡도를 제공함으로써 학생들이 혼잡한 장소를 피하고 분산되도록 유도할 수 있으며, 이는 캠퍼스 내 인구 분산을 도모하여 공간 부족 문제를 완화할 수 있습니다. 도서관 시설 예약 API 등이 제공된다면 교내 예약 시스템의 일원화로 더욱 체계화된 공간 예약 시스템이 완성될 수 있을 것으로 보이며 한계가 있더라도 추후 공간 부족 문제 해결에 대한 좋은 선례 및 기반이 되는 프로젝트가 될 수 있음을 기대합니다.
  
 
 
-## 2. 시연 영상
-     [![Video Label](http://img.youtube.com/vi/yvX1-mZZx_o/0.jpg)](https://youtu.be/yvX1-mZZx_o)
+## 2. 시연 영상 <br>(아래 사진을 클릭하세요 !)
 
+
+[![소개 영상](https://img.youtube.com/vi/yvX1-mZZx_o/sddefault.jpg)](https://youtu.be/yvX1-mZZx_o?t=0s) 
 
 
 ## 3. 팀 소개
 
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/b5a25016-8451-4dfd-a0f0-b069f894a018" height="150" width="180px;">
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/b5a25016-8451-4dfd-a0f0-b069f894a018" height="170" width="180px;">
 
 ```markdown
+
 😁 Name : 안수현(팀장)
 👨🏻‍💻 Student_ID : ****1621
 📧 Email: saker123456@kookmin.ac.kr
 🛠 Role: PM, Full Stack
 
-
-
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/735be5e0-e21c-4456-a973-ee365e565a86" height="170" width="180px;" >
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/735be5e0-e21c-4456-a973-ee365e565a86" height="150" width="170px;" >
 
 ```markdown
+
 😁 Name : 정의석
 👨🏻‍💻 Student_ID : ****3134
 📧 Email: jungus07@kookmin.ac.kr
 🛠 Role : Backend, DataBase
 
-
-
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/7657b2e9-1f79-4773-8ad8-f705819441b6" height="170" width="180px;" >
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/7657b2e9-1f79-4773-8ad8-f705819441b6" height="150" width="180px;" >
 
 ```markdown
+
 😁 Name : 정일형
 👨🏻‍💻 Student_ID : ****5303
 📧 Email: jungih1017@gmail.com
 🛠 Role : Frontend, Web Design 
 
-
-
 ```
 
-<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/068f5b2d-9fcd-41fe-9b4e-9f180d18a9f3" height="170"  width="180px;" >
+<img align=left src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/068f5b2d-9fcd-41fe-9b4e-9f180d18a9f3" height="150"  width="180px;" >
 
 ```markdown
+
 😁 Name : 이재훈
 👨🏻‍💻 Student_ID : ****3053
 📧 Email: jhoon5061@gmail.com
 🛠 Role : AI Model Serving
     
-
-
 ```
 
-## 4. 기술 스택
-  
- 
+## 4. 기술 스택 <br>
+
  ### ✔️ Front-end
  <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
  
@@ -176,5 +177,5 @@ SDK 설치
 최종 발표 자료:
 최종 보고서:
 ```
-
+</div>
         
