@@ -4,10 +4,10 @@
 
 # 🏫 &nbsp;&nbsp;캠퍼스 공간 최적화를 위한 스마트 예약 플랫폼, <br> K-SharePlace
 
+</div>
 
 
-
-![포스터](/read.me_image/poster.png)
+![poster](https://github.com/kookmin-sw/capstone-2024-26/assets/106470291/25c7a6f8-f13e-451b-82da-2af1b22c19c6)
 
 ## 1. 프로젝트 소개 및 의의
 
@@ -177,5 +177,5 @@ SDK 설치
 최종 발표 자료:
 최종 보고서:
 ```
-</div>
+
         
