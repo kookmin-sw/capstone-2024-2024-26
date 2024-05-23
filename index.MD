@@ -2,7 +2,7 @@
 <br>
 <br>
 
-<h1>🏫 &nbsp;&nbsp;캠퍼스 공간 최적화를 위한 스마트 예약 플랫폼,<br>K-SharePlace<h1> 
+<h1>🏫 &nbsp;&nbsp;캠퍼스 공간 최적화를 위한 스마트 예약 플랫폼,<br>K-SharePlace</h1> 
 
 </div>
 
@@ -111,24 +111,24 @@
  <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white">
  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white">
  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
- <h3>
+ </h3>
  <h3>🛠️ Back-end<br><br>
  <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white">
  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white">
  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=Flask&logoColor=white">
- <h3>
+ </h3>
  <h3>🤖 AI<br><br>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
   <img src="https://img.shields.io/badge/PyTorch-3776AB?style=for-the-badge&logo=Python&logoColor=white">
- <h3>
+ </h3>
  <h3>🤝 Common<br><br>
  <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
- <h3>
+ </h3>
  <h3>🚀 Deploy<br><br>
  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
  <img src="https://img.shields.io/badge/Amazon%20AWS-232F3E?style=for-the-badge&logo=Amazon%20AWS&logoColor=white">
- <h3>
+ </h3>
 </div>
 
 
@@ -203,7 +203,7 @@ SDK 설치
 
 ### Front-end(Web)
 ```
-1. git clone
+1. git clone https://github.com/kookmin-sw/capstone-2024-26.git
 2. cd react_admin
 3. npm install
 4. npm start
@@ -215,6 +215,14 @@ SDK 설치
 2. cd backend
 3. npm install 
 4. npm start
+```
+
+### AI-SERVER
+```
+1. git clone https://github.com/kookmin-sw/capstone-2024-26.git
+2. cd ai
+3. pip install -r requirements.txt
+4. python app.py
 ```
 
 <br>

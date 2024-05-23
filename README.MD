@@ -203,10 +203,10 @@ SDK 설치
 
 ### Front-end(Web)
 ```
-1. git clone
+1. git clone https://github.com/kookmin-sw/capstone-2024-26.git
 2. cd react_admin
 3. npm install
-4. npm
+4. npm start
 ```
 
 ### Back-end(Server)
@@ -215,6 +215,14 @@ SDK 설치
 2. cd backend
 3. npm install 
 4. npm start
+```
+
+### AI-SERVER
+```
+1. git clone https://github.com/kookmin-sw/capstone-2024-26.git
+2. cd ai
+3. pip install -r requirements.txt
+4. python app.py
 ```
 
 <br>
