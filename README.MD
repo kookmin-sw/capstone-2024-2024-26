@@ -220,10 +220,10 @@ SDK 설치
 <br>
 
 ## 8. 관련 자료
-```
-중간 발표 자료: [중간발표자료.pdf](중간발표자료.pdf)
-중간 보고서: [중간보고서.pdf](중간보고서.pdf)
-최종 발표 자료: [최종발표자료.pdf](최종발표자료.pdf)
-최종 보고서: [최종보고서.pdf](최종보고서.pdf)
-```
+
+
+[최종발표자료.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/15415749/default.pdf) <br>
+[수행결과보고서.pdf](https://github.com/kookmin-sw/capstone-2024-26/files/15415759/2024.26.-.pdf)
+
+
 
