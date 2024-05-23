@@ -1,1 +1,8 @@
-theme: jekyll-theme-slate
+# _config.yml
+
+source: docs
+
+sass:
+  style: compressed
+
+theme: jekyll-theme-primer
