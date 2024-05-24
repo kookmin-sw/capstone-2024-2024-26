@@ -31,6 +31,7 @@
 ## 2. 프로젝트 기능
 
 ### 📌&nbsp;&nbsp;핵심 기능
+[APP]
 <table>
   <tr>
     <th style="text-align:center;">공유 공간 예약</th>
@@ -44,9 +45,55 @@
     <td style="text-align:center;"><img src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/ad5499c3-8f0a-458d-b0f4-102d2e75c92f"></td>
     <td style="text-align:center;"><img src="https://github.com/kookmin-sw/capstone-2024-26/assets/70683738/542e73f0-96ab-464d-85c6-22e5d4242601"></td>
   </tr>
+
+
+</table>
+
+[WEB]
+<table>
+  <tr>
+    <th style="text-align:center;">관리자 공간 생성</th>
+   
+    
+  </tr>
+  <tr>
+    <td style="text-align:center;"><img src="https://github.com/kookmin-sw/capstone-2024-26/assets/106470291/d599560c-50ee-47f0-9cf1-a5248e7f5351"></td>
+    <br>
+    
+  </tr>
+
+</table>
+
+<table>
+  <tr>
+    <th style="text-align:center;"> 승인 내역 관리</th>
+   
+    
+  </tr>
+  <tr>
+    <td style="text-align:center;"><img src="https://github.com/kookmin-sw/capstone-2024-26/assets/106470291/8aaf0034-e17a-4e95-969b-857ce75bb51a"></td>
+    <br>
+    
+  </tr>
+
+</table>
+
+<table>
+  <tr>
+    <th style="text-align:center;"> 예약 내역 확인</th>
+   
+    
+  </tr>
+  <tr>
+    <td style="text-align:center;"><img src="https://github.com/kookmin-sw/capstone-2024-26/assets/106470291/2d7aff46-089f-45cd-8652-f0f18f15d64c"></td>
+    <br>
+    
+  </tr>
+
 </table>
 
 <br>
+
 
 ## 3. 시연 영상&nbsp;&nbsp;<small>(아래 사진을 클릭해주세요 !)</small>
 
