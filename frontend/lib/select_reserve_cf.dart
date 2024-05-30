@@ -79,7 +79,7 @@ class _select_cf extends State<Select_reserve_cf> {
         'userId': uid!,
         'roomName': roomName,
         'date':
-            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
+            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
       };
 
       final response = await http.post(

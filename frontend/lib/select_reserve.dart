@@ -168,7 +168,7 @@ class _select extends State<Select_reserve> {
         'userId': uid!,
         'roomName': roomName,
         'date':
-            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
+            '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
       };
       print(data);
 
@@ -882,7 +882,7 @@ class _select extends State<Select_reserve> {
       'userId': uid!,
       'roomName': roomName,
       'date':
-          '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
+          '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
       'startTime': startTime,
       'endTime': endTime,
       'tableNumber': table_number.toString(),

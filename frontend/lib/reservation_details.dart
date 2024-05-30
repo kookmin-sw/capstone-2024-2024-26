@@ -122,7 +122,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         Map<String, dynamic> data = json.decode(response.body);
         if (mounted) {
           setState(() {
-            reservations = mergeConsecutiveReservations(data['reservations']);
+            reservations =
+                mergeConsecutiveReservations(data['reservations'], false);
             isLoading = false;
           });
         }
@@ -157,7 +158,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         if (mounted) {
           setState(() {
             classroomReservations =
-                mergeConsecutiveReservations(data['previousReservation']);
+                mergeConsecutiveReservations2(data['previousReservation']);
 
             isLoading = false;
           });
@@ -170,27 +171,67 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     }
   }
 
-  List<dynamic> mergeConsecutiveReservations(List<dynamic> reservations) {
+  List<dynamic> mergeConsecutiveReservations(
+      List<dynamic> reservations, bool isClassroom) {
     if (reservations.isEmpty) return [];
+
+    // 날짜와 시작 시간으로 예약을 정렬
     reservations.sort((a, b) {
       if (a['date'] == b['date']) {
-        if (a['startTime'] == b['startTime']) {
-          return a['tableData'].compareTo(b['tableData']);
-        }
         return a['startTime'].compareTo(b['startTime']);
       }
       return a['date'].compareTo(b['date']);
     });
-    List<dynamic> merged = [];
 
+    List<dynamic> merged = [];
     var current = reservations.first;
 
     for (var i = 1; i < reservations.length; i++) {
       var next = reservations[i];
-      if (current['date'] == next['date'] &&
+      bool canMerge = current['date'] == next['date'] &&
           current['endTime'] == next['startTime'] &&
-          current['tableData'] == next['tableData']) {
+          current['roomName'] == next['roomName'] &&
+          (isClassroom ||
+              getKeyWithTrueValue(current['tableData']) ==
+                  getKeyWithTrueValue(next['tableData']));
+
+      if (canMerge) {
         current['endTime'] = next['endTime'];
+      } else {
+        merged.add(current);
+        current = next;
+      }
+    }
+
+    merged.add(current);
+    return merged;
+  }
+
+  List<dynamic> mergeConsecutiveReservations2(List<dynamic> reservations) {
+    if (reservations.isEmpty) return [];
+
+    // 날짜와 시작 시간으로 예약을 정렬
+    reservations.sort((a, b) {
+      if (a['date'] == b['date']) {
+        return a['startTime'].compareTo(b['startTime']);
+      }
+      return a['date'].compareTo(b['date']);
+    });
+
+    List<dynamic> merged = [];
+    var current = reservations.first;
+
+    for (var i = 1; i < reservations.length; i++) {
+      var next = reservations[i];
+
+      // 같은 날짜에 같은 강의실에서 예약 시간이 겹치거나 연속되는 경우
+      if (current['date'] == next['date'] &&
+          current['roomName'] == next['roomName'] &&
+          (current['endTime'].compareTo(next['startTime']) >= 0)) {
+        // 종료 시간이 다음 시작 시간과 겹치거나 더 큰 경우, 종료 시간을 다음 예약의 종료 시간으로 갱신
+        if (current['endTime'].compareTo(next['endTime']) < 0) {
+          current['endTime'] = next['endTime'];
+        }
       } else {
         merged.add(current);
         current = next;
@@ -223,7 +264,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         if (mounted) {
           setState(() {
             done_reservations =
-                mergeConsecutiveReservations(data['reservations']);
+                mergeConsecutiveReservations(data['reservations'], false);
             isLoading = false;
           });
         }
@@ -257,7 +298,7 @@ class _Details extends State<Details> with WidgetsBindingObserver {
         if (mounted) {
           setState(() {
             classroomDoneReservations =
-                mergeConsecutiveReservations(data['doneReservation']);
+                mergeConsecutiveReservations2(data['doneReservation']);
             isLoading = false;
           });
         }
