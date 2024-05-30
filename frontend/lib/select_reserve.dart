@@ -170,6 +170,7 @@ class _select extends State<Select_reserve> {
         'date':
             '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day}',
       };
+      print(data);
 
       final response = await http.post(
         Uri.parse(url),
@@ -945,7 +946,8 @@ class _select extends State<Select_reserve> {
       ),
     );
 
-    await _local.show(1, "예약 완료", "${roomName} 예약이 완료되었습니다.", details); // 알림 전송
+    await _local.show(
+        1, "K-SharePlace", "${roomName} 예약이 완료되었습니다.", details); // 알림 전송
   }
 
   void showErrorAndReset(int index, String message) {

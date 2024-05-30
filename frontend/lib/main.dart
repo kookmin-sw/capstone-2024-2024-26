@@ -81,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token == 'true') {
       Timer(const Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const SignIn()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       });
     } else if (token == 'false') {
@@ -181,6 +181,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       if (responseData['message'] == 'successfully get lentroom') {
         setState(() {
           spaceData = responseData['share_room_data'];
+
           isLoading = false; // 로딩 끝
         });
       } else {

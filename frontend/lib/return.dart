@@ -553,8 +553,8 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       ),
     );
 
-    await _local.show(
-        1, "반납 알림", "${widget.roomName} 성공적으로 반납이 완료되었습니다. ", details); // 알림 전송
+    await _local.show(1, "K-SharePlace",
+        "${widget.roomName} 성공적으로 반납이 완료되었습니다. ", details); // 알림 전송
   }
 
   @override

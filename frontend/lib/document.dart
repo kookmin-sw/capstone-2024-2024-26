@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'dart:typed_data'; // 서명을 이미지 데이터로 변환하기 위해 필요
 import 'complete_cf.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class FormPage extends StatefulWidget {
   final DateTime selectedDate;
@@ -68,6 +69,31 @@ class _FormPageState extends State<FormPage> {
     _checkUidStatus();
   }
 
+  Future<void> _showNotification() async {
+    final FlutterLocalNotificationsPlugin _local =
+        FlutterLocalNotificationsPlugin();
+
+    DarwinInitializationSettings ios = const DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    InitializationSettings settings = InitializationSettings(iOS: ios);
+    await _local.initialize(settings);
+
+    NotificationDetails details = const NotificationDetails(
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+
+    await _local.show(1, "K-SharePlace", "${widget.roomName} 예약 신청이 완료되었습니다.",
+        details); // 알림 전송
+  }
+
   Future<void> Reservation(BuildContext context, String room_name) async {
     setState(() {
       isLoading = true; // 요청 시작 시 로딩 시작
@@ -100,6 +126,7 @@ class _FormPageState extends State<FormPage> {
 
     setState(() {
       isLoading = false; // 요청 완료 시 로딩 숨김
+      _showNotification();
     });
 
     if (response.statusCode == 201) {

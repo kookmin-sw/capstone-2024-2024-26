@@ -174,6 +174,9 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     if (reservations.isEmpty) return [];
     reservations.sort((a, b) {
       if (a['date'] == b['date']) {
+        if (a['startTime'] == b['startTime']) {
+          return a['tableData'].compareTo(b['tableData']);
+        }
         return a['startTime'].compareTo(b['startTime']);
       }
       return a['date'].compareTo(b['date']);
@@ -185,7 +188,8 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     for (var i = 1; i < reservations.length; i++) {
       var next = reservations[i];
       if (current['date'] == next['date'] &&
-          current['endTime'] == next['startTime']) {
+          current['endTime'] == next['startTime'] &&
+          current['tableData'] == next['tableData']) {
         current['endTime'] = next['endTime'];
       } else {
         merged.add(current);
