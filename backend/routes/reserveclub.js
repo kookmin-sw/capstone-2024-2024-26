@@ -34,7 +34,7 @@ const reserveClub = express.Router();
 
 // 관리자가 등록한 예약 가능 공유공간 조회 (메인)
 reserveClub.post("/main_lentroom/:uid", async (req, res) => {
-  const { uid } = req.params;
+  const { uid } = req.body;
 
   try {
     // 사용자 정보 가져오기
@@ -75,7 +75,7 @@ reserveClub.post("/main_lentroom/:uid", async (req, res) => {
 
 // 관리자가 등록한 예약 가능 강의실 조회 (메인)
 reserveClub.post("/main_conference_room/:uid", async (req, res) => {
-  const { uid } = req.params;
+  const { uid } = req.body;
 
   try {
     // 사용자 정보 가져오기
