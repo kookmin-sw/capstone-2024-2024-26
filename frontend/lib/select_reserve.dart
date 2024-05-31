@@ -144,6 +144,15 @@ class _select extends State<Select_reserve> {
         updatedIsButtonPressedList[startIndex] = true;
       }
     }
+
+    DateTime now = DateTime.now();
+    int currentHour = now.hour;
+    for (int i = 0; i < 16; i++) {
+      int hour = i + 9;
+      if (hour < currentHour) {
+        updatedIsButtonPressedList[i] = true;
+      }
+    }
   }
 
   Future<void> _checkFirstVisit() async {

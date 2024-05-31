@@ -67,6 +67,17 @@ class _select_cf extends State<Select_reserve_cf> {
         updatedIsButtonPressedList[i] = true;
       }
     }
+
+    DateTime now = DateTime.now();
+    if (isSameDay(selectedDate, now)) {
+      int currentHour = now.hour;
+      for (int i = 0; i < 16; i++) {
+        int hour = i + 9;
+        if (hour <= currentHour) {
+          updatedIsButtonPressedList[i] = true;
+        }
+      }
+    }
   }
 
   // 선택된 날짜를 서버로 전송하는 함수
@@ -93,7 +104,7 @@ class _select_cf extends State<Select_reserve_cf> {
         // 서버 응답이 성공적인 경우
 
         reservations = json.decode(response.body);
-        _checkReservation(reservations);
+        await _checkReservation(reservations);
       } else {
         // 서버 에러 처리
         print('Failed to send date. Status code: ${response.statusCode}');
@@ -444,7 +455,6 @@ class _select_cf extends State<Select_reserve_cf> {
                                                 isTimeSelected =
                                                     isButtonPressedList.any(
                                                         (element) => element);
-                                                ;
                                                 if (isButtonPressedList[
                                                         index] ==
                                                     true) {
@@ -459,7 +469,6 @@ class _select_cf extends State<Select_reserve_cf> {
                                                   setting -= 1;
                                                   if (setting == 0) {
                                                     st = 0;
-
                                                     ed = 0;
                                                   } else if (setting <= 1) {
                                                     st = ed;

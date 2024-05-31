@@ -175,6 +175,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       body: json.encode(data),
       headers: {'Content-Type': 'application/json'},
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);

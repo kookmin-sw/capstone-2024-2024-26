@@ -189,14 +189,18 @@ class _Details extends State<Details> with WidgetsBindingObserver {
     for (var i = 1; i < reservations.length; i++) {
       var next = reservations[i];
       bool canMerge = current['date'] == next['date'] &&
-          current['endTime'] == next['startTime'] &&
           current['roomName'] == next['roomName'] &&
           (isClassroom ||
               getKeyWithTrueValue(current['tableData']) ==
                   getKeyWithTrueValue(next['tableData']));
 
-      if (canMerge) {
-        current['endTime'] = next['endTime'];
+      if (canMerge &&
+          (current['endTime'] == next['startTime'] ||
+              current['endTime'].compareTo(next['startTime']) > 0)) {
+        // 병합할 예약 시간이 겹치는 경우 현재 예약의 끝 시간을 다음 예약의 끝 시간으로 갱신
+        current['endTime'] = current['endTime'].compareTo(next['endTime']) > 0
+            ? current['endTime']
+            : next['endTime'];
       } else {
         merged.add(current);
         current = next;
